@@ -1,0 +1,82 @@
+body {
+  margin: 0;
+  background: url("connectwork/connectwork.png");
+  background-size: auto;
+  font-family: Work Sans, sans-serif;
+  font-weight: 500;
+  font-size: 1.25em;
+  /*
+Use to have static background on site
+   background-image:
+  background-position: scroll
+  */
+}
+header::after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+header {
+    background-color: white ;
+}
+
+
+.container{
+  width: 80%;
+  margin: 0 auto;
+}
+
+.logo{
+  float: left;
+  padding: 10px 0;
+}
+
+nav{
+  float: right;
+}
+
+nav ul{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+nav li{
+  display: inline-block;
+  margin-left: 70px;
+  margin-right: 40px;
+  padding-top: 45px;
+
+  position: relative;
+
+}
+
+nav ul li a {
+    color: #444;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+nav a:hover {
+    color: #0000;
+}
+
+nav a::before {
+    content: '';
+    display: block;
+    height: 5px;
+    background-color: black;
+
+    position: absolute;
+    top: 1.5em;
+    width: 0%;
+
+    transition: all ease-in-out 0;
+
+}
+
+nav a:hover::before {
+    width: 100%;
+    transition: 450ms;
+}
