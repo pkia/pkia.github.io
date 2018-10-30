@@ -21,6 +21,10 @@ header {
     background-color: white ;
 }
 
+head {
+  cursor: url("Egg.cur");
+}
+
 
 .container{
   width: 80%;
@@ -34,6 +38,13 @@ header {
 
 nav{
   float: right;
+}
+
+body ul li {
+  color: black;
+  margin-left: 25px;
+  text-align: left;
+  position:relative;
 }
 
 nav ul{
