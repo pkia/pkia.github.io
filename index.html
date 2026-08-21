@@ -1,72 +1,393 @@
-
 <!DOCTYPE html>
 <html lang="en">
-	<head>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Evan Dunbar — Site Reliability Engineer</title>
+  <meta name="description" content="Evan Dunbar is a Site Reliability Engineer at Cohesity in Cork, Ireland, building reliable production systems by day and self-hosted maritime infrastructure on a Raspberry Pi by night." />
+  <meta property="og:title" content="Evan Dunbar — Site Reliability Engineer" />
+  <meta property="og:description" content="Reliable systems in production, ship radar at home. SRE @ Cohesity, Cork, Ireland." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://pkia.github.io/" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-		<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-127859751-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="#top">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>evan&nbsp;dunbar</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#experience">Experience</a>
+        <a href="#journey">Journey</a>
+        <a href="#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
 
-  gtag('config', 'UA-127859751-1');
-</script>
+  <main id="main">
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="top">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="hero-role reveal"><span class="dot" aria-hidden="true"></span> Site Reliability Engineer · Cohesity</p>
+          <h1 class="hero-name reveal">
+            <span class="line">Evan</span>
+            <span class="line">Dunbar<span class="accent">.</span></span>
+          </h1>
+          <p class="hero-tagline reveal">
+            Pragmatic, delivery-oriented engineer with a weakness for
+            <strong>reliability</strong>, <strong>radio antennas</strong> and the
+            <strong>south coast of Ireland</strong>. I keep production systems
+            healthy at work — and run a 24/7 ship-tracking station from a
+            Raspberry Pi at home.
+          </p>
+          <div class="hero-actions reveal">
+            <a class="btn btn-primary" href="#projects">View my work
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a class="btn btn-ghost" href="mailto:evandunb@gmail.com">Get in touch</a>
+          </div>
+          <p class="hero-note reveal">glad you're here ⚓</p>
+        </div>
 
-		<link href="favicon.ico" rel="icon" type="#" />
-		<link rel="stylesheet" href="assets/css/style.css">
-		<meta charset="utf-8" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<title>Evan Dunbar</title>
-	</head>
-	<body>
+        <div class="hero-radar reveal" aria-hidden="true">
+          <svg viewBox="0 0 420 420" role="img" aria-label="Animated ship radar">
+            <defs>
+              <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="var(--accent)" stop-opacity=".55"/>
+                <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <circle cx="210" cy="210" r="190" class="radar-ring"/>
+            <circle cx="210" cy="210" r="140" class="radar-ring"/>
+            <circle cx="210" cy="210" r="90" class="radar-ring"/>
+            <circle cx="210" cy="210" r="45" class="radar-ring"/>
+            <line x1="210" y1="20" x2="210" y2="400" class="radar-cross"/>
+            <line x1="20" y1="210" x2="400" y2="210" class="radar-cross"/>
+            <g class="radar-sweep-wrap">
+              <path d="M210 210 L210 20 A190 190 0 0 1 344 76 Z" fill="url(#sweep)"/>
+              <line x1="210" y1="210" x2="210" y2="20" class="radar-sweep-line"/>
+            </g>
+            <circle cx="150" cy="130" r="4" class="blip b1"/>
+            <circle cx="300" cy="180" r="3" class="blip b2"/>
+            <circle cx="240" cy="300" r="4" class="blip b3"/>
+            <circle cx="120" cy="260" r="3" class="blip b4"/>
+            <circle cx="210" cy="210" r="5" class="radar-center"/>
+          </svg>
+        </div>
+      </div>
 
-		<header class="container">
-				<img src="images/logo.jpg" width="150" height="100" alt="logo" class="logo">
+      <div class="stats-bar" aria-label="Quick facts">
+        <div class="container stats-grid">
+          <div class="stat reveal">
+            <span class="stat-num"><span data-count="8">0</span>+</span>
+            <span class="stat-label">years building &amp; shipping</span>
+          </div>
+          <div class="stat reveal">
+            <span class="stat-num"><span data-count="25">0</span>+</span>
+            <span class="stat-label">projects, repos &amp; services</span>
+          </div>
+          <div class="stat reveal">
+            <span class="stat-num"><span data-count="45">0</span>%</span>
+            <span class="stat-label">fewer tests via hackathon optimisation</span>
+          </div>
+          <div class="stat reveal">
+            <span class="stat-num">24/7</span>
+            <span class="stat-label">home-lab uptime discipline</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-				<nav>
-					<ul>
-						<li><a href="index.html">Home</a></li>
-						<li><a href="html/aboutme.html">About</a></li>
-						<li><a href="html/labs.html">Labs</a></li>
-						<li><a href="html/contact.html">Contact</a></li>
-					</ul>
-				</nav>
-		</header>
+    <!-- ============ ABOUT ============ -->
+    <section class="section" id="about">
+      <div class="container">
+        <p class="section-label reveal"><span class="section-index">01</span> — About</p>
+        <h2 class="section-title reveal"><span class="greeting" id="greeting">Dia duit</span>, I keep things running.</h2>
+        <div class="about-grid">
+          <div class="about-copy reveal">
+            <p>
+              I'm a Site Reliability Engineer at <a href="https://www.cohesity.com" target="_blank" rel="noopener">Cohesity</a>
+              in Cork, Ireland. My work is about the unglamorous side of engineering done well:
+              monitoring, automation, blameless postmortems, and systems that page you
+              as rarely as possible.
+            </p>
+            <p>
+              Off the clock I apply the same discipline to my home lab. A Raspberry Pi
+              with an RTL-SDR dongle and a rooftop antenna decodes <strong>AIS signals from real
+              ships</strong> off the Irish coast and <strong>NOAA weather-satellite passes</strong> overhead,
+              around the clock. Every service ships with tests on push, pull-based
+              deploys and auto-rollback — because home projects deserve production
+              standards too.
+            </p>
+            <p>
+              I got into engineering through hackathons and curiosity — my team won the
+              MTU Cork Open Data Hackathon with a pool-testing optimisation that cut
+              required COVID-19 tests by 45%.
+            </p>
+          </div>
+          <aside class="about-side reveal">
+            <div class="panel">
+              <h3 class="panel-title">Toolbox</h3>
+              <ul class="chips">
+                <li>Python</li><li>JavaScript</li><li>Flask</li><li>Docker</li>
+                <li>Linux</li><li>systemd</li><li>Raspberry&nbsp;Pi</li><li>RTL-SDR</li>
+                <li>MySQL</li><li>pandas</li><li>GitHub&nbsp;Actions</li><li>pytest</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3 class="panel-title">Currently</h3>
+              <ul class="fact-list">
+                <li><span>Building</span> a self-hosted marine situation display</li>
+                <li><span>Learning</span> everything RF, one satellite pass at a time</li>
+                <li><span>Located</span> Cork, Ireland — remote-friendly</li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
 
-	<main>
-					<section class="wrapper style1">
-						<div class="inner">
-							<header class="align-center">
-								<h2>Evan Dunbar CK401 2022</h2>
-								<p>This is where I will display my progress and own personal work throughout my career</p>
-							</header>
-							<div class="flex flex-3">
-								<div class="col align-center">
-									<div class="image round fit">
-										<img src="images/ucclogo.png" alt="" />
-									</div>
-									<p>I am currently studying Computer Science CK401 in University College Cork </p>
-									<a href="https://www.ucc.ie/en/ck401/" class="button">Learn More</a>
-								</div>
-								<div class="col align-center">
-									<div class="image round fit">
-										<img src="images/pictureme.png" alt="" />
-									</div>
-									<p>My name is Evan Dunbar, I enjoy working on my own projects and having a pint on the weekend with my friends</p>
-									<a href="aboutme.html" class="button">Learn More</a>
-								</div>
-								<div class="col align-center">
-									<div class="image round fit">
-										<img src="images/soundcloudlogo.png" alt="" />
-									</div>
-									<p>My music interest varies from techno to small rappers. My soundcloud playlists havent been updated in a while so dont judge!</p>
-									<a href="" class="button">Learn More</a>
-								</div>
-							</div>
-						</div>
-					</section>
+    <!-- ============ PROJECTS ============ -->
+    <section class="section section-alt" id="projects">
+      <div class="container">
+        <p class="section-label reveal"><span class="section-index">02</span> — Projects</p>
+        <h2 class="section-title reveal">Things I've built &amp; run.</h2>
 
+        <div class="project-grid">
+          <article class="project-card featured reveal">
+            <div class="project-top">
+              <span class="project-badge">🛟 Flagship</span>
+              <span class="project-year">2026</span>
+            </div>
+            <h3>Maritime Dashboard</h3>
+            <p>
+              A self-hosted marine situation display for the south coast of Ireland,
+              running 24/7 on a Raspberry Pi touchscreen kiosk. Decodes AIS signals
+              from the station's own antenna, captures NOAA weather-satellite imagery
+              as birds pass overhead, and blends in an online vessel feed.
+            </p>
+            <ul class="chips chips-sm">
+              <li>RTL-SDR</li><li>AIS</li><li>NOAA satellites</li><li>Flask</li><li>pytest CI/CD</li>
+            </ul>
+            <a class="project-link" href="https://github.com/pkia/maritime-dashboard" target="_blank" rel="noopener">View on GitHub
+              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
 
-	</body>
+          <article class="project-card reveal">
+            <div class="project-top">
+              <span class="project-badge subtle">Ops</span>
+              <span class="project-year">2026</span>
+            </div>
+            <h3>Project Hub</h3>
+            <p>
+              Single-page operations portal for my Raspberry Pi home server: live
+              port and systemd health for every project on the box, host vitals,
+              pull-based CD with auto-rollback. The bookmark I actually use dozens
+              of times a day.
+            </p>
+            <ul class="chips chips-sm">
+              <li>Flask</li><li>systemd</li><li>Self-hosted</li><li>CI/CD</li>
+            </ul>
+            <a class="project-link" href="https://github.com/pkia/project-hub" target="_blank" rel="noopener">View on GitHub
+              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+
+          <article class="project-card reveal">
+            <div class="project-top">
+              <span class="project-badge win">🏆 Hackathon winner</span>
+              <span class="project-year">2021</span>
+            </div>
+            <h3>Covid Pool Testing</h3>
+            <p>
+              Winning entry at the MTU Cork Open Data Hackathon (sponsored by Riot
+              Games, CSO and Lero). A binary-splitting pool-testing optimisation,
+              grounded in published research, that reduced the number of COVID-19
+              tests Ireland needed by 45%.
+            </p>
+            <ul class="chips chips-sm">
+              <li>Python</li><li>Optimisation</li><li>Data science</li>
+            </ul>
+            <a class="project-link" href="https://github.com/pkia/Covid-Pool-Testing" target="_blank" rel="noopener">View on GitHub
+              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+
+          <article class="project-card reveal">
+            <div class="project-top">
+              <span class="project-badge subtle">Team of five</span>
+              <span class="project-year">2021</span>
+            </div>
+            <h3>Tweet Guard</h3>
+            <p>
+              Web app that defends against inappropriate and threatening Twitter
+              users: NLP scans of a user's timeline with category filters, plus a
+              community report database. Dockerised Flask deployment.
+            </p>
+            <ul class="chips chips-sm">
+              <li>NLP</li><li>Flask</li><li>Docker</li>
+            </ul>
+            <a class="project-link" href="https://github.com/pkia/Twitter_Threat_Scanner" target="_blank" rel="noopener">View on GitHub
+              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+        </div>
+
+        <p class="more-link reveal">
+          Also: a <a href="https://github.com/pkia/CoinMarketCap_Scraper" target="_blank" rel="noopener">CoinMarketCap dataset scraper</a>
+          and a graveyard of experiments, archived with honour.
+          <a href="https://github.com/pkia?tab=repositories" target="_blank" rel="noopener">Browse everything →</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ EXPERIENCE ============ -->
+    <section class="section" id="experience">
+      <div class="container">
+        <p class="section-label reveal"><span class="section-index">03</span> — Experience &amp; education</p>
+        <h2 class="section-title reveal">Where I've worked &amp; studied.</h2>
+        <div class="exp-grid">
+          <article class="exp-card reveal">
+            <div class="exp-head">
+              <div class="exp-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+              </div>
+              <div>
+                <h3>Site Reliability Engineer</h3>
+                <p class="exp-org">Cohesity · Cork, Ireland</p>
+              </div>
+              <span class="exp-dates">Present</span>
+            </div>
+            <p>
+              Keeping enterprise data-management systems healthy: observability,
+              incident response, automation, and the steady work of making failures
+              boring.
+            </p>
+          </article>
+
+          <article class="exp-card reveal">
+            <div class="exp-head">
+              <div class="exp-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 4 2 9l10 5 10-5-10-5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <h3>Munster Technological University</h3>
+                <p class="exp-org">Cork, Ireland</p>
+              </div>
+              <span class="exp-dates">2018 – 2022</span>
+            </div>
+            <p>
+              Computer science coursework across software engineering, algorithms and
+              data science; hackathon regular on the side.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ JOURNEY ============ -->
+    <section class="section section-alt" id="journey">
+      <div class="container">
+        <p class="section-label reveal"><span class="section-index">04</span> — Journey</p>
+        <h2 class="section-title reveal">A short timeline.</h2>
+        <ol class="timeline">
+          <li class="reveal">
+            <span class="tl-dot" aria-hidden="true"></span>
+            <div class="tl-body">
+              <p class="tl-date">Now</p>
+              <h3>SRE at Cohesity, ship spotter at home</h3>
+              <p>Production reliability by day; AIS receivers, satellite decoders and ops portals on a Pi by night — with CI/CD on everything.</p>
+            </div>
+          </li>
+          <li class="reveal">
+            <span class="tl-dot" aria-hidden="true"></span>
+            <div class="tl-body">
+              <p class="tl-date">2025 – 2026</p>
+              <h3>The home lab gets serious</h3>
+              <p>A maritime dashboard, a service portal, pytest suites and auto-rollback. The turning point was treating side projects like production systems.</p>
+            </div>
+          </li>
+          <li class="reveal">
+            <span class="tl-dot" aria-hidden="true"></span>
+            <div class="tl-body">
+              <p class="tl-date">2021</p>
+              <h3>Hackathon win &amp; first team projects</h3>
+              <p>Won the MTU Cork Open Data Hackathon with a 45% pool-testing optimisation; built Tweet Guard, an NLP abuse scanner, with four teammates.</p>
+            </div>
+          </li>
+          <li class="reveal">
+            <span class="tl-dot" aria-hidden="true"></span>
+            <div class="tl-body">
+              <p class="tl-date">2018</p>
+              <h3>First commit</h3>
+              <p>Joined GitHub as a student in Cork and started shipping — scrapers, stock models, linked lists and everything in between.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="section contact" id="contact">
+      <div class="container contact-inner">
+        <p class="section-label reveal"><span class="section-index">05</span> — Contact</p>
+        <h2 class="section-title reveal">Let's talk.</h2>
+        <p class="contact-copy reveal">
+          Happy to talk reliability engineering, Raspberry Pi experiments, radio,
+          or Cork's maritime traffic. Or we can just have a
+          <a href="mailto:evandunb@gmail.com?subject=Virtual%20coffee">virtual coffee</a>.
+        </p>
+        <div class="contact-actions reveal">
+          <button class="btn btn-primary" id="copy-email" type="button" data-email="evandunb@gmail.com">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5" y="5" width="8" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 5V4a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 4v5.5A1.5 1.5 0 0 0 4 11h1" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            <span id="copy-email-label">Copy email address</span>
+          </button>
+          <a class="btn btn-ghost" href="https://www.linkedin.com/in/evan-dunbar-a184641a1/" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="btn btn-ghost" href="https://github.com/pkia" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Evan Dunbar · Cork, Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/evan-dunbar-a184641a1/" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.55V9h3.57v11.45Z"/></svg>
+        </a>
+        <a href="mailto:evandunb@gmail.com" aria-label="Email">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M3 6h18v12H3zM3 7l9 6 9-6"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
 </html>
