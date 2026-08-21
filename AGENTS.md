@@ -78,9 +78,15 @@ is current. Rules:
   or refresh the "Now" entry. Do not add an entry per day.
 - **Stats bar**: update counts only when clearly stale (e.g. number of
   projects/repos).
-- Content changes only: never redesign, never restyle, never restructure
-  sections, never touch the hero copy, experience or contact sections. Reuse
-  existing classes and keep the HTML valid.
+- **Design and structure changes are allowed** — hero, experience, contact,
+  new sections, restyling, restructuring — when there is a genuine reason
+  (outdated copy, a better way to present something, new content that needs a
+  home). The owner has explicitly OK'd this: CI/CD and git history are the
+  safety net, and anything that breaks can be reverted.
+- Quality bar for any change: stay in the site's design language (the CSS
+  variables and class system in `styles.css`), keep the HTML valid and the
+  page fast (no frameworks, no build step), and only ship changes that make
+  the site better — never churn for the sake of change.
 
 ### Publish flow
 
