@@ -8,7 +8,8 @@ HTML/CSS/JS, no build step. The deploy branch is `master` — pushing to
 ## Devlog job (runs daily at 07:00 via hermes cron)
 
 Write today's devlog post and publish it, then refresh the homepage content to
-match the current state of things (see "Portfolio refresh" below). The blog is
+match the current state of things (see "Portfolio refresh" below), then refresh
+my GitHub profile README (see "Profile README refresh" below). The blog is
 at `blog/`; each post is a standalone HTML page styled by the site's existing
 `styles.css`.
 
@@ -87,6 +88,41 @@ is current. Rules:
   variables and class system in `styles.css`), keep the HTML valid and the
   page fast (no frameworks, no build step), and only ship changes that make
   the site better — never churn for the sake of change.
+
+### Profile README refresh (also part of the daily job)
+
+Keep my GitHub profile README (repo `pkia/pkia`, file `README.md`, default
+branch `master`) in sync with the projects I'm actually working on. It is
+**not** part of this repo — do not clone it into `/home/ev` (that would
+pollute the devlog repo discovery); edit it through the GitHub contents API
+with the authenticated `gh` CLI:
+
+```bash
+gh api repos/pkia/pkia/readme --jq '.sha'                  # sha needed for the update
+gh api repos/pkia/pkia/readme --jq '.content' | base64 -d  # current README.md
+# write the new README to a temp file, then commit it in one API call:
+gh api -X PUT repos/pkia/pkia/contents/README.md \
+    -f message='readme: <what changed>' -f sha=<sha> \
+    -f content="$(base64 -w0 /tmp/readme-new.md)"
+```
+
+Rules:
+
+- **Featured work**: same bar as the homepage projects grid — owned repos
+  that shipped real substance (README, tests, working code). Add newly
+  shipped repos (including ones created by the radar implementer), keep the
+  list at four to five bullets, retire or fold the least significant older
+  ones into a short "More on GitHub" line. Never invent or oversell work.
+- **"Right now" interest line**: refresh from the same sources as the
+  homepage "Currently" panel (recent commits + the radar board at
+  https://github.com/pkia/radar/IDEAS.md).
+- **Toolbox**: update only when genuinely stale.
+- Keep the intro bio, contact links and profile-views badge untouched unless
+  genuinely outdated; keep the markdown valid and the concise engineer voice;
+  no emoji spam.
+- Only push a commit when something actually changed — never churn for the
+  sake of change. If the API update fails, report the failure and continue
+  with the rest of the job.
 
 ### Publish flow
 
