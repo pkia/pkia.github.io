@@ -514,6 +514,7 @@ strong { color: #fff; font-weight: 600; }
   position: relative;
   aspect-ratio: 1080 / 1000;
   width: 100%;
+  container-type: inline-size;
 }
 
 .arch-overlay {
@@ -562,11 +563,12 @@ strong { color: #fff; font-weight: 600; }
   position: absolute; left: var(--x); top: var(--y);
   width: var(--w); height: var(--h);
   display: flex; flex-direction: column;
-  justify-content: center; gap: .22rem;
-  padding: .5rem .65rem;
+  justify-content: center;
+  gap: clamp(.1rem, .2cqw, .24rem);
+  padding: clamp(.38rem, .5cqw, .55rem) clamp(.45rem, .62cqw, .68rem);
   background: linear-gradient(155deg, rgba(30, 48, 78, .85), #101c33 75%);
   border: 1px solid rgba(148, 178, 215, .3);
-  border-radius: 11px;
+  border-radius: clamp(8px, 1.05cqw, 11px);
   cursor: default;
   transition: transform .2s, border-color .2s, box-shadow .2s;
 }
@@ -584,12 +586,16 @@ strong { color: #fff; font-weight: 600; }
   background: linear-gradient(155deg, rgba(23, 37, 60, .9), #0d1729 80%);
 }
 
-.arch-card-top { display: flex; align-items: center; gap: .45rem; }
-.arch-ico { width: 15px; height: 15px; flex: 0 0 auto; color: var(--accent); }
+.arch-card-top { display: flex; align-items: center; gap: clamp(.3rem, .43cqw, .5rem); }
+.arch-ico {
+  width: clamp(11px, 1.43cqw, 15px); height: clamp(11px, 1.43cqw, 15px);
+  flex: 0 0 auto; color: var(--accent);
+}
 .rf .arch-ico { color: var(--gold); }
 .arch-led {
   margin-left: auto;
-  width: 6px; height: 6px; border-radius: 50%;
+  width: clamp(4px, .57cqw, 6px); height: clamp(4px, .57cqw, 6px);
+  border-radius: 50%;
   background: #2dd4a7;
   box-shadow: 0 0 8px rgba(45, 212, 167, .9);
   animation: pulse 2.6s infinite;
@@ -597,18 +603,21 @@ strong { color: #fff; font-weight: 600; }
 .arch-led.rf { background: var(--gold); box-shadow: 0 0 8px rgba(255, 209, 102, .85); }
 .arch-name {
   font-family: var(--font-mono);
-  font-size: .68rem; font-weight: 500; letter-spacing: .045em;
+  font-size: clamp(.56rem, 1.04cqw, .68rem); font-weight: 500; letter-spacing: .045em;
+  line-height: 1.25;
   color: var(--text); white-space: nowrap;
 }
 .rf .arch-name { color: var(--gold); }
 .arch-sub {
   font-family: var(--font-mono);
-  font-size: .58rem; letter-spacing: .02em;
+  font-size: clamp(.48rem, .88cqw, .58rem); letter-spacing: .02em;
+  line-height: 1.25;
   color: var(--text-faint); white-space: nowrap;
 }
 .arch-src {
   font-family: var(--font-mono);
-  font-size: .56rem; color: var(--accent); opacity: .8;
+  font-size: clamp(.46rem, .84cqw, .56rem); color: var(--accent); opacity: .8;
+  line-height: 1.25;
   white-space: nowrap;
 }
 
@@ -650,17 +659,17 @@ strong { color: #fff; font-weight: 600; }
 }
 .arch-pi-title {
   font-family: var(--font-mono);
-  font-size: .8rem; font-weight: 600; letter-spacing: .22em;
+  font-size: clamp(.66rem, 1.24cqw, .8rem); font-weight: 600; letter-spacing: .22em;
   color: var(--text);
 }
 .arch-pi-sub {
   font-family: var(--font-mono);
-  font-size: .58rem; letter-spacing: .05em;
+  font-size: clamp(.48rem, .9cqw, .58rem); letter-spacing: .05em;
   color: var(--text-faint); margin-top: .15rem; white-space: nowrap;
 }
 .arch-uptime {
   display: inline-flex; align-items: center; gap: .45rem;
-  font-family: var(--font-mono); font-size: .62rem; letter-spacing: .12em;
+  font-family: var(--font-mono); font-size: clamp(.52rem, .96cqw, .62rem); letter-spacing: .12em;
   color: #2dd4a7;
   border: 1px solid rgba(45, 212, 167, .35);
   background: rgba(45, 212, 167, .08);
@@ -680,8 +689,8 @@ strong { color: #fff; font-weight: 600; }
   position: absolute;
   left: var(--x); top: var(--y);
   width: var(--w); height: var(--h);
-  border-radius: 14px;
-  padding: 1.35rem .55rem .55rem;
+  border-radius: clamp(10px, 1.33cqw, 14px);
+  padding: clamp(1.05rem, 2cqw, 1.35rem) clamp(.4rem, .52cqw, .55rem) clamp(.4rem, .52cqw, .55rem);
 }
 .arch-band-svc {
   background: rgba(76, 201, 240, .05);
@@ -696,9 +705,9 @@ strong { color: #fff; font-weight: 600; }
   border: 1px solid rgba(148, 178, 215, .24);
 }
 .arch-band-tag {
-  position: absolute; top: .48rem; left: .68rem;
+  position: absolute; top: clamp(.3rem, .55cqw, .48rem); left: clamp(.4rem, .65cqw, .68rem);
   font-family: var(--font-mono);
-  font-size: .58rem; letter-spacing: .24em;
+  font-size: clamp(.48rem, .85cqw, .58rem); letter-spacing: .24em;
   color: var(--text-faint);
 }
 .arch-band-rf .arch-band-tag { color: rgba(255, 209, 102, .8); }
