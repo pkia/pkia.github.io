@@ -914,6 +914,57 @@ strong { color: #fff; font-weight: 600; }
   font-weight: 600; font-size: .92rem; margin-top: 2rem;
 }
 
+/* ============ Boot splash ============ */
+
+.boot-screen {
+  position: fixed; inset: 0; z-index: 200;
+  display: none;
+  place-items: center;
+  font-family: var(--font-mono);
+  background:
+    radial-gradient(1100px 500px at 85% -5%, rgba(76, 201, 240, .08), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(24, 153, 201, .07), transparent 55%),
+    var(--bg);
+  color: var(--text-dim);
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity .55s ease;
+}
+html.boot .boot-screen { display: grid; }
+html.boot body { overflow: hidden; }
+
+.boot-screen::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .018) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+.boot-screen.done { opacity: 0; pointer-events: none; }
+
+.boot-inner {
+  width: min(92vw, 520px);
+  font-size: .78rem; line-height: 1.8;
+}
+.boot-head {
+  display: flex; justify-content: space-between; gap: 1rem;
+  font-size: .66rem; letter-spacing: .18em; color: var(--text-faint);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: .55rem; margin-bottom: .9rem;
+}
+.boot-line { white-space: nowrap; overflow: hidden; }
+.boot-ok { color: #2dd4a7; font-weight: 500; }
+.boot-prompt { color: var(--accent); }
+.boot-out { color: var(--text); margin-top: .35rem; }
+.boot-skip {
+  position: absolute; right: 1.2rem; bottom: 1rem;
+  margin: 0; font-size: .64rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--text-faint);
+}
+
+@media (max-width: 540px) {
+  .boot-inner { font-size: .66rem; }
+}
+
 /* ============ Responsive ============ */
 
 @media (max-width: 920px) {

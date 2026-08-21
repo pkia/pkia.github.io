@@ -94,6 +94,11 @@ is current. Rules:
   or refresh the "Now" entry. Do not add an entry per day.
 - **Stats bar**: update counts only when clearly stale (e.g. number of
   projects/repos).
+- **Boot splash** (`#boot` overlay + the small inline script in `<head>` of
+  `index.html`): plays once per browser session on the homepage only —
+  structure, inline script and dismissal logic are load-bearing, leave them
+  alone. At most, refresh the systemd-style boot lines if the service set
+  changes materially. Never copy it onto blog pages.
 - **Design and structure changes are allowed** — hero, experience, contact,
   new sections, restyling, restructuring — when there is a genuine reason
   (outdated copy, a better way to present something, new content that needs a

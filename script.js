@@ -161,6 +161,75 @@
     setTimeout(playTerm, 6000);
   }
 
+  /* ---------- Boot splash (homepage, once per session) ---------- */
+  var bootScreen = document.getElementById("boot");
+  if (bootScreen && document.documentElement.classList.contains("boot")) {
+    var bootLines = [
+      "Mounted /dev/maritime",
+      "Started rtl-sdr — 162 MHz antenna locked",
+      "Started ais-catcher — decoding ships",
+      "Started noaa-sched — pass recorder armed",
+      "Started maritime-dashboard :8000",
+      "Started radar-agent — daily loop armed",
+      "Reached target — all stations reporting"
+    ];
+    var bootLinesEl = document.getElementById("boot-lines");
+    var bootCmdLine = document.getElementById("boot-cmd-line");
+    var bootCmd = document.getElementById("boot-cmd");
+    var bootOut = document.getElementById("boot-out");
+    var bootDone = false;
+    var bootTimers = [];
+
+    var bootFinish = function () {
+      if (bootDone) return;
+      bootDone = true;
+      bootTimers.forEach(function (t) { clearTimeout(t); });
+      bootScreen.classList.add("done");
+      try { sessionStorage.setItem("booted", "1"); } catch (e) { /* private mode */ }
+      setTimeout(function () {
+        document.documentElement.classList.remove("boot");
+        if (bootScreen.parentNode) bootScreen.parentNode.removeChild(bootScreen);
+      }, 650);
+    };
+
+    bootScreen.addEventListener("click", bootFinish);
+    document.addEventListener("keydown", bootFinish);
+
+    var bootAt = 280;
+    bootLines.forEach(function (text) {
+      bootAt += 70 + Math.random() * 90;
+      bootTimers.push(setTimeout(function () {
+        var row = document.createElement("div");
+        row.className = "boot-line";
+        var ok = document.createElement("span");
+        ok.className = "boot-ok";
+        ok.textContent = "[  OK  ]";
+        row.appendChild(ok);
+        row.appendChild(document.createTextNode(text));
+        bootLinesEl.appendChild(row);
+      }, bootAt));
+    });
+
+    bootAt += 340;
+    bootTimers.push(setTimeout(function () {
+      bootCmdLine.hidden = false;
+      var cmd = "./welcome.sh";
+      var i = 0;
+      var typer = setInterval(function () {
+        if (bootDone) { clearInterval(typer); return; }
+        if (i < cmd.length) {
+          bootCmd.textContent += cmd.charAt(i++);
+        } else {
+          clearInterval(typer);
+          bootTimers.push(setTimeout(function () {
+            bootOut.hidden = false;
+            bootTimers.push(setTimeout(bootFinish, 600));
+          }, 240));
+        }
+      }, 24);
+    }, bootAt));
+  }
+
   /* ---------- Footer year ---------- */
   var year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());

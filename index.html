@@ -41,9 +41,35 @@
     ]
   }
   </script>
+  <script>
+    /* Boot splash gate — must run before first paint. Shows the boot screen
+       only on the homepage, once per session, never for reduced-motion
+       visitors or deep links, and never without JS. */
+    (function () {
+      try { if (sessionStorage.getItem("booted")) return; } catch (e) { /* private mode */ }
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if (location.hash) return;
+      document.documentElement.classList.add("boot");
+    })();
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="boot-screen" id="boot" aria-hidden="true">
+    <div class="boot-inner">
+      <div class="boot-head">
+        <span>EV-PI5 · BOOT SEQUENCE</span>
+        <span>CORK / IE</span>
+      </div>
+      <div class="boot-lines" id="boot-lines"></div>
+      <div class="boot-line boot-cmd-line" id="boot-cmd-line" hidden>
+        <span class="boot-prompt">ev@pi5:~$ </span><span id="boot-cmd"></span>
+      </div>
+      <div class="boot-line boot-out" id="boot-out" hidden>radar online — welcome aboard ⚓</div>
+    </div>
+    <p class="boot-skip">click to skip</p>
+  </div>
 
   <header class="nav" id="nav">
     <div class="container nav-inner">
