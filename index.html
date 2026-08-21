@@ -308,115 +308,238 @@
           improvements while I sleep.
         </p>
 
-        <div class="reveal">
-          <svg class="arch-svg" viewBox="0 0 1080 750" role="img" aria-label="Architecture of the Raspberry Pi home server: RF and satellite stack, web services, ops and agent layer, and their network flows">
-            <defs>
-              <marker id="arch-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
-                <path d="M0 0 L10 5 L0 10 Z" fill="context-stroke"/>
-              </marker>
-            </defs>
+        <div class="arch-stage reveal">
 
-            <!-- ============ FLOWS (under the nodes) ============ -->
-            <path class="arch-flow arch-flow-rf" d="M190 102 C 228 102, 252 138, 286 138"/>
-            <path class="arch-flow arch-flow-rf" d="M440 138 L 460 138"/>
-            <path class="arch-flow" d="M540 166 C 540 244, 412 244, 412 316"/>
-            <path class="arch-flow arch-flow-rf" d="M365 236 C 365 282, 402 282, 402 316"/>
-            <path class="arch-flow" d="M190 330 C 420 336, 715 320, 715 238"/>
-            <path class="arch-flow" d="M192 342 C 262 366, 262 626, 286 626"/>
-            <path class="arch-flow" d="M535 348 C 782 348, 890 246, 890 116"/>
-            <path class="arch-flow" d="M800 485 C 856 483, 890 402, 890 340"/>
-            <path class="arch-flow arch-flow-dim" d="M190 652 C 226 652, 226 700, 244 700"/>
-            <path class="arch-flow" d="M412 596 L 412 539"/>
-            <path class="arch-flow arch-flow-dim" d="M800 694 C 858 692, 890 662, 890 596"/>
-
-            <!-- ============ LEFT: INPUTS ============ -->
-            <rect class="arch-node arch-node-rf" x="10" y="70" width="180" height="64" rx="10"/>
-            <text class="arch-node-name arch-node-name-rf" x="100" y="97" text-anchor="middle">ROOFTOP ANTENNA</text>
-            <text class="arch-node-port" x="100" y="115" text-anchor="middle">AIS 162 · NOAA 137 MHz</text>
-
-            <rect class="arch-node" x="10" y="300" width="180" height="64" rx="10"/>
-            <text class="arch-node-name" x="100" y="327" text-anchor="middle">INTERNET</text>
-            <text class="arch-node-port" x="100" y="345" text-anchor="middle">GitHub · aisstream.io · HLTV</text>
-
-            <rect class="arch-node" x="10" y="620" width="180" height="64" rx="10"/>
-            <text class="arch-node-name" x="100" y="647" text-anchor="middle">TAILSCALE VPN</text>
-            <text class="arch-node-port" x="100" y="665" text-anchor="middle">phones · laptops · anywhere</text>
-
-            <!-- ============ CENTER: THE PI ============ -->
-            <rect class="arch-box" x="250" y="20" width="570" height="710" rx="18"/>
-            <text class="arch-box-title" x="535" y="48" text-anchor="middle">RASPBERRY PI 5 · 8 GB</text>
-            <text class="arch-box-sub" x="535" y="64" text-anchor="middle">192.168.0.7 LAN · 100.122.94.33 tailnet · Cork, Ireland</text>
-
-            <!-- RF band -->
-            <rect class="arch-band arch-band-rf" x="270" y="80" width="530" height="180" rx="12"/>
-            <text class="arch-band-label arch-band-label-rf" x="282" y="100">RF / SDR STACK</text>
-            <rect class="arch-node arch-node-rf" x="290" y="110" width="150" height="56" rx="8"/>
-            <text class="arch-node-name arch-node-name-rf" x="365" y="133" text-anchor="middle">RTL-SDR</text>
-            <text class="arch-node-port" x="365" y="150" text-anchor="middle">tuner gain 40</text>
-            <rect class="arch-node arch-node-rf" x="465" y="110" width="150" height="56" rx="8"/>
-            <text class="arch-node-name arch-node-name-rf" x="540" y="133" text-anchor="middle">AIS-CATCHER</text>
-            <text class="arch-node-port" x="540" y="150" text-anchor="middle">:8080 · ship decoder</text>
-            <rect class="arch-node arch-node-rf" x="640" y="110" width="150" height="56" rx="8"/>
-            <text class="arch-node-name arch-node-name-rf" x="715" y="133" text-anchor="middle">SDR-MONITOR</text>
-            <text class="arch-node-port" x="715" y="150" text-anchor="middle">signal health</text>
-            <rect class="arch-node arch-node-rf" x="290" y="180" width="150" height="56" rx="8"/>
-            <text class="arch-node-name arch-node-name-rf" x="365" y="203" text-anchor="middle">NOAA SCHED</text>
-            <text class="arch-node-port" x="365" y="220" text-anchor="middle">pass recorder</text>
-            <rect class="arch-node arch-node-rf" x="465" y="180" width="150" height="56" rx="8"/>
-            <text class="arch-node-name arch-node-name-rf" x="540" y="203" text-anchor="middle">SAT-AUDIO</text>
-            <text class="arch-node-port" x="540" y="220" text-anchor="middle">:8085 live audio</text>
-            <rect class="arch-node arch-node-rf" x="640" y="180" width="150" height="56" rx="8"/>
-            <text class="arch-node-name arch-node-name-rf" x="715" y="203" text-anchor="middle">ONLINE-SHIPS</text>
-            <text class="arch-node-port" x="715" y="220" text-anchor="middle">aisstream feed</text>
-
-            <!-- Services band -->
-            <rect class="arch-band" x="270" y="285" width="530" height="250" rx="12"/>
-            <text class="arch-band-label" x="282" y="305">WEB SERVICES</text>
-            <rect class="arch-node" x="290" y="320" width="245" height="56" rx="8"/>
-            <text class="arch-node-name" x="412" y="343" text-anchor="middle">MARITIME DASHBOARD</text>
-            <text class="arch-node-port" x="412" y="360" text-anchor="middle">:8000 · AIS + NOAA + fleet</text>
-            <rect class="arch-node" x="555" y="320" width="245" height="56" rx="8"/>
-            <text class="arch-node-name" x="677" y="343" text-anchor="middle">CS2 DASHBOARD</text>
-            <text class="arch-node-port" x="677" y="360" text-anchor="middle">:8001 · HLTV feeder</text>
-            <rect class="arch-node" x="290" y="390" width="245" height="56" rx="8"/>
-            <text class="arch-node-name" x="412" y="413" text-anchor="middle">PROJECT HUB</text>
-            <text class="arch-node-port" x="412" y="430" text-anchor="middle">:8090 · ops portal</text>
-            <rect class="arch-node" x="555" y="390" width="245" height="56" rx="8"/>
-            <text class="arch-node-name" x="677" y="413" text-anchor="middle">KIOSK HOME</text>
-            <text class="arch-node-port" x="677" y="430" text-anchor="middle">:8091 · launcher</text>
-            <rect class="arch-node" x="290" y="460" width="510" height="56" rx="8"/>
-            <text class="arch-node-name" x="545" y="483" text-anchor="middle">ADGUARD HOME</text>
-            <text class="arch-node-port" x="545" y="500" text-anchor="middle">:53 DNS for the whole house · admin :3001</text>
-
-            <!-- Ops band -->
-            <rect class="arch-band" x="270" y="560" width="530" height="150" rx="12" style="fill: rgba(148,178,215,.03); stroke: var(--line-strong);"/>
-            <text class="arch-band-label" x="282" y="580">OPS &amp; AGENTS</text>
-            <rect class="arch-node" x="290" y="598" width="245" height="56" rx="8"/>
-            <text class="arch-node-name" x="412" y="621" text-anchor="middle">PULL-BASED CD</text>
-            <text class="arch-node-port" x="412" y="638" text-anchor="middle">3-min poll · auto-rollback</text>
-            <rect class="arch-node" x="555" y="598" width="245" height="56" rx="8"/>
-            <text class="arch-node-name" x="677" y="621" text-anchor="middle">PROJECT-GUARD</text>
-            <text class="arch-node-port" x="677" y="638" text-anchor="middle">adopts repos · adds CI</text>
-            <rect class="arch-node" x="290" y="666" width="245" height="56" rx="8"/>
-            <text class="arch-node-name" x="412" y="689" text-anchor="middle">HERMES GATEWAY</text>
-            <text class="arch-node-port" x="412" y="706" text-anchor="middle">agents · tools · chat</text>
-            <rect class="arch-node" x="555" y="666" width="245" height="56" rx="8"/>
-            <text class="arch-node-name" x="677" y="689" text-anchor="middle">CRON AGENTS</text>
-            <text class="arch-node-port" x="677" y="706" text-anchor="middle">07:00 devlog · 09:00 radar</text>
-
-            <!-- ============ RIGHT: CONSUMERS ============ -->
-            <rect class="arch-node" x="890" y="80" width="180" height="64" rx="10"/>
-            <text class="arch-node-name" x="980" y="107" text-anchor="middle">TOUCHSCREEN KIOSK</text>
-            <text class="arch-node-port" x="980" y="125" text-anchor="middle">Weston + Chromium</text>
-
-            <rect class="arch-node" x="890" y="300" width="180" height="64" rx="10"/>
-            <text class="arch-node-name" x="980" y="327" text-anchor="middle">HOUSE NETWORK</text>
-            <text class="arch-node-port" x="980" y="345" text-anchor="middle">every device · DNS here</text>
-
-            <rect class="arch-node" x="890" y="560" width="180" height="64" rx="10"/>
-            <text class="arch-node-name" x="980" y="587" text-anchor="middle">PUBLIC SITE</text>
-            <text class="arch-node-port" x="980" y="605" text-anchor="middle">pkia.github.io · devlog</text>
+          <!-- ============ CONNECTOR FLOWS (SVG overlay) ============ -->
+          <svg class="arch-overlay" viewBox="0 0 1080 1000" preserveAspectRatio="none" aria-hidden="true">
+            <path class="arch-flow arch-flow-rf" data-link="antenna rtl" vector-effect="non-scaling-stroke" d="M180 138 C 216 138, 228 174, 256 174"/>
+            <path class="arch-flow arch-flow-rf" data-link="rtl ais" vector-effect="non-scaling-stroke" d="M448 174 L 458 174"/>
+            <path class="arch-flow" data-link="ais maritime" vector-effect="non-scaling-stroke" d="M542 216 C 542 300, 400 300, 400 352"/>
+            <path class="arch-flow arch-flow-rf" data-link="noaa maritime" vector-effect="non-scaling-stroke" d="M352 302 C 352 332, 392 332, 392 352"/>
+            <path class="arch-flow" data-link="internet cd" vector-effect="non-scaling-stroke" d="M182 486 C 244 540, 244 730, 260 730"/>
+            <path class="arch-flow" data-link="internet adguard" vector-effect="non-scaling-stroke" d="M182 500 C 218 560, 240 598, 260 598"/>
+            <path class="arch-flow" data-link="maritime kiosk" vector-effect="non-scaling-stroke" d="M534 388 C 640 470, 840 300, 900 172"/>
+            <path class="arch-flow" data-link="adguard house" vector-effect="non-scaling-stroke" d="M818 598 C 864 594, 900 540, 900 472"/>
+            <path class="arch-flow arch-flow-dim" data-link="tailscale" vector-effect="non-scaling-stroke" d="M180 806 C 216 806, 216 870, 228 870"/>
+            <path class="arch-flow" data-link="cd" vector-effect="non-scaling-stroke" d="M398 684 L 398 652"/>
+            <path class="arch-flow arch-flow-dim" data-link="cron site" vector-effect="non-scaling-stroke" d="M818 824 C 856 824, 878 816, 896 810"/>
+            <circle class="arch-pulse arch-pulse-rf" r="3"><animateMotion dur="2.8s" repeatCount="indefinite" path="M180 138 C 216 138, 228 174, 256 174"/></circle>
+            <circle class="arch-pulse" r="3"><animateMotion dur="3.2s" repeatCount="indefinite" path="M542 216 C 542 300, 400 300, 400 352"/></circle>
+            <circle class="arch-pulse" r="3"><animateMotion dur="3.4s" repeatCount="indefinite" path="M182 486 C 244 540, 244 730, 260 730"/></circle>
+            <circle class="arch-pulse" r="3"><animateMotion dur="2.6s" repeatCount="indefinite" path="M182 500 C 218 560, 240 598, 260 598"/></circle>
+            <circle class="arch-pulse" r="3"><animateMotion dur="3s" repeatCount="indefinite" path="M534 388 C 640 470, 840 300, 900 172"/></circle>
+            <circle class="arch-pulse" r="3"><animateMotion dur="2.7s" repeatCount="indefinite" path="M818 598 C 864 594, 900 540, 900 472"/></circle>
           </svg>
+
+          <!-- ============ LEFT: INPUTS ============ -->
+          <div class="arch-col in">
+            <div class="arch-card io rf" data-node="antenna" style="--x:0%;--y:7%;--w:100%;--h:9.2%">
+              <div class="arch-card-top">
+                <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-5M8.6 13a4.8 4.8 0 0 1 6.8 0M6 10.4a8.4 8.4 0 0 1 12 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="16.2" r="1.3" fill="currentColor"/></svg>
+                <span class="arch-name">ROOFTOP ANTENNA</span>
+              </div>
+              <span class="arch-sub">AIS 162 · NOAA 137 MHz</span>
+            </div>
+            <div class="arch-card io" data-node="internet" style="--x:0%;--y:42.2%;--w:100%;--h:9.2%">
+              <div class="arch-card-top">
+                <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.6 12h16.8M12 3.6c3.1 2.7 3.1 14.1 0 16.8M12 3.6c-3.1 2.7-3.1 14.1 0 16.8" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+                <span class="arch-name">INTERNET</span>
+              </div>
+              <span class="arch-sub">GitHub Actions · aisstream · HLTV</span>
+            </div>
+            <div class="arch-card io" data-node="tailscale" style="--x:0%;--y:76%;--w:100%;--h:9.2%">
+              <div class="arch-card-top">
+                <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 2.8v5.6c0 4.5-2.9 7.7-7 9.6-4.1-1.9-7-5.1-7-9.6V5.8z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+                <span class="arch-name">TAILSCALE VPN</span>
+              </div>
+              <span class="arch-sub">phones · laptops · anywhere</span>
+            </div>
+          </div>
+
+          <!-- ============ CENTER: THE PI ============ -->
+          <div class="arch-pi">
+            <div class="arch-pi-head">
+              <div>
+                <div class="arch-pi-title">RASPBERRY PI 5 · 8 GB</div>
+                <div class="arch-pi-sub">LAN + tailnet · Cork, Ireland</div>
+              </div>
+              <span class="arch-uptime"><i></i>24/7</span>
+            </div>
+
+            <div class="arch-band arch-band-rf" style="--x:3.2%;--y:10.61%;--w:93.5%;--h:20.82%">
+              <span class="arch-band-tag">RF / SDR STACK</span>
+              <div class="arch-card rf" data-node="rtl" style="--x:2.07%;--y:10.78%;--w:31.03%;--h:39.22%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="7.5" y="7.5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9.5 7.5V4M14.5 7.5V4M9.5 20v-3.5M14.5 20v-3.5M7.5 9.5H4M7.5 14.5H4M20 9.5h-3.5M20 14.5h-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  <span class="arch-led rf"></span>
+                </div>
+                <span class="arch-name">RTL-SDR</span>
+                <span class="arch-sub">tuner gain 40</span>
+              </div>
+              <div class="arch-card rf" data-node="ais" style="--x:34.83%;--y:10.78%;--w:31.03%;--h:39.22%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14.5h16l-2.1 4a2 2 0 0 1-1.8 1.1H7.9a2 2 0 0 1-1.8-1.1z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 14.5V4M12 5.2l5.2 3.3M12 5.2L6.8 8.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  <span class="arch-led rf"></span>
+                </div>
+                <span class="arch-name">AIS-CATCHER</span>
+                <span class="arch-sub">:8080 · ship decoder</span>
+              </div>
+              <div class="arch-card rf" data-node="sdrmon" style="--x:67.59%;--y:10.78%;--w:31.03%;--h:39.22%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13.5v-3M8 15V9M12 17.5v-11M16 15V9M20 13.5v-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  <span class="arch-led rf"></span>
+                </div>
+                <span class="arch-name">SDR-MONITOR</span>
+                <span class="arch-sub">signal health</span>
+              </div>
+              <div class="arch-card rf" data-node="noaa" style="--x:2.07%;--y:52.94%;--w:31.03%;--h:39.22%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="9.2" y="9.2" width="5.6" height="5.6" rx="1" transform="rotate(45 12 12)" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6.2 6.2l1.9 1.9M17.8 17.8l-1.9-1.9M17.8 6.2l-1.9 1.9M6.2 17.8l1.9-1.9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  <span class="arch-led rf"></span>
+                </div>
+                <span class="arch-name">NOAA SCHED</span>
+                <span class="arch-sub">pass recorder</span>
+              </div>
+              <div class="arch-card rf" data-node="sataudio" style="--x:34.83%;--y:52.94%;--w:31.03%;--h:39.22%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h1.5M8.5 8.5v7M12 5.5v13M15.5 8.5v7M20 12h-1.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  <span class="arch-led rf"></span>
+                </div>
+                <span class="arch-name">SAT-AUDIO</span>
+                <span class="arch-sub">:8085 live audio</span>
+              </div>
+              <div class="arch-card rf" data-node="online" style="--x:67.59%;--y:52.94%;--w:31.03%;--h:39.22%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 18a4.1 4.1 0 0 1 .5-8.2 5.6 5.6 0 0 1 10.8 1.4A3.6 3.6 0 0 1 17.7 18z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+                  <span class="arch-led rf"></span>
+                </div>
+                <span class="arch-name">ONLINE-SHIPS</span>
+                <span class="arch-sub">live vessel backup</span>
+                <span class="arch-src">☁ aisstream.io</span>
+              </div>
+            </div>
+
+            <div class="arch-band arch-band-svc" style="--x:3.2%;--y:33.06%;--w:93.5%;--h:32.24%">
+              <span class="arch-band-tag">WEB SERVICES</span>
+              <div class="arch-card" data-node="maritime" style="--x:2.07%;--y:8.23%;--w:46.9%;--h:29.11%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M15.2 8.8l-1.9 4.5-4.5 1.9 1.9-4.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">MARITIME DASHBOARD</span>
+                <span class="arch-sub">:8000 · AIS + NOAA + fleet</span>
+              </div>
+              <div class="arch-card" data-node="cs2" style="--x:51.03%;--y:8.23%;--w:46.9%;--h:29.11%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.8v3.4M12 17.8v3.4M2.8 12h3.4M17.8 12h3.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">CS2 DASHBOARD</span>
+                <span class="arch-sub">:8001 · matches + live scores</span>
+                <span class="arch-src">☁ hltv.org</span>
+              </div>
+              <div class="arch-card" data-node="hub" style="--x:2.07%;--y:39.87%;--w:46.9%;--h:29.11%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.8" height="6.8" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13.2" y="4" width="6.8" height="6.8" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="4" y="13.2" width="6.8" height="6.8" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13.2" y="13.2" width="6.8" height="6.8" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">PROJECT HUB</span>
+                <span class="arch-sub">:8090 · ops portal</span>
+              </div>
+              <div class="arch-card" data-node="kioskhome" style="--x:51.03%;--y:39.87%;--w:46.9%;--h:29.11%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9 20.5h6M12 16.5v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">KIOSK HOME</span>
+                <span class="arch-sub">:8091 · launcher</span>
+              </div>
+              <div class="arch-card" data-node="adguard" style="--x:2.07%;--y:74.05%;--w:95.86%;--h:20.25%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 2.8v5.6c0 4.5-2.9 7.7-7 9.6-4.1-1.9-7-5.1-7-9.6V5.8z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.8 11.8l2.3 2.3 4.1-4.6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">ADGUARD HOME</span>
+                <span class="arch-sub">:53 DNS for the whole house · admin :3001</span>
+              </div>
+            </div>
+
+            <div class="arch-band arch-band-ops" style="--x:3.2%;--y:66.94%;--w:93.5%;--h:32.65%">
+              <span class="arch-band-tag">OPS &amp; AGENTS</span>
+              <div class="arch-card" data-node="cd" style="--x:2.07%;--y:6.88%;--w:46.9%;--h:27.5%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 0 1 13-5.1M19.5 12a7.5 7.5 0 0 1-13 5.1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M17.6 3.4v3.6H14M6.4 20.6V17H10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <span class="arch-name">PULL-BASED CD</span>
+                <span class="arch-sub">3-min poll · auto-rollback</span>
+                <span class="arch-src">☁ GitHub Actions</span>
+              </div>
+              <div class="arch-card" data-node="guard" style="--x:51.03%;--y:6.88%;--w:46.9%;--h:27.5%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5.5v11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="7" cy="4" r="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="7" cy="18.5" r="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="17" cy="6.5" r="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7 9.5h5.5a3 3 0 0 0 3-3v-.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                </div>
+                <span class="arch-name">PROJECT-GUARD</span>
+                <span class="arch-sub">adopts repos · adds CI</span>
+              </div>
+              <div class="arch-card" data-node="hermes" style="--x:2.07%;--y:36.25%;--w:46.9%;--h:27.5%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="8" width="14" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 8V5.2M9.4 5.2h5.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="9.4" cy="13" r="1" fill="currentColor"/><circle cx="14.6" cy="13" r="1" fill="currentColor"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">HERMES GATEWAY</span>
+                <span class="arch-sub">agents · tools · messaging</span>
+              </div>
+              <div class="arch-card" data-node="cron" style="--x:51.03%;--y:36.25%;--w:46.9%;--h:27.5%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.4V12l3.1 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">CRON · AI AGENTS</span>
+                <span class="arch-sub">07:00 devlog · 09:00 radar</span>
+              </div>
+              <div class="arch-card" data-node="watchdog" style="--x:2.07%;--y:65.63%;--w:46.9%;--h:27.5%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2-5 4 10 2-5h6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">HEALTH WATCHDOG</span>
+                <span class="arch-sub">every 30m · no-agent script</span>
+              </div>
+              <div class="arch-card" data-node="pipeline" style="--x:51.03%;--y:65.63%;--w:46.9%;--h:27.5%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.2l1.8 1.8 3.2-3.4M4 16.2l1.8 1.8 3.2-3.4M12.5 7h7.5M12.5 16.8h7.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">PIPELINE CHECK</span>
+                <span class="arch-sub">hourly · CI compliance audit</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ============ RIGHT: CONSUMERS ============ -->
+          <div class="arch-col out">
+            <div class="arch-card io" data-node="kiosk" style="--x:0%;--y:11%;--w:100%;--h:9.2%">
+              <div class="arch-card-top">
+                <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9 20.5h6M12 16.5v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                <span class="arch-name">TOUCHSCREEN KIOSK</span>
+              </div>
+              <span class="arch-sub">Weston + Chromium</span>
+            </div>
+            <div class="arch-card io" data-node="house" style="--x:0%;--y:42.4%;--w:100%;--h:9.2%">
+              <div class="arch-card-top">
+                <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.8a13.5 13.5 0 0 1 18 0M6.2 13a9 9 0 0 1 11.6 0M9.2 16.2a4.6 4.6 0 0 1 5.6 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="19.2" r="1.2" fill="currentColor"/></svg>
+                <span class="arch-name">HOUSE NETWORK</span>
+              </div>
+              <span class="arch-sub">every device · DNS here</span>
+            </div>
+            <div class="arch-card io" data-node="site" style="--x:0%;--y:76%;--w:100%;--h:9.2%">
+              <div class="arch-card-top">
+                <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2s5.6 4.9 5.6 10.6a5.6 5.6 0 0 1-11.2 0C6.4 8.1 12 3.2 12 3.2z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="14" r="2.2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+                <span class="arch-name">PUBLIC SITE</span>
+              </div>
+              <span class="arch-sub">pkia.github.io · devlog</span>
+            </div>
+          </div>
         </div>
 
         <div class="arch-legend reveal">
@@ -425,7 +548,7 @@
           <span><i class="dim"></i>remote / agents</span>
         </div>
         <ul class="chips chips-sm arch-chips reveal">
-          <li>Pi 5 · 8 GB</li><li>7 network services</li><li>2 cron agents</li>
+          <li>Pi 5 · 8 GB</li><li>7 network services</li><li>4 hermes cron jobs</li>
           <li>Tailscale VPN</li><li>AdGuard DNS</li><li>auto-rollback CD</li><li>pytest on every push</li>
         </ul>
       </div>
