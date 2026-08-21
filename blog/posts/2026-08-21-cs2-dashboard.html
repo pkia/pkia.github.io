@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Three data sources, one live score: building a CS2 kiosk — EV</title>
+  <meta name="description" content="How the esports dashboard on my Raspberry Pi kiosk stitches together Liquipedia, bo3.gg and HLTV's scorebot to show live round scores, map vetoes and an embedded stream — and the bugs fought along the way." />
+  <meta property="og:title" content="Three data sources, one live score: building a CS2 kiosk" />
+  <meta property="og:description" content="Project deep-dive — Liquipedia, bo3.gg and HLTV's scorebot, one kiosk screen." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-08-21-cs2-dashboard.html" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/" aria-current="page">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">06</span> — Devlog</p>
+        <h1 class="post-title reveal">Three data sources, one live score: building a CS2 kiosk</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">project</span>
+          <time datetime="2026-08-21">Friday, 21 August 2026</time>
+          <span>·</span>
+          <span>deep-dive</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          The maritime kiosk on my desk tracks ships, satellites and RF spectrum
+          around the the city coast. It turns out a touchscreen that's on 24/7 has a
+          spare seat, and I follow the CS2 pro scene — so this week it got a
+          second dashboard:
+          <a href="https://github.com/pkia/cs2-dashboard" target="_blank" rel="noopener">cs2-dashboard</a>,
+          plus a small chooser screen
+          (<a href="https://github.com/pkia/kiosk-home" target="_blank" rel="noopener">kiosk-home</a>)
+          so the kiosk boots into neither and both. The interesting part wasn't
+          the UI. It was discovering just how deep you have to dig to answer
+          one question: <em>what's the score, right now?</em>
+        </p>
+
+        <h2>The easy layer</h2>
+        <p>
+          <a href="https://liquipedia.net/counterstrike" target="_blank" rel="noopener">Liquipedia</a>
+          is how this should work everywhere: one documented API call returns
+          every live, upcoming and finished match — teams, logos, tournaments,
+          streams — and their terms welcome polite automation. A small DOM-tree
+          parser, a two-minute cache that serves stale data while refreshing in
+          the background, and the schedule half of the dashboard was done in an
+          afternoon.
+        </p>
+        <p>
+          Then the catch, found during a live map: Liquipedia publishes the
+          series score <em>between</em> maps. Mid-map, the honest answer is
+          nothing at all. For a viewer that's useless — the thing you actually
+          want mid-round is "7–4, round 12, Mirage".
+        </p>
+
+        <h2>Finding a source that actually knows</h2>
+        <p>
+          I tested the candidates from this Pi rather than trusting anyone's
+          docs. HLTV and Sofascore: 403, bot protection, no conversation.
+          PandaScore has a free tier but keeps the interesting granularity
+          behind the paywall. Then a lucky break:
+          <a href="https://bo3.gg" target="_blank" rel="noopener">bo3.gg</a>'s
+          page shell loaded with plain <code>curl</code> — a JavaScript app,
+          which meant the real data lived in an API their own frontend calls.
+        </p>
+        <p>
+          So I used the stealth browser (camoufox, already on this Pi) as a
+          <em>discovery tool</em> rather than a runtime: loaded their site,
+          recorded every XHR it made, and out fell a clean JSON API — live
+          matches, map statuses, per-match streams with viewer counts, team
+          world ranks — plus a websocket that pushes "something changed"
+          events. The websocket even accepts a plain Python client once you
+          send the right <code>Origin</code> header. The runtime needs no
+          browser, no key, no scraping.
+        </p>
+        <p>
+          Two design rules fell out of that websocket. One: events are used
+          only as a trigger to re-poll REST, never parsed — their payload
+          schema can change and nothing breaks. Two: a failed fetch must never
+          clobber good cached data. That second rule was learned the hard way;
+          more below.
+        </p>
+
+        <h2>The scorebot</h2>
+        <p>
+          bo3.gg knows which map is live and updates the series score promptly,
+          but the per-round score for the events I watch comes from exactly one
+          place: HLTV's embedded scorebot. Behind bot protection. So the
+          camoufox runtime made it in after all — as a separate feeder service
+          that renders the match page, extracts the veto, per-map results with
+          half scores, and the live round score, and hands them over as a JSON
+          file. If the browser hangs or dies, the dashboard loses a feature,
+          never availability.
+        </p>
+        <p>
+          The feeder's favourite bug: HLTV's scorebot renders
+          <em>asynchronously</em>. On a cold page load my fixed 4-second wait
+          happened to win the race; on warm, cached repeat loads it lost every
+          time, and the score quietly went null mid-match. The fix is to wait
+          for the element instead of guessing a sleep. The bigger win came
+          after: why re-render the page at all? The page keeps HLTV's own
+          scorebot websocket alive — so the feeder now leaves it open and just
+          reads the numbers out of the live DOM every eight seconds. Round
+          scores land seconds after they happen, and the Pi barely notices.
+        </p>
+
+        <h2>The stream that kept dying</h2>
+        <p>
+          Embedding the broadcast under the score was meant to be the easy
+          part. It became a trilogy. First, Twitch's player hit a login wall
+          whose buttons navigate the host page — on a kiosk with no address
+          bar, that's a fullscreen trap. The iframe is sandboxed now; the
+          embed can never take over the screen again. Second, the stream died
+          every thirty seconds, which turned out to be my own UI: every poll
+          rebuilt the featured card, destroying the iframe along with it. The
+          card now only rebuilds on structural change — round scores and
+          viewer counts are patched into the DOM in place. Third, the rebuilds
+          were being triggered by data flapping: viewer counts reordering the
+          stream list, and a transient API failure wiping cached teams and
+          streams. Both fixed; the signature is order-insensitive and the
+          cache keeps last-good data for half an hour.
+        </p>
+
+        <h2>What the screen shows now</h2>
+        <p>
+          The live tab leads with the stream, because that's why you'd walk
+          over to it: the game video large on the left, map pills and the veto
+          line beneath, and beside it the series score, the running round
+          (team-ordered — the scorebot reports by CT/T side, and sides swap at
+          halftime), world ranks, and what's on next. All three sources degrade
+          independently; the dashboard shows whatever the survivors know.
+        </p>
+        <p>
+          Everything's on GitHub with the same CI/CD as the rest of the Pi:
+          <a href="https://github.com/pkia/cs2-dashboard" target="_blank" rel="noopener">cs2-dashboard</a>
+          and <a href="https://github.com/pkia/kiosk-home" target="_blank" rel="noopener">kiosk-home</a>.
+          The whole stack got its first full live test during Esports World Cup
+          playoffs — Vitality against Spirit, kickoff 18:50. If the round score
+          on the kiosk keeps up with the crowd noise, it worked.
+        </p>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+        <a href="https://www." target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.55V9h3.57v11.45Z"/></svg>
+        </a>
+        <a href="mailto:" aria-label="Email">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M3 6h18v12H3zM3 7l9 6 9-6"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js" defer></script>
+</body>
+</html>
