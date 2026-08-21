@@ -120,6 +120,12 @@ Rules:
 - Keep the intro bio, contact links and profile-views badge untouched unless
   genuinely outdated; keep the markdown valid and the concise engineer voice;
   no emoji spam.
+- **Profile-views badge health**: counter services die (komarev.com went 404
+  in Aug 2026; replaced with `https://count.getloli.com/get/@pkia-github?theme=normal`).
+  Occasionally verify the badge URL still returns an image (curl status +
+  content-type). If the service is dead, swap to a live counter service — and
+  confirm it renders through GitHub's camo proxy by checking the profile page
+  HTML — or remove the badge line. Never leave a broken image.
 - Only push a commit when something actually changed — never churn for the
   sake of change. If the API update fails, report the failure and continue
   with the rest of the job.
