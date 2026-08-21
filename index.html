@@ -105,8 +105,8 @@
             <span class="stat-label">years building &amp; shipping</span>
           </div>
           <div class="stat reveal">
-            <span class="stat-num"><span data-count="25">0</span>+</span>
-            <span class="stat-label">projects, repos &amp; services</span>
+            <span class="stat-num"><span data-count="8">0</span></span>
+            <span class="stat-label">live services on the home-lab Pi</span>
           </div>
           <div class="stat reveal">
             <span class="stat-num"><span data-count="45">0</span>%</span>
@@ -166,9 +166,9 @@
             <div class="panel">
               <h3 class="panel-title">Currently</h3>
               <ul class="fact-list">
-                <li><span>Vibe coding</span> building with AI — my main focus right now</li>
-                <li><span>Building</span> a self-hosted marine situation display</li>
-                <li><span>Learning</span> everything RF, one satellite pass at a time</li>
+                <li><span>Running</span> an agentic devlog → implementer loop (radar)</li>
+                <li><span>Hardening</span> CI/CD with auto-rollback for every Pi service</li>
+                <li><span>Digging into</span> a growing pile of AIS captures</li>
                 <li><span>Located</span> Cork, Ireland — remote-friendly</li>
               </ul>
             </div>
@@ -226,6 +226,27 @@
 
           <article class="project-card reveal">
             <div class="project-top">
+              <span class="project-badge subtle">Ops</span>
+              <span class="project-year">2026</span>
+            </div>
+            <h3>pi-cicd</h3>
+            <p>
+              The CI/CD machinery that runs the Pi itself: a project-guard that
+              auto-adopts and versions every directory on the box, pull-based
+              deploys with compile gates, health checks and automatic rollback,
+              plus continuous backup of work-in-progress. The architecture
+              reference for how everything here ships.
+            </p>
+            <ul class="chips chips-sm">
+              <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
+            </ul>
+            <a class="project-link" href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">View on GitHub
+              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+
+          <article class="project-card reveal">
+            <div class="project-top">
               <span class="project-badge win">🏆 Hackathon winner</span>
               <span class="project-year">2021</span>
             </div>
@@ -265,7 +286,8 @@
         </div>
 
         <p class="more-link reveal">
-          Also: a <a href="https://github.com/pkia/CoinMarketCap_Scraper" target="_blank" rel="noopener">CoinMarketCap dataset scraper</a>
+          Also: <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar</a> — the agentic devlog/implementer loop that keeps this site honest —
+          a growing <a href="https://github.com/pkia/ais_analysis" target="_blank" rel="noopener">AIS capture archive</a> awaiting analysis,
           and a graveyard of experiments, archived with honour.
           <a href="https://github.com/pkia?tab=repositories" target="_blank" rel="noopener">Browse everything →</a>
         </p>
@@ -326,8 +348,8 @@
             <span class="tl-dot" aria-hidden="true"></span>
             <div class="tl-body">
               <p class="tl-date">Now</p>
-              <h3>Support engineer, ship spotter, vibe coder</h3>
-              <p>Deep-dive troubleshooting by day; AIS receivers, satellite decoders and ops portals on a Pi by night — and lately, building almost everything hand-in-hand with AI.</p>
+              <h3>Support engineer, ship spotter, agent supervisor</h3>
+              <p>Deep-dive troubleshooting by day; AIS receivers, satellite decoders and ops portals on a Pi by night — now orchestrated by a daily devlog → implementer loop that writes about itself every morning at 07:00.</p>
             </div>
           </li>
           <li class="reveal">
