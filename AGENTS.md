@@ -31,18 +31,21 @@ Sections, in order:
 
 1. **Intro** — one short paragraph setting the scene for the day.
 2. `Shipped` — work completed since the previous post.
-3. `On the radar` — future project ideas / what's coming next.
+3. `On the radar` — future project ideas / what's coming next. Make them
+   concrete and buildable: a 09:00 "radar implementer" job
+   (github.com/pkia/radar) picks one of these per day and builds it, so phrase
+   each as an actionable next step rather than a vague wish.
 4. `Interesting reads` — 2–3 external links.
 
 Content rules:
 
 - `Shipped` must be evidence-backed. Determine the date of the newest existing
-  post (filename), then run git log since that date, e.g.
-  `git -C <repo> log --since=<YYYY-MM-DD> --oneline`, across:
-  `/home/ev/personal-website`, `/home/ev/maritime-dashboard`,
-  `/home/ev/project-hub`, `/home/ev/pi-cicd`, `/home/ev/ais_analysis`
-  (skip repos that don't exist). Summarise real commits in first person;
-  link repos as `https://github.com/pkia/<repo>`.
+  post (filename), then discover the repos to cover with
+  `for d in /home/ev/*/; do git -C "$d" remote get-url origin 2>/dev/null | grep -q pkia && echo "$d"; done`
+  (owned repos only — new repos created by the radar implementer show up here
+  automatically) and run `git -C <repo> log --since=<YYYY-MM-DD> --oneline`
+  in each. Summarise real commits in first person; link repos as
+  `https://github.com/pkia/<repo>`.
 - Quiet day with no commits? Say so in one line and lean on `On the radar`
   and `Interesting reads`. Never invent work.
 - `Interesting reads`: pick 2–3 current items matching my interests — AI / dev
