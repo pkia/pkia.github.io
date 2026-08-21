@@ -122,6 +122,27 @@
     });
   }
 
+  /* ---------- Pi architecture: flow highlighting ---------- */
+  var archStage = document.querySelector(".arch-stage");
+  if (archStage) {
+    var archFlows = archStage.querySelectorAll(".arch-flow");
+    if (reduceMotion) {
+      archStage.querySelectorAll(".arch-pulse").forEach(function (p) { p.remove(); });
+    }
+    archStage.querySelectorAll(".arch-card").forEach(function (card) {
+      var node = card.getAttribute("data-node");
+      card.addEventListener("mouseenter", function () {
+        archFlows.forEach(function (f) {
+          var links = (f.getAttribute("data-link") || "").split(" ");
+          f.classList.toggle("lit", links.indexOf(node) !== -1);
+        });
+      });
+      card.addEventListener("mouseleave", function () {
+        archFlows.forEach(function (f) { f.classList.remove("lit"); });
+      });
+    });
+  }
+
   /* ---------- Footer year ---------- */
   var year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());
