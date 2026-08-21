@@ -57,6 +57,9 @@ Content rules:
   unavailable this run, omit the section gracefully.
 - Tone: first-person engineer's devlog — concise, concrete, a little dry
   humour is fine, no marketing voice, no emoji spam.
+- **Never publish network addresses** — no LAN IPs, no Tailscale/tailnet IPs,
+  no hostnames that resolve to the home network (say "LAN" or "tailnet"
+  instead of the address). Applies to posts, homepage and profile README.
 
 ### Portfolio refresh (also part of the daily job)
 
