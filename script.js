@@ -147,15 +147,18 @@
   var term = document.getElementById("currently");
   if (term && "IntersectionObserver" in window && !reduceMotion) {
     term.classList.add("anim");
+    var playTerm = function () { term.classList.add("play"); };
     var termIo = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
-          term.classList.add("play");
+          playTerm();
           termIo.disconnect();
         }
       });
     }, { threshold: 0.45 });
     termIo.observe(term);
+    /* safety net: never leave the output hidden if the observer never fires */
+    setTimeout(playTerm, 6000);
   }
 
   /* ---------- Footer year ---------- */
