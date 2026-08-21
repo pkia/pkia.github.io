@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ship it: portfolio launch, hardened deploys, and a new architecture repo — Devlog — Evan Dunbar</title>
+  <meta name="description" content="Launch day: this site goes live, maritime-dashboard and project-hub ship with hardened CI/CD, pi-cicd becomes the architecture repo. Plus: CM5 programming jig news and AI-agent adoption numbers." />
+  <meta property="og:title" content="Ship it: portfolio launch, hardened deploys, and a new architecture repo" />
+  <meta property="og:description" content="Devlog, 21 Aug 2026 — launch day." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-08-21.html" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>evan&nbsp;dunbar</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/" aria-current="page">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">06</span> — Devlog</p>
+        <h1 class="post-title reveal">Ship it: portfolio launch, hardened deploys, and a new architecture repo</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-08-21">Friday, 21 August 2026</time>
+          <span>·</span>
+          <span>launch day</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Busy day on the Pi. This devlog is the first entry of what will be a
+          daily habit — every morning at 7am an agent reads the git history of my
+          projects and writes this post, so it stays honest by construction: if
+          it's in here, there's a commit to back it up.
+        </p>
+
+        <h2>Shipped today</h2>
+        <ul>
+          <li>
+            <strong>This website</strong> — launched the portfolio at
+            <a href="https://pkia.github.io/">pkia.github.io</a>: navy maritime
+            theme, animated radar hero, vanilla HTML/CSS/JS with no build step.
+            This devlog now lives here too.
+          </li>
+          <li>
+            <strong><a href="https://github.com/pkia/maritime-dashboard" target="_blank" rel="noopener">maritime-dashboard</a></strong> —
+            repo went public with pytest CI and pull-based CD. Hardened the NOAA
+            scheduler to pause <code>sdr-monitor</code> during satellite passes,
+            made runtime paths checkout-relative, and taught the deploy loop
+            marker-based restarts with dirty-tree and flap guards.
+          </li>
+          <li>
+            <strong><a href="https://github.com/pkia/project-hub" target="_blank" rel="noopener">project-hub</a></strong> —
+            the ops portal shipped with the same CI/CD treatment: environment-agnostic
+            tests that pass on the Pi and on GitHub runners alike, and
+            <code>deploy.log</code> no longer dirties the tree.
+          </li>
+          <li>
+            <strong>pi-cicd</strong> — new flagship repo documenting the whole
+            CI/CD architecture on this machine. Fixed a pile of project-guard
+            adoption bugs along the way: lost <code>.gitignore</code>, overwritten
+            script checks, a hardcoded <code>main</code> branch, container
+            handling, zero-commit repos.
+          </li>
+          <li>
+            <strong>ais_analysis</strong> — initial import under the guard, plus a
+            CI fix for the install step exiting 1 without a
+            <code>requirements.txt</code>.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            Grow <strong>pi-cicd</strong> into the single architecture reference
+            for how everything on this Pi builds, tests, deploys and rolls back.
+          </li>
+          <li>
+            Start making sense of the AIS data pile in <strong>ais_analysis</strong> —
+            first proper look at what the station has been collecting.
+          </li>
+          <li>
+            Keep this devlog honest and boring: tests green, deploys dull,
+            rollback never needed.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.raspberrypi.com/news/" target="_blank" rel="noopener">Raspberry Pi shipped a Compute Module 5 Programming Jig</a> —
+            simple, repeatable provisioning for CM5 modules. Announced today,
+            aimed at production lines rather than home labs, but a nice sign of
+            where the industrial side of the ecosystem is going.
+          </li>
+          <li>
+            <a href="https://blog.jetbrains.com/research/2026/08/ai-coding-agent-adoption-2026/" target="_blank" rel="noopener">JetBrains: 90% of professional developers now use AI coding agents weekly</a> —
+            their May–July 2026 adoption research. The vibe-coding wave stopped
+            being a niche thing a while ago; numbers like this make it official.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Evan Dunbar · Cork, Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/evan-dunbar-a184641a1/" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.55V9h3.57v11.45Z"/></svg>
+        </a>
+        <a href="mailto:evandunb@gmail.com" aria-label="Email">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M3 6h18v12H3zM3 7l9 6 9-6"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js" defer></script>
+</body>
+</html>
