@@ -21,6 +21,9 @@ at `blog/`; each post is a standalone HTML page styled by the site's existing
 - Index update: prepend a new `<article class="post-card reveal">` directly
   below the `<!-- ... -->` marker line inside `<div id="post-list">` in
   `blog/index.html` — newest post always first.
+- Feed + sitemap update: prepend a matching `<item>` to `feed.xml` (title,
+  link, guid, pubDate at 07:00 +0100, description = the post card's summary)
+  and add the post URL to `sitemap.xml`.
 - Copy the overall page structure (head, nav, footer, `post-header`,
   `post-body`) from the newest existing post in `blog/posts/`. Link assets
   absolutely: `/styles.css`, `/script.js`, `/favicon.svg`; nav links use
@@ -75,10 +78,17 @@ is current. Rules:
   ais_analysis, hub, pi-cicd) before older highlights; past eight, fold the
   least significant into the "Also:" `.more-link` line instead. Badges must
   stay honest: "In progress" until the work is committed and green.
-- **"Currently" panel** (in `#about`): update the fact-list entries to match
-  what is actually being worked on right now (recent commits + the radar
-  board's In progress / Proposed items). Keep the four-entry shape and label
-  style.
+- **"Currently" panel** (`#currently`, in `#about`): a terminal-styled panel
+  showing `systemctl status currently` output. Update the systemd-style lines
+  to match what is actually being worked on right now (recent commits + the
+  radar board's In progress / Proposed items). Shape per line:
+  `● <unit>  active (running|waiting)  <one-line description>` — keep two or
+  three work units plus the final `location.service … active (permanent)`
+  the city line. Unit names are lowercase-hyphenated slugs (e.g.
+  `radar-agent.service`; use `.timer` + `active (waiting)` for recurring
+  background work). Leave the command line, closing prompt line and window
+  chrome untouched; if you change the command text, update the `--term-ch`
+  style hint on `.term-type` to its character count.
 - **Journey timeline** (`#journey`): only for genuinely notable milestones
   (a new flagship project going live, awards, role changes) — add an entry
   or refresh the "Now" entry. Do not add an entry per day.
@@ -135,7 +145,7 @@ Rules:
 ### Publish flow
 
 ```bash
-git add blog index.html styles.css
+git add blog index.html styles.css script.js feed.xml sitemap.xml
 git commit -m "devlog: YYYY-MM-DD"        # + a separate "content: ..." commit if portfolio content changed
 git push origin master
 ```

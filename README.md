@@ -15,6 +15,11 @@ blog/posts/*.html     one devlog post per day (YYYY-MM-DD.html)
 styles.css            design system (navy maritime theme, radar accent)
 script.js             reveals, counters, rotating greeting, copy-email
 favicon.svg           radar mark
+og.png                social share card (1200×630)
+apple-touch-icon.png  home-screen icon
+feed.xml              RSS feed for the devlog
+sitemap.xml · robots.txt   search engine plumbing
+404.html              themed "signal lost" page
 AGENTS.md             conventions for the automated devlog writer
 ```
 

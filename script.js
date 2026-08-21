@@ -143,6 +143,21 @@
     });
   }
 
+  /* ---------- "Currently" terminal: staged playback ---------- */
+  var term = document.getElementById("currently");
+  if (term && "IntersectionObserver" in window && !reduceMotion) {
+    term.classList.add("anim");
+    var termIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          term.classList.add("play");
+          termIo.disconnect();
+        }
+      });
+    }, { threshold: 0.45 });
+    termIo.observe(term);
+  }
+
   /* ---------- Footer year ---------- */
   var year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());

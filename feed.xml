@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>EV — Devlog</title>
+    <link>https://pkia.github.io/blog/</link>
+    <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Ireland.</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 21 Aug 2026 07:00:00 +0100</lastBuildDate>
+    <atom:link href="https://pkia.github.io/feed.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Three data sources, one live score: building a CS2 kiosk</title>
+      <link>https://pkia.github.io/blog/posts/2026-08-21-cs2-dashboard.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-08-21-cs2-dashboard.html</guid>
+      <pubDate>Fri, 21 Aug 2026 07:00:00 +0100</pubDate>
+      <description>The maritime kiosk gets an esports sibling. Liquipedia for the schedule, bo3.gg for live series state, HLTV's scorebot (via a stealth Firefox that only ever reads) for the running round score — plus the login-wall trap, the stream that died every thirty seconds, and why a failed fetch must never clobber good data.</description>
+    </item>
+
+    <item>
+      <title>Ship it: portfolio launch, hardened deploys, and a new architecture repo</title>
+      <link>https://pkia.github.io/blog/posts/2026-08-21.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-08-21.html</guid>
+      <pubDate>Fri, 21 Aug 2026 07:00:00 +0100</pubDate>
+      <description>Launch day: this site goes live, maritime-dashboard and project-hub ship to GitHub with marker-based deploys and flap guards, pi-cicd becomes the flagship architecture repo — plus CM5 jig news and AI-agent adoption numbers.</description>
+    </item>
+  </channel>
+</rss>
