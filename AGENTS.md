@@ -7,8 +7,10 @@ HTML/CSS/JS, no build step. The deploy branch is `master` — pushing to
 
 ## Devlog job (runs daily at 07:00 via hermes cron)
 
-Write today's devlog post and publish it. The blog is at `blog/`; each post is
-a standalone HTML page styled by the site's existing `styles.css`.
+Write today's devlog post and publish it, then refresh the homepage content to
+match the current state of things (see "Portfolio refresh" below). The blog is
+at `blog/`; each post is a standalone HTML page styled by the site's existing
+`styles.css`.
 
 ### File conventions
 
@@ -55,11 +57,36 @@ Content rules:
 - Tone: first-person engineer's devlog — concise, concrete, a little dry
   humour is fine, no marketing voice, no emoji spam.
 
+### Portfolio refresh (also part of the daily job)
+
+After writing the post, bring the homepage content up to date with what the
+git history and the radar board (https://github.com/pkia/radar/IDEAS.md) say
+is current. Rules:
+
+- **Projects section** (`#projects`): add a `.project-card` for any owned
+  repo that has shipped real substance (README, tests, working code) and is
+  not already listed. Copy the exact markup pattern of an existing card
+  (`.project-top`, badge, year, `chips-sm`, GitHub link). If the grid would
+  grow past five cards, fold the least significant older ones into the
+  "Also:" `.more-link` line instead.
+- **"Currently" panel** (in `#about`): update the fact-list entries to match
+  what is actually being worked on right now (recent commits + the radar
+  board's In progress / Proposed items). Keep the four-entry shape and label
+  style.
+- **Journey timeline** (`#journey`): only for genuinely notable milestones
+  (a new flagship project going live, awards, role changes) — add an entry
+  or refresh the "Now" entry. Do not add an entry per day.
+- **Stats bar**: update counts only when clearly stale (e.g. number of
+  projects/repos).
+- Content changes only: never redesign, never restyle, never restructure
+  sections, never touch the hero copy, experience or contact sections. Reuse
+  existing classes and keep the HTML valid.
+
 ### Publish flow
 
 ```bash
 git add blog index.html styles.css
-git commit -m "devlog: YYYY-MM-DD"
+git commit -m "devlog: YYYY-MM-DD"        # + a separate "content: ..." commit if portfolio content changed
 git push origin master
 ```
 
