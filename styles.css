@@ -503,6 +503,52 @@ strong { color: #fff; font-weight: 600; }
 }
 .reveal.visible { opacity: 1; transform: none; }
 
+/* ============ Pi architecture ============ */
+
+.arch-intro {
+  margin: -1.4rem 0 2.6rem; max-width: 46rem;
+  color: var(--text-dim); font-size: 1.04rem;
+}
+.arch-svg { width: 100%; height: auto; display: block; }
+.arch-svg text { font-family: var(--font-mono); }
+.arch-box {
+  fill: rgba(11, 20, 36, .5);
+  stroke: var(--line-strong);
+  stroke-dasharray: 7 7;
+}
+.arch-box-title { fill: var(--text); font-size: 12.5px; letter-spacing: .2em; font-weight: 500; }
+.arch-box-sub { fill: var(--text-faint); font-size: 9.5px; letter-spacing: .06em; }
+.arch-band { fill: rgba(76, 201, 240, .035); stroke: rgba(76, 201, 240, .22); stroke-dasharray: 4 5; }
+.arch-band-rf { fill: rgba(255, 209, 102, .035); stroke: rgba(255, 209, 102, .22); }
+.arch-band-label { fill: var(--text-faint); font-size: 9.5px; letter-spacing: .24em; }
+.arch-band-label-rf { fill: rgba(255, 209, 102, .75); }
+.arch-node { fill: var(--bg-panel); stroke: var(--line-strong); }
+.arch-node-rf { stroke: rgba(255, 209, 102, .45); }
+.arch-node-name { fill: var(--text); font-size: 10.5px; letter-spacing: .03em; font-weight: 500; }
+.arch-node-name-rf { fill: var(--gold); }
+.arch-node-port { fill: var(--text-faint); font-size: 9px; letter-spacing: .02em; }
+.arch-flow {
+  fill: none; stroke: var(--accent); stroke-width: 1.4;
+  stroke-dasharray: 5 6; marker-end: url(#arch-arrow);
+  animation: archflow 1.5s linear infinite;
+}
+.arch-flow-rf { stroke: var(--gold); }
+.arch-flow-dim { stroke: var(--text-faint); }
+@keyframes archflow { to { stroke-dashoffset: -22; } }
+
+.arch-legend {
+  display: flex; flex-wrap: wrap; gap: 1.4rem;
+  margin: 1.4rem 0 0;
+  font-family: var(--font-mono); font-size: .78rem; color: var(--text-faint);
+}
+.arch-legend span { display: inline-flex; align-items: center; gap: .5rem; }
+.arch-legend i {
+  width: 22px; height: 0; border-top: 2px dashed var(--accent);
+}
+.arch-legend i.rf { border-color: var(--gold); }
+.arch-legend i.dim { border-color: var(--text-faint); }
+.arch-chips { margin-top: 1.4rem; }
+
 /* ============ Devlog ============ */
 
 .page-hero { padding: 150px 0 0; }

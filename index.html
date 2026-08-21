@@ -32,6 +32,7 @@
       <nav class="nav-links" id="nav-links" aria-label="Primary">
         <a href="#about">About</a>
         <a href="#projects">Projects</a>
+        <a href="#architecture">The Pi</a>
         <a href="#experience">Experience</a>
         <a href="#journey">Journey</a>
         <a href="blog/">Devlog</a>
@@ -294,10 +295,146 @@
       </div>
     </section>
 
+    <!-- ============ PI ARCHITECTURE ============ -->
+    <section class="section" id="architecture">
+      <div class="container">
+        <p class="section-label reveal"><span class="section-index">03</span> — Architecture</p>
+        <h2 class="section-title reveal">One Pi, everything on it.</h2>
+        <p class="arch-intro reveal">
+          Almost everything on this page runs 24/7 on a single Raspberry Pi 5 in
+          the city — a ship-tracking RF station and weather-satellite receiver, the
+          DNS for the whole house, a CS2 match tracker, pull-based deploys with
+          auto-rollback, and a pair of AI agents that write the devlog and ship
+          improvements while I sleep.
+        </p>
+
+        <div class="reveal">
+          <svg class="arch-svg" viewBox="0 0 1080 750" role="img" aria-label="Architecture of the Raspberry Pi home server: RF and satellite stack, web services, ops and agent layer, and their network flows">
+            <defs>
+              <marker id="arch-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 Z" fill="context-stroke"/>
+              </marker>
+            </defs>
+
+            <!-- ============ FLOWS (under the nodes) ============ -->
+            <path class="arch-flow arch-flow-rf" d="M190 102 C 228 102, 252 138, 286 138"/>
+            <path class="arch-flow arch-flow-rf" d="M440 138 L 460 138"/>
+            <path class="arch-flow" d="M540 166 C 540 244, 412 244, 412 316"/>
+            <path class="arch-flow arch-flow-rf" d="M365 236 C 365 282, 402 282, 402 316"/>
+            <path class="arch-flow" d="M190 330 C 420 336, 715 320, 715 238"/>
+            <path class="arch-flow" d="M192 342 C 262 366, 262 626, 286 626"/>
+            <path class="arch-flow" d="M535 348 C 782 348, 890 246, 890 116"/>
+            <path class="arch-flow" d="M800 485 C 856 483, 890 402, 890 340"/>
+            <path class="arch-flow arch-flow-dim" d="M190 652 C 226 652, 226 700, 244 700"/>
+            <path class="arch-flow" d="M412 596 L 412 539"/>
+            <path class="arch-flow arch-flow-dim" d="M800 694 C 858 692, 890 662, 890 596"/>
+
+            <!-- ============ LEFT: INPUTS ============ -->
+            <rect class="arch-node arch-node-rf" x="10" y="70" width="180" height="64" rx="10"/>
+            <text class="arch-node-name arch-node-name-rf" x="100" y="97" text-anchor="middle">ROOFTOP ANTENNA</text>
+            <text class="arch-node-port" x="100" y="115" text-anchor="middle">AIS 162 · NOAA 137 MHz</text>
+
+            <rect class="arch-node" x="10" y="300" width="180" height="64" rx="10"/>
+            <text class="arch-node-name" x="100" y="327" text-anchor="middle">INTERNET</text>
+            <text class="arch-node-port" x="100" y="345" text-anchor="middle">GitHub · aisstream.io · HLTV</text>
+
+            <rect class="arch-node" x="10" y="620" width="180" height="64" rx="10"/>
+            <text class="arch-node-name" x="100" y="647" text-anchor="middle">TAILSCALE VPN</text>
+            <text class="arch-node-port" x="100" y="665" text-anchor="middle">phones · laptops · anywhere</text>
+
+            <!-- ============ CENTER: THE PI ============ -->
+            <rect class="arch-box" x="250" y="20" width="570" height="710" rx="18"/>
+            <text class="arch-box-title" x="535" y="48" text-anchor="middle">RASPBERRY PI 5 · 8 GB</text>
+            <text class="arch-box-sub" x="535" y="64" text-anchor="middle">192.168.0.7 LAN · 100.122.94.33 tailnet · Ireland</text>
+
+            <!-- RF band -->
+            <rect class="arch-band arch-band-rf" x="270" y="80" width="530" height="180" rx="12"/>
+            <text class="arch-band-label arch-band-label-rf" x="282" y="100">RF / SDR STACK</text>
+            <rect class="arch-node arch-node-rf" x="290" y="110" width="150" height="56" rx="8"/>
+            <text class="arch-node-name arch-node-name-rf" x="365" y="133" text-anchor="middle">RTL-SDR</text>
+            <text class="arch-node-port" x="365" y="150" text-anchor="middle">tuner gain 40</text>
+            <rect class="arch-node arch-node-rf" x="465" y="110" width="150" height="56" rx="8"/>
+            <text class="arch-node-name arch-node-name-rf" x="540" y="133" text-anchor="middle">AIS-CATCHER</text>
+            <text class="arch-node-port" x="540" y="150" text-anchor="middle">:8080 · ship decoder</text>
+            <rect class="arch-node arch-node-rf" x="640" y="110" width="150" height="56" rx="8"/>
+            <text class="arch-node-name arch-node-name-rf" x="715" y="133" text-anchor="middle">SDR-MONITOR</text>
+            <text class="arch-node-port" x="715" y="150" text-anchor="middle">signal health</text>
+            <rect class="arch-node arch-node-rf" x="290" y="180" width="150" height="56" rx="8"/>
+            <text class="arch-node-name arch-node-name-rf" x="365" y="203" text-anchor="middle">NOAA SCHED</text>
+            <text class="arch-node-port" x="365" y="220" text-anchor="middle">pass recorder</text>
+            <rect class="arch-node arch-node-rf" x="465" y="180" width="150" height="56" rx="8"/>
+            <text class="arch-node-name arch-node-name-rf" x="540" y="203" text-anchor="middle">SAT-AUDIO</text>
+            <text class="arch-node-port" x="540" y="220" text-anchor="middle">:8085 live audio</text>
+            <rect class="arch-node arch-node-rf" x="640" y="180" width="150" height="56" rx="8"/>
+            <text class="arch-node-name arch-node-name-rf" x="715" y="203" text-anchor="middle">ONLINE-SHIPS</text>
+            <text class="arch-node-port" x="715" y="220" text-anchor="middle">aisstream feed</text>
+
+            <!-- Services band -->
+            <rect class="arch-band" x="270" y="285" width="530" height="250" rx="12"/>
+            <text class="arch-band-label" x="282" y="305">WEB SERVICES</text>
+            <rect class="arch-node" x="290" y="320" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="412" y="343" text-anchor="middle">MARITIME DASHBOARD</text>
+            <text class="arch-node-port" x="412" y="360" text-anchor="middle">:8000 · AIS + NOAA + fleet</text>
+            <rect class="arch-node" x="555" y="320" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="677" y="343" text-anchor="middle">CS2 DASHBOARD</text>
+            <text class="arch-node-port" x="677" y="360" text-anchor="middle">:8001 · HLTV feeder</text>
+            <rect class="arch-node" x="290" y="390" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="412" y="413" text-anchor="middle">PROJECT HUB</text>
+            <text class="arch-node-port" x="412" y="430" text-anchor="middle">:8090 · ops portal</text>
+            <rect class="arch-node" x="555" y="390" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="677" y="413" text-anchor="middle">KIOSK HOME</text>
+            <text class="arch-node-port" x="677" y="430" text-anchor="middle">:8091 · launcher</text>
+            <rect class="arch-node" x="290" y="460" width="510" height="56" rx="8"/>
+            <text class="arch-node-name" x="545" y="483" text-anchor="middle">ADGUARD HOME</text>
+            <text class="arch-node-port" x="545" y="500" text-anchor="middle">:53 DNS for the whole house · admin :3001</text>
+
+            <!-- Ops band -->
+            <rect class="arch-band" x="270" y="560" width="530" height="150" rx="12" style="fill: rgba(148,178,215,.03); stroke: var(--line-strong);"/>
+            <text class="arch-band-label" x="282" y="580">OPS &amp; AGENTS</text>
+            <rect class="arch-node" x="290" y="598" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="412" y="621" text-anchor="middle">PULL-BASED CD</text>
+            <text class="arch-node-port" x="412" y="638" text-anchor="middle">3-min poll · auto-rollback</text>
+            <rect class="arch-node" x="555" y="598" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="677" y="621" text-anchor="middle">PROJECT-GUARD</text>
+            <text class="arch-node-port" x="677" y="638" text-anchor="middle">adopts repos · adds CI</text>
+            <rect class="arch-node" x="290" y="666" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="412" y="689" text-anchor="middle">HERMES GATEWAY</text>
+            <text class="arch-node-port" x="412" y="706" text-anchor="middle">agents · tools · chat</text>
+            <rect class="arch-node" x="555" y="666" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="677" y="689" text-anchor="middle">CRON AGENTS</text>
+            <text class="arch-node-port" x="677" y="706" text-anchor="middle">07:00 devlog · 09:00 radar</text>
+
+            <!-- ============ RIGHT: CONSUMERS ============ -->
+            <rect class="arch-node" x="890" y="80" width="180" height="64" rx="10"/>
+            <text class="arch-node-name" x="980" y="107" text-anchor="middle">TOUCHSCREEN KIOSK</text>
+            <text class="arch-node-port" x="980" y="125" text-anchor="middle">Weston + Chromium</text>
+
+            <rect class="arch-node" x="890" y="300" width="180" height="64" rx="10"/>
+            <text class="arch-node-name" x="980" y="327" text-anchor="middle">HOUSE NETWORK</text>
+            <text class="arch-node-port" x="980" y="345" text-anchor="middle">every device · DNS here</text>
+
+            <rect class="arch-node" x="890" y="560" width="180" height="64" rx="10"/>
+            <text class="arch-node-name" x="980" y="587" text-anchor="middle">PUBLIC SITE</text>
+            <text class="arch-node-port" x="980" y="605" text-anchor="middle">pkia.github.io · devlog</text>
+          </svg>
+        </div>
+
+        <div class="arch-legend reveal">
+          <span><i class="rf"></i>RF / satellite</span>
+          <span><i></i>web / data</span>
+          <span><i class="dim"></i>remote / agents</span>
+        </div>
+        <ul class="chips chips-sm arch-chips reveal">
+          <li>Pi 5 · 8 GB</li><li>7 network services</li><li>2 cron agents</li>
+          <li>Tailscale VPN</li><li>AdGuard DNS</li><li>auto-rollback CD</li><li>pytest on every push</li>
+        </ul>
+      </div>
+    </section>
+
     <!-- ============ EXPERIENCE ============ -->
     <section class="section" id="experience">
       <div class="container">
-        <p class="section-label reveal"><span class="section-index">03</span> — Experience &amp; education</p>
+        <p class="section-label reveal"><span class="section-index">04</span> — Experience &amp; education</p>
         <h2 class="section-title reveal">Where I've worked &amp; studied.</h2>
         <div class="exp-grid">
           <article class="exp-card reveal">
@@ -341,7 +478,7 @@
     <!-- ============ JOURNEY ============ -->
     <section class="section section-alt" id="journey">
       <div class="container">
-        <p class="section-label reveal"><span class="section-index">04</span> — Journey</p>
+        <p class="section-label reveal"><span class="section-index">05</span> — Journey</p>
         <h2 class="section-title reveal">A short timeline.</h2>
         <ol class="timeline">
           <li class="reveal">
@@ -383,7 +520,7 @@
     <!-- ============ CONTACT ============ -->
     <section class="section contact" id="contact">
       <div class="container contact-inner">
-        <p class="section-label reveal"><span class="section-index">05</span> — Contact</p>
+        <p class="section-label reveal"><span class="section-index">06</span> — Contact</p>
         <h2 class="section-title reveal">Let's talk.</h2>
         <p class="contact-copy reveal">
           Happy to talk reliability engineering, Raspberry Pi experiments, radio,
