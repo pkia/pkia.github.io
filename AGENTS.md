@@ -26,8 +26,11 @@ at `blog/`; each post is a standalone HTML page styled by the site's existing
   and add the post URL to `sitemap.xml`.
 - Copy the overall page structure (head, nav, footer, `post-header`,
   `post-body`) from the newest existing post in `blog/posts/`. Link assets
-  absolutely: `/styles.css`, `/script.js`, `/favicon.svg`; nav links use
-  `/#about`, `/#projects`, `/#journey`, `/blog/`, `/#contact`.
+  absolutely: `/styles.css?v=3`, `/script.js?v=3`, `/favicon.svg`; nav links
+  use `/#about`, `/#projects`, `/#architecture`, `/#experience`, `/#journey`,
+  `/blog/`, `/#contact`. Keep the `?v=` cache-buster on CSS/JS references —
+  bump the number everywhere (all pages) whenever `styles.css` or `script.js`
+  change meaningfully, so visitors never get new HTML with old assets.
 - Reuse existing CSS classes (`post-*`, `section-label`, `chips`, …). Only add
   to `styles.css` if genuinely necessary.
 

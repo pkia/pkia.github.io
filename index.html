@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=3" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -45,14 +45,14 @@
     /* Boot splash gate — must run before first paint. Shows the boot screen
        only on the homepage, once per session, never for reduced-motion
        visitors or deep links, and never without JS. Append ?boot=1 to force
-       it (for demoing). */
+       it (for demoing) — overrides the session flag and reduced-motion. */
     (function () {
       var force = /[?&]boot=1\b/.test(location.search);
       if (!force) {
         try { if (sessionStorage.getItem("booted")) return; } catch (e) { /* private mode */ }
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        if (location.hash) return;
       }
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      if (location.hash) return;
       document.documentElement.classList.add("boot");
     })();
   </script>
@@ -833,6 +833,6 @@
     </div>
   </footer>
 
-  <script src="script.js" defer></script>
+  <script src="script.js?v=3" defer></script>
 </body>
 </html>
