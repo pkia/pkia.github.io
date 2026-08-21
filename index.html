@@ -44,9 +44,13 @@
   <script>
     /* Boot splash gate — must run before first paint. Shows the boot screen
        only on the homepage, once per session, never for reduced-motion
-       visitors or deep links, and never without JS. */
+       visitors or deep links, and never without JS. Append ?boot=1 to force
+       it (for demoing). */
     (function () {
-      try { if (sessionStorage.getItem("booted")) return; } catch (e) { /* private mode */ }
+      var force = /[?&]boot=1\b/.test(location.search);
+      if (!force) {
+        try { if (sessionStorage.getItem("booted")) return; } catch (e) { /* private mode */ }
+      }
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       if (location.hash) return;
       document.documentElement.classList.add("boot");
