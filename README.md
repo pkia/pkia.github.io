@@ -27,5 +27,6 @@ Push to `master` and GitHub Pages deploys automatically.
 
 A hermes cron job on the Pi runs every morning at 07:00, gathers the previous
 day's commits across the home-lab repos, writes `blog/posts/YYYY-MM-DD.html`,
-prepends its card to `blog/index.html` and pushes to `master`. Conventions for
-that job live in `AGENTS.md`.
+prepends its card to `blog/index.html`, refreshes the homepage content
+(project cards, "Currently" panel, milestones) and pushes to `master`.
+Conventions for that job live in `AGENTS.md`.
