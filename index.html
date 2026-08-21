@@ -309,7 +309,7 @@
         </p>
 
         <div class="reveal">
-          <svg class="arch-svg" viewBox="0 0 1080 750" role="img" aria-label="Architecture of the Raspberry Pi home server: RF and satellite stack, web services, ops and agent layer, and their network flows">
+          <svg class="arch-svg" viewBox="0 0 1080 828" role="img" aria-label="Architecture of the Raspberry Pi home server: RF and satellite stack, web services, ops and agent layer with four hermes cron jobs, and their network flows">
             <defs>
               <marker id="arch-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
                 <path d="M0 0 L10 5 L0 10 Z" fill="context-stroke"/>
@@ -322,12 +322,12 @@
             <path class="arch-flow" d="M540 166 C 540 244, 412 244, 412 316"/>
             <path class="arch-flow arch-flow-rf" d="M365 236 C 365 282, 402 282, 402 316"/>
             <path class="arch-flow" d="M190 330 C 420 336, 715 320, 715 238"/>
-            <path class="arch-flow" d="M192 342 C 262 366, 262 626, 286 626"/>
+            <path class="arch-flow" d="M192 342 C 262 366, 262 624, 286 624"/>
             <path class="arch-flow" d="M535 348 C 782 348, 890 246, 890 116"/>
             <path class="arch-flow" d="M800 485 C 856 483, 890 402, 890 340"/>
             <path class="arch-flow arch-flow-dim" d="M190 652 C 226 652, 226 700, 244 700"/>
             <path class="arch-flow" d="M412 596 L 412 539"/>
-            <path class="arch-flow arch-flow-dim" d="M800 694 C 858 692, 890 662, 890 596"/>
+            <path class="arch-flow arch-flow-dim" d="M800 688 C 856 684, 890 656, 890 598"/>
 
             <!-- ============ LEFT: INPUTS ============ -->
             <rect class="arch-node arch-node-rf" x="10" y="70" width="180" height="64" rx="10"/>
@@ -343,7 +343,7 @@
             <text class="arch-node-port" x="100" y="665" text-anchor="middle">phones · laptops · anywhere</text>
 
             <!-- ============ CENTER: THE PI ============ -->
-            <rect class="arch-box" x="250" y="20" width="570" height="710" rx="18"/>
+            <rect class="arch-box" x="250" y="20" width="570" height="788" rx="18"/>
             <text class="arch-box-title" x="535" y="48" text-anchor="middle">RASPBERRY PI 5 · 8 GB</text>
             <text class="arch-box-sub" x="535" y="64" text-anchor="middle">192.168.0.7 LAN · 100.122.94.33 tailnet · Ireland</text>
 
@@ -389,20 +389,26 @@
             <text class="arch-node-port" x="545" y="500" text-anchor="middle">:53 DNS for the whole house · admin :3001</text>
 
             <!-- Ops band -->
-            <rect class="arch-band" x="270" y="560" width="530" height="150" rx="12" style="fill: rgba(148,178,215,.03); stroke: var(--line-strong);"/>
+            <rect class="arch-band" x="270" y="560" width="530" height="232" rx="12" style="fill: rgba(148,178,215,.03); stroke: var(--line-strong);"/>
             <text class="arch-band-label" x="282" y="580">OPS &amp; AGENTS</text>
-            <rect class="arch-node" x="290" y="598" width="245" height="56" rx="8"/>
-            <text class="arch-node-name" x="412" y="621" text-anchor="middle">PULL-BASED CD</text>
-            <text class="arch-node-port" x="412" y="638" text-anchor="middle">3-min poll · auto-rollback</text>
-            <rect class="arch-node" x="555" y="598" width="245" height="56" rx="8"/>
-            <text class="arch-node-name" x="677" y="621" text-anchor="middle">PROJECT-GUARD</text>
-            <text class="arch-node-port" x="677" y="638" text-anchor="middle">adopts repos · adds CI</text>
-            <rect class="arch-node" x="290" y="666" width="245" height="56" rx="8"/>
-            <text class="arch-node-name" x="412" y="689" text-anchor="middle">HERMES GATEWAY</text>
-            <text class="arch-node-port" x="412" y="706" text-anchor="middle">agents · tools · chat</text>
-            <rect class="arch-node" x="555" y="666" width="245" height="56" rx="8"/>
-            <text class="arch-node-name" x="677" y="689" text-anchor="middle">CRON AGENTS</text>
-            <text class="arch-node-port" x="677" y="706" text-anchor="middle">07:00 devlog · 09:00 radar</text>
+            <rect class="arch-node" x="290" y="596" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="412" y="619" text-anchor="middle">PULL-BASED CD</text>
+            <text class="arch-node-port" x="412" y="636" text-anchor="middle">3-min poll · auto-rollback</text>
+            <rect class="arch-node" x="555" y="596" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="677" y="619" text-anchor="middle">PROJECT-GUARD</text>
+            <text class="arch-node-port" x="677" y="636" text-anchor="middle">adopts repos · adds CI</text>
+            <rect class="arch-node" x="290" y="660" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="412" y="683" text-anchor="middle">HERMES GATEWAY</text>
+            <text class="arch-node-port" x="412" y="700" text-anchor="middle">agents · tools · messaging</text>
+            <rect class="arch-node" x="555" y="660" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="677" y="683" text-anchor="middle">CRON · AI AGENTS</text>
+            <text class="arch-node-port" x="677" y="700" text-anchor="middle">07:00 devlog · 09:00 radar</text>
+            <rect class="arch-node" x="290" y="724" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="412" y="747" text-anchor="middle">HEALTH WATCHDOG</text>
+            <text class="arch-node-port" x="412" y="764" text-anchor="middle">every 30m · no-agent script</text>
+            <rect class="arch-node" x="555" y="724" width="245" height="56" rx="8"/>
+            <text class="arch-node-name" x="677" y="747" text-anchor="middle">PIPELINE CHECK</text>
+            <text class="arch-node-port" x="677" y="764" text-anchor="middle">hourly · CI compliance audit</text>
 
             <!-- ============ RIGHT: CONSUMERS ============ -->
             <rect class="arch-node" x="890" y="80" width="180" height="64" rx="10"/>
@@ -425,7 +431,7 @@
           <span><i class="dim"></i>remote / agents</span>
         </div>
         <ul class="chips chips-sm arch-chips reveal">
-          <li>Pi 5 · 8 GB</li><li>7 network services</li><li>2 cron agents</li>
+          <li>Pi 5 · 8 GB</li><li>7 network services</li><li>4 hermes cron jobs</li>
           <li>Tailscale VPN</li><li>AdGuard DNS</li><li>auto-rollback CD</li><li>pytest on every push</li>
         </ul>
       </div>
