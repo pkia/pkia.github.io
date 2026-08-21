@@ -70,9 +70,11 @@ is current. Rules:
 - **Projects section** (`#projects`): add a `.project-card` for any owned
   repo that has shipped real substance (README, tests, working code) and is
   not already listed. Copy the exact markup pattern of an existing card
-  (`.project-top`, badge, year, `chips-sm`, GitHub link). If the grid would
-  grow past five cards, fold the least significant older ones into the
-  "Also:" `.more-link` line instead.
+  (`.project-top`, badge, year, `chips-sm`, GitHub link). Keep the grid at
+  about eight cards — flagship first, then recent home-lab work (radar, cs2,
+  ais_analysis, hub, pi-cicd) before older highlights; past eight, fold the
+  least significant into the "Also:" `.more-link` line instead. Badges must
+  stay honest: "In progress" until the work is committed and green.
 - **"Currently" panel** (in `#about`): update the fact-list entries to match
   what is actually being worked on right now (recent commits + the radar
   board's In progress / Proposed items). Keep the four-entry shape and label

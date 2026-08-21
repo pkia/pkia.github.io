@@ -604,17 +604,20 @@ strong { color: #fff; font-weight: 600; }
 .arch-name {
   font-family: var(--font-mono);
   font-size: clamp(.56rem, 1.04cqw, .68rem); font-weight: 500; letter-spacing: .045em;
+  line-height: 1.25;
   color: var(--text); white-space: nowrap;
 }
 .rf .arch-name { color: var(--gold); }
 .arch-sub {
   font-family: var(--font-mono);
   font-size: clamp(.48rem, .88cqw, .58rem); letter-spacing: .02em;
+  line-height: 1.25;
   color: var(--text-faint); white-space: nowrap;
 }
 .arch-src {
   font-family: var(--font-mono);
   font-size: clamp(.46rem, .84cqw, .56rem); color: var(--accent); opacity: .8;
+  line-height: 1.25;
   white-space: nowrap;
 }
 
