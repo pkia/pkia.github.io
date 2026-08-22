@@ -5,8 +5,16 @@
     <link>https://pkia.github.io/blog/</link>
     <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Ireland.</description>
     <language>en</language>
-    <lastBuildDate>Fri, 21 Aug 2026 07:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Sat, 22 Aug 2026 07:00:00 +0100</lastBuildDate>
     <atom:link href="https://pkia.github.io/feed.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Evening after launch: diagrams, boot splashes and protocol v2</title>
+      <link>https://pkia.github.io/blog/posts/2026-08-22.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-08-22.html</guid>
+      <pubDate>Sat, 22 Aug 2026 07:00:00 +0100</pubDate>
+      <description>The evening after launch day: an interactive architecture diagram of the Pi, a systemd-style boot splash, radar protocol v2 with a run log and a 14:00 slot, a METEOR demod fix — plus Slack's multiplayer vibe-coding channels and the state of 137 MHz in 2026.</description>
+    </item>
 
     <item>
       <title>Three data sources, one live score: building a CS2 kiosk</title>

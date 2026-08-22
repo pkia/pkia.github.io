@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Evening after launch: diagrams, boot splashes and protocol v2 — Devlog — EV</title>
+  <meta name="description" content="Devlog, 22 Aug 2026 — the evening after launch: an interactive architecture diagram of the Pi, a boot splash, radar protocol v2 with a run log, a METEOR demod fix, and a quieter night of guard housekeeping." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-08-22.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Evening after launch: diagrams, boot splashes and protocol v2" />
+  <meta property="og:description" content="Devlog, 22 Aug 2026 — the evening after launch." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-08-22.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-08-22T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=3" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">08</span> — Devlog</p>
+        <h1 class="post-title reveal">Evening after launch: diagrams, boot splashes and protocol v2</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-08-22">Saturday, 22 August 2026</time>
+          <span>·</span>
+          <span>quiet build-out</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday was all about shipping; this morning's log covers the evening
+          after — when the launch adrenaline wears off and the second-guessing
+          starts. I spent it making the site more honest about what actually
+          runs on the Pi, teaching the radar loop to remember its own failures,
+          and helping METEOR-M2 like me again.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong><a href="https://github.com/pkia/pkia.github.io" target="_blank" rel="noopener">this site</a></strong> —
+            rebuilt the homepage's "The Pi" section into an interactive
+            architecture diagram: animated SVG connector flows between cards,
+            hover-lit data paths, travelling pulses, LEDs, a legend, and a
+            responsive stacked layout that kills the overlap the old static
+            schematic had between 900 and 1050px. Then added a systemd-style
+            boot splash on the homepage — ten typed OK lines, a
+            <code>./welcome.sh</code> prompt, fading into the site — once per
+            browser session, with <code>?boot=1</code> to force it, reduced-motion
+            respected, and version-stamped asset URLs everywhere so nobody
+            ever gets new HTML with old CSS.
+          </li>
+          <li>
+            <strong><a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar</a></strong> —
+            rewrote the implementer protocol to v2: resume-first runs (the
+            board's "resume pointer" note beats picking anything new),
+            append-only run log including failures and no-ops, a lessons
+            section, and externally researched ideas with sources. Then moved
+            the implementer from 09:00 to 14:00 via <code>hermes cron edit</code>
+            so it stops colliding with this devlog job's shared usage window —
+            three runs failed silently to API errors yesterday before anyone
+            noticed. That's the last time the loop fails quietly.
+          </li>
+          <li>
+            <strong><a href="https://github.com/pkia/maritime-dashboard" target="_blank" rel="noopener">maritime-dashboard</a></strong> —
+            fixed the METEOR demodulator to try 72&nbsp;kSymbol/s (the LRPT
+            default) before 80k, and dropped the dead M2-2 satellite from the
+            schedule. Somewhere over the Atlantic, a Russian weather satellite
+            started making sense again.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Dead-man's switch on the agent loop</strong> — every
+            scheduled job (devlog, implementer, watchdog) pings
+            healthchecks.io on completion; silence pages me. Concrete next
+            step: create the check UUIDs, add the ping call at the end of each
+            job's success path, and document the wiring in
+            <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>.
+          </li>
+          <li>
+            <strong>ntfy as the notification backbone</strong> — self-hosted
+            pub/sub on the Pi, so radar shipped/blocked pings, AIS anomalies
+            and backup results land somewhere I'll actually see them. Next
+            step: systemd unit, topic-per-job convention, first subscriber on
+            my phone via the tailnet.
+          </li>
+          <li>
+            <strong>Uptime Kuma for service monitoring</strong> — watch
+            ais-catcher, AdGuardHome, kiosk, maritime-dashboard and the ops
+            portal from one screen. Next step: container on the Pi, HTTP
+            checks per service port, status page linked from project-hub.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.theverge.com/tech/982628/slack-code-vibe-coding-channels-launch" target="_blank" rel="noopener">Slack is launching collaborative vibe-coding channels</a> —
+            Slack Code puts Claude Code, Devin and Copilot into shared
+            channels where the whole team watches diffs and live previews —
+            "multiplayer AI". Fitting reading the week my own coding agents
+            got a shared, public ledger of everything they do.
+          </li>
+          <li>
+            <a href="https://www.sdrstore.eu/rtl-sdr-weather-satellite-reception-2026-what-still-works" target="_blank" rel="noopener">RTL-SDR weather satellite reception in 2026: what still works</a> —
+            a useful ecosystem check for anyone on 137 MHz: NOAA-15/18/19 are
+            decommissioned, and Meteor M2-4 LRPT is the new default target. I
+            had to make almost exactly this call in the demod scheduler
+            yesterday — nice to see the wider community agree.
+          </li>
+          <li>
+            <a href="https://techcrunch.com/2026/08/18/cursor-capitalizes-on-github-frustration-launches-rival-hosting-platform/" target="_blank" rel="noopener">Cursor launches a rival code-hosting platform</a> —
+            "Origin" does repos, PRs and code review, interoperating with
+            GitHub rather than replacing it — launched the same day GitHub
+            suffered a six-hour degradation. The home lab stays on GitHub —
+            for now — but it's worth watching where the agents' code lands
+            next.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+        <a href="https://www." target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.55V9h3.57v11.45Z"/></svg>
+        </a>
+        <a href="mailto:" aria-label="Email">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M3 6h18v12H3zM3 7l9 6 9-6"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=3" defer></script>
+</body>
+</html>
