@@ -237,19 +237,19 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">agentic devlog → implementer loop</span>
-                  </li>
-                  <li>
-                    <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">ci-hardening.timer</span>
-                    <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">auto-rollback for every Pi service</span>
+                    <span class="term-desc">devlog → implementer loop, protocol v2</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">ais-analysis.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">making sense of the AIS capture pile</span>
+                    <span class="term-desc">GMSK → HDLC decoder on the capture pile</span>
+                  </li>
+                  <li>
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-unit">observability.timer</span>
+                    <span class="term-state waiting">active (waiting)</span>
+                    <span class="term-desc">healthchecks + ntfy for every cron job</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -305,9 +305,9 @@
             <p>
               An autonomous improvement loop for everything else on this page:
               at 07:00 an agent writes the daily devlog and proposes what's next;
-              at 09:00 a second agent picks one idea and ships it — code, tests,
-              docs, brand-new repos included. The idea ledger and every outcome
-              are public.
+              at 14:00 a second agent picks one idea and ships it — code, tests,
+              docs, brand-new repos included. The idea ledger, every run and
+              every failure are public.
             </p>
             <ul class="chips chips-sm">
               <li>AI agents</li><li>Hermes cron</li><li>pytest</li><li>Autonomy</li>
@@ -648,7 +648,7 @@
                   <span class="arch-led"></span>
                 </div>
                 <span class="arch-name">CRON · AI AGENTS</span>
-                <span class="arch-sub">07:00 devlog · 09:00 radar</span>
+                <span class="arch-sub">07:00 devlog · 14:00 radar</span>
               </div>
               <div class="arch-card" data-node="watchdog" style="--x:2.07%;--y:65.63%;--w:46.9%;--h:27.5%">
                 <div class="arch-card-top">
