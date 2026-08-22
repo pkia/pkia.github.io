@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Book recommendations without the Goodreads API — EV</title>
+  <meta name="description" content="How ShelfMate turns a bare Goodreads profile link into book recommendations: the public RSS shelf feed Goodreads forgot to wall off, rating-weighted subject profiles from Open Library, and the honest 45-second loading screen. No accounts, no tracking, one Python file on a Pi." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-08-22-shelfmate.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Book recommendations without the Goodreads API" />
+  <meta property="og:description" content="Project deep-dive — the public RSS feed Goodreads forgot to wall off, Open Library subjects, and a recommender with an honest loading screen." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-08-22-shelfmate.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-08-22T23:30:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=3" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">07</span> — Devlog</p>
+        <h1 class="post-title reveal">Book recommendations without the Goodreads API</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">project</span>
+          <time datetime="2026-08-22">Saturday, 22 August 2026</time>
+          <span>·</span>
+          <span>deep-dive</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Goodreads has been winding down its public API for years. New developer
+          keys stopped being issued, the old ones aged out, and the standard
+          advice became "export your CSV and import it somewhere else." That
+          works, but it's a chore, and it means handing your reading history to
+          yet another account on yet another service. I wanted the opposite
+          thing: paste a link, get book recommendations. No account, no import,
+          no tracking. So I built
+          <a href="https://github.com/pkia/shelfmate" target="_blank" rel="noopener">ShelfMate</a>
+          — one Python file and one HTML page, running on the same Pi as
+          everything else here, working entirely off public data. This is how
+          it works, including the lucky discovery at the center of it.
+        </p>
+
+        <h2>The feed Goodreads forgot to wall off</h2>
+        <p>
+          The obvious data source, the shelf pages, is login-walled. Fetch one
+          while logged out and you get a sign-in screen. The profile page is
+          public, but it only exposes a few favorites and whatever you're
+          currently reading — not much of a taste profile. Then I found the RSS
+          feed. Every shelf has one, and it is completely public. Ask for it
+          with no session and you get the whole shelf: title, author, the
+          rating the user gave each book, read dates, page counts. A hundred
+          items per page, a <code>shelf=</code> parameter if you only want
+          <code>read</code> or <code>to-read</code>. It looks like a leftover
+          from the era when every site wanted widgets embedded everywhere, and
+          it is the entire foundation of the app. The login wall guards the
+          HTML; the machine-readable version waves you in.
+        </p>
+        <p>
+          The obvious flip side deserves saying out loud: if my app can read
+          your shelf without logging in, so can anyone or anything else, and
+          that's been true for years. Within the app I keep this as clean as I
+          can — shelf fetches are cached a few hours to stay off Goodreads'
+          nerves, then dropped, and nothing is stored about who asked. But the
+          real takeaway is between you and Goodreads' idea of privacy.
+        </p>
+
+        <h2>How the recommendations work</h2>
+        <p>
+          The pipeline is boring on purpose. Read the whole shelf from the RSS
+          feed, following pagination, up to 500 books. Look each one up on
+          <a href="https://openlibrary.org" target="_blank" rel="noopener">Open Library</a>
+          for its subject tags and cover — those lookups are cached for seven
+          days, because Open Library asks you to be gentle and there's no
+          reason to ask twice. Build a taste profile from all those subjects,
+          weighted by how much you liked the book: favorites count for extra,
+          and a shelf book's weight scales with the rating you gave it. A
+          five-star book shouts. A two-star book mumbles. Then pull candidates
+          from Open Library's "similar works" links and the subjects
+          themselves, score them by subject overlap with the profile, throw out
+          anything already anywhere on the shelf, and keep the top twelve, each
+          with a one-line reason.
+        </p>
+        <p>
+          Two details matter more than they sound. First, the exclusion check
+          runs against the entire library, not just favorites — big-name
+          services have recommended me books I finished last month. Second,
+          ratings shape the profile, so a shelf full of grudging three-stars
+          reads differently than a shelf of enthusiasms, even when the titles
+          overlap.
+        </p>
+        <p>
+          Open Library's subject tags are a mess in a lovable way. "New York
+          Times bestseller" is apparently a subject. "Fiction, women" is a
+          subject. Individually they're noise, but a few hundred of them
+          averaged over a whole shelf turn out to carry real signal about what
+          someone reads.
+        </p>
+
+        <h2>The parts that took longer than they should have</h2>
+        <p>
+          Title matching, first. Matching free-text shelf titles against Open
+          Library works about seven times in ten on a real shelf. You can push
+          that up with fuzzier search, but you start confusing reprints and
+          translations, so I stopped. The unmatched books get reported in the
+          results ("a few titles couldn't be matched") instead of silently
+          vanishing — a recommender that lies about how much it read is worse
+          than one that admits it skimmed.
+        </p>
+        <p>
+          Then the cap I shouldn't have shipped. The first version analysed
+          only the top 30 books by weight, a speed guard from when every lookup
+          was a fresh network call. Once the seven-day cache existed, the cap
+          was just throwing away signal, so I removed it. A shelf of about 150
+          books takes roughly 45 seconds the first time it's ever analysed, and
+          0.04 seconds ever after. Lesson repeated for the hundredth time in my
+          career: cache first, cap never.
+        </p>
+        <p>
+          And the wait. Forty-five seconds is an eternity on the web, and a
+          fake spinner makes it worse. The loading screen shows a little shelf
+          filling up with book spines, but the parts that matter are honest:
+          the progress bar tracks what the server is actually doing (fetching
+          the shelf, matching titles, reading subjects), the elapsed timer is
+          real, and the estimate up front says "up to about 45 seconds the
+          first time." Once the honest phases run out, the status lines hand
+          over to a librarian who is "definitely not judging your five-star
+          picks." People forgive a wait when you tell them how long it is.
+        </p>
+
+        <h2>A Raspberry Pi in a cupboard</h2>
+        <p>
+          The server is Python standard library only — no framework, no
+          dependencies, nothing to pip install; it runs on the bare system
+          Python of a Pi that has better things to do than babysit a package
+          manager. Tests are plain unittest, 25 of them, and CI runs pytest
+          and ruff on Python 3.11 and 3.13. Deploys are the same pull-based
+          arrangement as everything else on this machine: a systemd timer
+          fetches from GitHub every few minutes, health-checks the new
+          version, and rolls back if it doesn't serve. The whole thing idles
+          at approximately nothing, which feels correct for a tool that does
+          one small thing.
+        </p>
+
+        <h2>Where it's weak</h2>
+        <p>
+          Content-based recommenders can only suggest things adjacent to what
+          you already read, and this one is no exception. There's no
+          collaborative filtering, so don't expect it to surface the
+          blind-spot book that changes your life. It's English-centric,
+          because Open Library is. And my test shelf, heavy on modern fiction,
+          came back thick with Austens and Brontës — I have theories about why
+          (older books carry denser subject metadata) but haven't proven any
+          of them. The picks are sound, just more classic than the shelf
+          warranted.
+        </p>
+        <p>
+          None of that bothers me much. The app does what it set out to do:
+          paste a profile link, wait a well-labeled moment, get twelve books
+          with reasons, hand over no personal information in the process. The
+          code is on GitHub at
+          <a href="https://github.com/pkia/shelfmate" target="_blank" rel="noopener">pkia/shelfmate</a>.
+          Paste your profile link and see what your shelf says about you.
+        </p>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+        <a href="https://www." target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.55V9h3.57v11.45Z"/></svg>
+        </a>
+        <a href="mailto:" aria-label="Email">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M3 6h18v12H3zM3 7l9 6 9-6"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=3" defer></script>
+</body>
+</html>
