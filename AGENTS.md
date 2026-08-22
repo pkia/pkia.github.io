@@ -21,10 +21,16 @@ at `blog/`; each post is a standalone HTML page styled by the site's existing
 - Index update: prepend a new `<article class="post-card reveal">` directly
   below the `<!-- ... -->` marker line inside `<div id="post-list">` in
   `blog/index.html` — newest post always first.
+- Feed + sitemap update: prepend a matching `<item>` to `feed.xml` (title,
+  link, guid, pubDate at 07:00 +0100, description = the post card's summary)
+  and add the post URL to `sitemap.xml`.
 - Copy the overall page structure (head, nav, footer, `post-header`,
   `post-body`) from the newest existing post in `blog/posts/`. Link assets
-  absolutely: `/styles.css`, `/script.js`, `/favicon.svg`; nav links use
-  `/#about`, `/#projects`, `/#journey`, `/blog/`, `/#contact`.
+  absolutely: `/styles.css?v=3`, `/script.js?v=3`, `/favicon.svg`; nav links
+  use `/#about`, `/#projects`, `/#architecture`, `/#experience`, `/#journey`,
+  `/blog/`, `/#contact`. Keep the `?v=` cache-buster on CSS/JS references —
+  bump the number everywhere (all pages) whenever `styles.css` or `script.js`
+  change meaningfully, so visitors never get new HTML with old assets.
 - Reuse existing CSS classes (`post-*`, `section-label`, `chips`, …). Only add
   to `styles.css` if genuinely necessary.
 
@@ -75,15 +81,27 @@ is current. Rules:
   ais_analysis, hub, pi-cicd) before older highlights; past eight, fold the
   least significant into the "Also:" `.more-link` line instead. Badges must
   stay honest: "In progress" until the work is committed and green.
-- **"Currently" panel** (in `#about`): update the fact-list entries to match
-  what is actually being worked on right now (recent commits + the radar
-  board's In progress / Proposed items). Keep the four-entry shape and label
-  style.
+- **"Currently" panel** (`#currently`, in `#about`): a terminal-styled panel
+  showing `systemctl status currently` output. Update the systemd-style lines
+  to match what is actually being worked on right now (recent commits + the
+  radar board's In progress / Proposed items). Shape per line:
+  `● <unit>  active (running|waiting)  <one-line description>` — keep two or
+  three work units plus the final `location.service … active (permanent)`
+  Cork line. Unit names are lowercase-hyphenated slugs (e.g.
+  `radar-agent.service`; use `.timer` + `active (waiting)` for recurring
+  background work). Leave the command line, closing prompt line and window
+  chrome untouched; if you change the command text, update the `--term-ch`
+  style hint on `.term-type` to its character count.
 - **Journey timeline** (`#journey`): only for genuinely notable milestones
   (a new flagship project going live, awards, role changes) — add an entry
   or refresh the "Now" entry. Do not add an entry per day.
 - **Stats bar**: update counts only when clearly stale (e.g. number of
   projects/repos).
+- **Boot splash** (`#boot` overlay + the small inline script in `<head>` of
+  `index.html`): plays once per browser session on the homepage only —
+  structure, inline script and dismissal logic are load-bearing, leave them
+  alone. At most, refresh the systemd-style boot lines if the service set
+  changes materially. Never copy it onto blog pages.
 - **Design and structure changes are allowed** — hero, experience, contact,
   new sections, restyling, restructuring — when there is a genuine reason
   (outdated copy, a better way to present something, new content that needs a
@@ -135,7 +153,7 @@ Rules:
 ### Publish flow
 
 ```bash
-git add blog index.html styles.css
+git add blog index.html styles.css script.js feed.xml sitemap.xml
 git commit -m "devlog: YYYY-MM-DD"        # + a separate "content: ..." commit if portfolio content changed
 git push origin master
 ```

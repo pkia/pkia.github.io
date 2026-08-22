@@ -4,16 +4,26 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Devlog — Evan Dunbar</title>
-  <meta name="description" content="Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from my Raspberry Pi every morning." />
+  <meta name="description" content="Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from my Raspberry Pi overnight." />
+  <link rel="canonical" href="https://pkia.github.io/blog/" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="Evan Dunbar" />
   <meta property="og:title" content="Devlog — Evan Dunbar" />
   <meta property="og:description" content="Daily notes on shipping, home-lab ops and building with AI." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://pkia.github.io/blog/" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="Evan Dunbar — Devlog" href="/feed.xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/styles.css?v=3" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -32,6 +42,8 @@
       <nav class="nav-links" id="nav-links" aria-label="Primary">
         <a href="/#about">About</a>
         <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
         <a href="/#journey">Journey</a>
         <a href="/blog/" aria-current="page">Devlog</a>
         <a href="/#contact" class="nav-cta">Let's talk</a>
@@ -50,11 +62,44 @@
         <p class="lead reveal">
           What I shipped, what's coming next on the radar, and a few interesting
           reads. Written and published automatically by an agent on my Raspberry Pi
-          every morning at 7am — from the git history of the projects themselves.
+          overnight while the tokens are cheap — from the git history of the
+          projects themselves.
+          <a class="feed-link" href="/feed.xml" title="RSS feed">RSS ↗</a>
         </p>
 
         <!-- ============ POST LIST — new entries are prepended below this line (newest first) ============ -->
         <div class="post-list" id="post-list">
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">project</span>
+              <time datetime="2026-08-22">22 Aug 2026</time>
+              <span>·</span>
+              <span>deep-dive</span>
+            </p>
+            <h2><a href="/blog/posts/2026-08-22-shelfmate.html">Book recommendations without the Goodreads API</a></h2>
+            <p>
+              Paste a Goodreads profile link, get twelve book recommendations —
+              no account, no CSV export, no tracking. Built on the public RSS
+              shelf feed Goodreads forgot to wall off, rating-weighted subject
+              profiles from Open Library, and an honest loading screen for the
+              45-second first read of a big shelf.
+            </p>
+          </article>
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
+              <time datetime="2026-08-22">22 Aug 2026</time>
+              <span>·</span>
+              <span>quiet build-out</span>
+            </p>
+            <h2><a href="/blog/posts/2026-08-22.html">Evening after launch: diagrams, boot splashes and protocol v2</a></h2>
+            <p>
+              The evening after launch day: an interactive architecture diagram
+              of the Pi, a systemd-style boot splash, radar protocol v2 with a
+              run log and a 14:00 slot, a METEOR demod fix — plus Slack's
+              multiplayer vibe-coding channels and the state of 137 MHz in 2026.
+            </p>
+          </article>
           <article class="post-card reveal">
             <p class="post-meta">
               <span class="post-tag">project</span>
@@ -109,6 +154,6 @@
     </div>
   </footer>
 
-  <script src="/script.js" defer></script>
+  <script src="/script.js?v=3" defer></script>
 </body>
 </html>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Evan Dunbar — Devlog</title>
+    <link>https://pkia.github.io/blog/</link>
+    <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Cork, Ireland.</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 22 Aug 2026 23:32:00 +0100</lastBuildDate>
+    <atom:link href="https://pkia.github.io/feed.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Book recommendations without the Goodreads API</title>
+      <link>https://pkia.github.io/blog/posts/2026-08-22-shelfmate.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-08-22-shelfmate.html</guid>
+      <pubDate>Sat, 22 Aug 2026 23:32:00 +0100</pubDate>
+      <description>Paste a Goodreads profile link, get twelve book recommendations — no account, no CSV export, no tracking. Built on the public RSS shelf feed Goodreads forgot to wall off, rating-weighted subject profiles from Open Library, and an honest loading screen for the 45-second first read of a big shelf.</description>
+    </item>
+
+    <item>
+      <title>Evening after launch: diagrams, boot splashes and protocol v2</title>
+      <link>https://pkia.github.io/blog/posts/2026-08-22.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-08-22.html</guid>
+      <pubDate>Sat, 22 Aug 2026 07:00:00 +0100</pubDate>
+      <description>The evening after launch day: an interactive architecture diagram of the Pi, a systemd-style boot splash, radar protocol v2 with a run log and a 14:00 slot, a METEOR demod fix — plus Slack's multiplayer vibe-coding channels and the state of 137 MHz in 2026.</description>
+    </item>
+
+    <item>
+      <title>Three data sources, one live score: building a CS2 kiosk</title>
+      <link>https://pkia.github.io/blog/posts/2026-08-21-cs2-dashboard.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-08-21-cs2-dashboard.html</guid>
+      <pubDate>Fri, 21 Aug 2026 07:00:00 +0100</pubDate>
+      <description>The maritime kiosk gets an esports sibling. Liquipedia for the schedule, bo3.gg for live series state, HLTV's scorebot (via a stealth Firefox that only ever reads) for the running round score — plus the login-wall trap, the stream that died every thirty seconds, and why a failed fetch must never clobber good data.</description>
+    </item>
+
+    <item>
+      <title>Ship it: portfolio launch, hardened deploys, and a new architecture repo</title>
+      <link>https://pkia.github.io/blog/posts/2026-08-21.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-08-21.html</guid>
+      <pubDate>Fri, 21 Aug 2026 07:00:00 +0100</pubDate>
+      <description>Launch day: this site goes live, maritime-dashboard and project-hub ship to GitHub with marker-based deploys and flap guards, pi-cicd becomes the flagship architecture repo — plus CM5 jig news and AI-agent adoption numbers.</description>
+    </item>
+  </channel>
+</rss>

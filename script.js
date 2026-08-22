@@ -143,6 +143,120 @@
     });
   }
 
+  /* ---------- "Currently" terminal: staged playback ---------- */
+  var term = document.getElementById("currently");
+  if (term && "IntersectionObserver" in window && !reduceMotion) {
+    term.classList.add("anim");
+    var playTerm = function () { term.classList.add("play"); };
+    var termIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          playTerm();
+          termIo.disconnect();
+        }
+      });
+    }, { threshold: 0.45 });
+    termIo.observe(term);
+    /* safety net: never leave the output hidden if the observer never fires */
+    setTimeout(playTerm, 6000);
+  }
+
+  /* ---------- Boot splash (homepage, once per session) ---------- */
+  var bootScreen = document.getElementById("boot");
+  if (bootScreen && document.documentElement.classList.contains("boot")) {
+    var bootLines = [
+      "Mounted /dev/maritime",
+      "Started rtl-sdr — 162 MHz antenna locked",
+      "Started ais-catcher — decoding ships",
+      "Started noaa-sched — pass recorder armed",
+      "Started adguard-home — DNS for the house",
+      "Started tailscale — tailnet up",
+      "Started cs2-dashboard :8001",
+      "Started maritime-dashboard :8000 — kiosk link up",
+      "Started radar-agent — daily loop armed",
+      "Reached target — all stations reporting"
+    ];
+    var bootLinesEl = document.getElementById("boot-lines");
+    var bootCmdLine = document.getElementById("boot-cmd-line");
+    var bootCmd = document.getElementById("boot-cmd");
+    var bootOut = document.getElementById("boot-out");
+    var bootDone = false;
+    var bootTimers = [];
+    var bootStartedAt = 0;
+
+    var bootFinish = function () {
+      if (bootDone) return;
+      bootDone = true;
+      bootTimers.forEach(function (t) { clearTimeout(t); });
+      bootScreen.classList.add("done");
+      try { sessionStorage.setItem("booted", "1"); } catch (e) { /* private mode */ }
+      setTimeout(function () {
+        document.documentElement.classList.remove("boot");
+        if (bootScreen.parentNode) bootScreen.parentNode.removeChild(bootScreen);
+      }, 750);
+    };
+
+    /* clicks inside the first 800ms are usually just "focus the tab" —
+       don't let them kill the boot before it starts */
+    bootScreen.addEventListener("click", function () {
+      if (Date.now() - bootStartedAt < 800) return;
+      bootFinish();
+    });
+    document.addEventListener("keydown", bootFinish);
+
+    var bootBegin = function () {
+      bootStartedAt = Date.now();
+      var bootAt = 500;
+      bootLines.forEach(function (text) {
+        bootAt += 120 + Math.random() * 130;
+        bootTimers.push(setTimeout(function () {
+          var row = document.createElement("div");
+          row.className = "boot-line";
+          var ok = document.createElement("span");
+          ok.className = "boot-ok";
+          ok.textContent = "[  OK  ]";
+          row.appendChild(ok);
+          row.appendChild(document.createTextNode(text));
+          bootLinesEl.appendChild(row);
+        }, bootAt));
+      });
+
+      /* typed ./welcome.sh once the units settle */
+      bootAt += 550;
+      bootTimers.push(setTimeout(function () {
+        bootCmdLine.hidden = false;
+        var cmd = "./welcome.sh";
+        var i = 0;
+        var typer = setInterval(function () {
+          if (bootDone) { clearInterval(typer); return; }
+          if (i < cmd.length) {
+            bootCmd.textContent += cmd.charAt(i++);
+          } else {
+            clearInterval(typer);
+            bootTimers.push(setTimeout(function () {
+              bootOut.hidden = false;
+              bootTimers.push(setTimeout(bootFinish, 950));
+            }, 320));
+          }
+        }, 38);
+      }, bootAt));
+    };
+
+    /* if the page loads in a background tab, hold the boot until the
+       visitor actually looks at it */
+    if (document.visibilityState === "visible") {
+      bootBegin();
+    } else {
+      var bootOnVisible = function () {
+        if (document.visibilityState === "visible") {
+          document.removeEventListener("visibilitychange", bootOnVisible);
+          bootBegin();
+        }
+      };
+      document.addEventListener("visibilitychange", bootOnVisible);
+    }
+  }
+
   /* ---------- Footer year ---------- */
   var year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());

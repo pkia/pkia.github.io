@@ -5,18 +5,75 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Evan Dunbar — Technical Support Engineer</title>
   <meta name="description" content="Evan Dunbar is a Technical Support Engineer at Cohesity in Cork, Ireland — solving deep enterprise troubleshooting cases by day, vibe coding with AI, and running self-hosted maritime infrastructure on a Raspberry Pi by night." />
+  <link rel="canonical" href="https://pkia.github.io/" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="Evan Dunbar" />
   <meta property="og:title" content="Evan Dunbar — Technical Support Engineer" />
   <meta property="og:description" content="Deep technical support by day, ship radar and AI-assisted building at home. Technical Support Engineer @ Cohesity, Cork, Ireland." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://pkia.github.io/" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Evan Dunbar — Technical Support Engineer, ship-radar motif on dark navy" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="Evan Dunbar — Devlog" href="/feed.xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=3" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Evan Dunbar",
+    "jobTitle": "Technical Support Engineer",
+    "worksFor": { "@type": "Organization", "name": "Cohesity" },
+    "url": "https://pkia.github.io/",
+    "email": "mailto:evandunb@gmail.com",
+    "address": { "@type": "PostalAddress", "addressLocality": "Cork", "addressCountry": "IE" },
+    "sameAs": [
+      "https://github.com/pkia",
+      "https://www.linkedin.com/in/evan-dunbar-a184641a1/"
+    ]
+  }
+  </script>
+  <script>
+    /* Boot splash gate — must run before first paint. Shows the boot screen
+       only on the homepage, once per session, never for reduced-motion
+       visitors or deep links, and never without JS. Append ?boot=1 to force
+       it (for demoing) — overrides the session flag and reduced-motion. */
+    (function () {
+      var force = /[?&]boot=1\b/.test(location.search);
+      if (!force) {
+        try { if (sessionStorage.getItem("booted")) return; } catch (e) { /* private mode */ }
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        if (location.hash) return;
+      }
+      document.documentElement.classList.add("boot");
+    })();
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="boot-screen" id="boot" aria-hidden="true">
+    <div class="boot-inner">
+      <div class="boot-head">
+        <span>EV-PI5 · BOOT SEQUENCE</span>
+        <span>CORK / IE</span>
+      </div>
+      <div class="boot-lines" id="boot-lines"></div>
+      <div class="boot-line boot-cmd-line" id="boot-cmd-line" hidden>
+        <span class="boot-prompt">ev@pi5:~$ </span><span id="boot-cmd"></span>
+      </div>
+      <div class="boot-line boot-out" id="boot-out" hidden>radar online — welcome aboard ⚓</div>
+    </div>
+    <p class="boot-skip">click to skip</p>
+  </div>
 
   <header class="nav" id="nav">
     <div class="container nav-inner">
@@ -73,7 +130,7 @@
         </div>
 
         <div class="hero-radar reveal" aria-hidden="true">
-          <svg viewBox="0 0 420 420" role="img" aria-label="Animated ship radar">
+          <svg viewBox="0 0 420 420">
             <defs>
               <linearGradient id="sweep" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stop-color="var(--accent)" stop-opacity=".55"/>
@@ -164,14 +221,48 @@
                 <li>MySQL</li><li>pandas</li><li>GitHub&nbsp;Actions</li><li>pytest</li>
               </ul>
             </div>
-            <div class="panel">
-              <h3 class="panel-title">Currently</h3>
-              <ul class="fact-list">
-                <li><span>Running</span> an agentic devlog → implementer loop (radar)</li>
-                <li><span>Hardening</span> CI/CD with auto-rollback for every Pi service</li>
-                <li><span>Digging into</span> a growing pile of AIS captures</li>
-                <li><span>Located</span> Cork, Ireland — remote-friendly</li>
-              </ul>
+            <div class="panel terminal" id="currently" aria-label="What I'm currently working on">
+              <div class="terminal-bar">
+                <span class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="terminal-title">ev@pi5: ~</span>
+                <span aria-hidden="true"></span>
+              </div>
+              <div class="terminal-body">
+                <p class="term-line term-cmd">
+                  <span class="term-prompt" aria-hidden="true">ev@pi5:~$</span>
+                  <span class="term-type" style="--term-ch:26">systemctl status currently</span>
+                </p>
+                <ul class="term-out">
+                  <li>
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-unit">radar-agent.service</span>
+                    <span class="term-state running">active (running)</span>
+                    <span class="term-desc">devlog → implementer loop, protocol v2</span>
+                  </li>
+                  <li>
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-unit">ais-analysis.service</span>
+                    <span class="term-state running">active (running)</span>
+                    <span class="term-desc">GMSK → HDLC decoder on the capture pile</span>
+                  </li>
+                  <li>
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-unit">observability.timer</span>
+                    <span class="term-state waiting">active (waiting)</span>
+                    <span class="term-desc">healthchecks + ntfy for every cron job</span>
+                  </li>
+                  <li>
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-unit">location.service</span>
+                    <span class="term-state permanent">active (permanent)</span>
+                    <span class="term-desc">Cork, Ireland — remote-friendly</span>
+                  </li>
+                </ul>
+                <p class="term-line term-last" aria-hidden="true">
+                  <span class="term-prompt">ev@pi5:~$</span>
+                  <span class="term-cursor"></span>
+                </p>
+              </div>
             </div>
           </aside>
         </div>
@@ -214,9 +305,9 @@
             <p>
               An autonomous improvement loop for everything else on this page:
               at 07:00 an agent writes the daily devlog and proposes what's next;
-              at 09:00 a second agent picks one idea and ships it — code, tests,
-              docs, brand-new repos included. The idea ledger and every outcome
-              are public.
+              at 14:00 a second agent picks one idea and ships it — code, tests,
+              docs, brand-new repos included. The idea ledger, every run and
+              every failure are public.
             </p>
             <ul class="chips chips-sm">
               <li>AI agents</li><li>Hermes cron</li><li>pytest</li><li>Autonomy</li>
@@ -557,7 +648,7 @@
                   <span class="arch-led"></span>
                 </div>
                 <span class="arch-name">CRON · AI AGENTS</span>
-                <span class="arch-sub">07:00 devlog · 09:00 radar</span>
+                <span class="arch-sub">07:00 devlog · 14:00 radar</span>
               </div>
               <div class="arch-card" data-node="watchdog" style="--x:2.07%;--y:65.63%;--w:46.9%;--h:27.5%">
                 <div class="arch-card-top">
@@ -742,6 +833,6 @@
     </div>
   </footer>
 
-  <script src="script.js" defer></script>
+  <script src="script.js?v=3" defer></script>
 </body>
 </html>
