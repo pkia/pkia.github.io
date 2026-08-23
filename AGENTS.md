@@ -5,7 +5,7 @@ HTML/CSS/JS, no build step. The deploy branch is `master` — pushing to
 `origin master` deploys automatically.
 **Never force-push. Never rewrite history. Never delete existing posts.**
 
-## Devlog job (runs daily at 07:00 via hermes cron)
+## Devlog job (runs daily at 01:00 via hermes cron)
 
 Write today's devlog post and publish it, then refresh the homepage content to
 match the current state of things (see "Portfolio refresh" below), then refresh
@@ -22,7 +22,7 @@ at `blog/`; each post is a standalone HTML page styled by the site's existing
   below the `<!-- ... -->` marker line inside `<div id="post-list">` in
   `blog/index.html` — newest post always first.
 - Feed + sitemap update: prepend a matching `<item>` to `feed.xml` (title,
-  link, guid, pubDate at 07:00 +0100, description = the post card's summary)
+  link, guid, pubDate at 01:00 +0100, description = the post card's summary)
   and add the post URL to `sitemap.xml`.
 - Copy the overall page structure (head, nav, footer, `post-header`,
   `post-body`) from the newest existing post in `blog/posts/`. Link assets

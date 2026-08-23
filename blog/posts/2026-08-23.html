@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShelfMate goes public, AIS goes on the shelf — Evan Dunbar</title>
+  <meta name="description" content="ShelfMate is open-sourced with tests and a deploy pipeline, its private instance is hardened behind the same pull-based CD as everything else, the AIS decoder's round trip finally works — and the whole agent loop moves to an overnight schedule. Plus the August coding-agent leaderboard, the RAM shortage eating the Pi ecosystem, and a borgmatic guide worth an hour." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-08-23.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="Evan Dunbar" />
+  <meta property="og:title" content="ShelfMate goes public, AIS goes on the shelf" />
+  <meta property="og:description" content="Open-sourcing ShelfMate, pausing the AIS decoder on a working round trip, and rescheduling the agent loop to run while Cork sleeps." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-08-23.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-08-23T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="Evan Dunbar — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=4" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>evan&nbsp;dunbar</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">09</span> — Devlog</p>
+        <h1 class="post-title reveal">ShelfMate goes public, AIS goes on the shelf</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-08-23">Sunday, 23 August 2026</time>
+          <span>·</span>
+          <span>shipping &amp; shelving</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          You're reading the first devlog written at 01:00. The whole agent loop
+          moved overnight — this job to 01:00, the X writer to 02:30, the radar
+          implementer to 04:00 — so the Pi's token budget gets spent while Cork
+          sleeps instead of three jobs fighting over one morning window. The
+          window covered a lot for a "quiet Saturday": ShelfMate went from
+          private experiment to public repo, the AIS decoder reached the
+          milestone I'd been chasing for a week, and I then deliberately
+          paused the AIS project while it's ahead.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong><a href="https://github.com/pkia/shelfmate" target="_blank" rel="noopener">shelfmate</a></strong> —
+            open-sourced the whole thing. The public repo landed with the
+            initial release, CI (pytest + ruff, stdlib-only so the pip cache
+            step went straight back out), a deploy script that's actually
+            executable, and a README with a status badge. Then three feature
+            commits in an evening: analyse the user's <em>entire</em> library
+            via the public RSS shelf feed rather than a top-30 slice, an
+            animated loading screen for the 45-second first analysis (honest
+            progress phases included), and a fix so the API endpoint resolves
+            properly behind the reverse-proxy mount. The private instance that
+            started all this got the opposite treatment — repo privatised, and
+            its pull-based deploy verified end to end, including running the
+            deploy unit as a regular user because private repos need the
+            credential helper. Both deploy timers are now registered in
+            <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>'s
+            pipeline checks. The deep-dive on how it works is
+            <a href="/blog/posts/2026-08-22-shelfmate.html">yesterday's post</a>.
+          </li>
+          <li>
+            <strong><a href="https://github.com/pkia/ais_analysis" target="_blank" rel="noopener">ais_analysis</a></strong> —
+            the decoder round trip finally <em>works</em>: synthesise a GMSK
+            burst, add it to noise, demodulate, get the same bits back out.
+            What fixed it was envelope-gated DC removal (correct the carrier
+            only where a burst is actually present, instead of smearing the
+            whole capture), wideband burst detection, and a streaming
+            <code>decode_file</code> that no longer needs the entire capture in
+            memory. And that's where I stopped: the AIS project is paused for
+            now, on purpose, with the work-in-progress preserved on a branch
+            and a resume pointer on the radar board. Decoding a real
+            two-minute capture is a problem for a future me; the round trip
+            was the hill, and it's taken.
+          </li>
+          <li>
+            <strong><a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar</a></strong> —
+            the loop itself had a busy evening: implementer slot moved out of
+            the shared usage window (three runs died silently to API errors on
+            Friday; that's what started all this), the board learned to record
+            failures and no-ops in an append-only run log, and the AIS pause
+            was written into the board properly — item moved to Skipped with a
+            resume pointer, RF-hardware ideas shelved alongside it, and a
+            standing note not to re-propose AIS work unless I lift the pause.
+            The board is now purely monitoring-and-infra flavoured, which is
+            an honest reflection of what this machine needs next.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Dead-man's switch on the loop (healthchecks.io)</strong> —
+            every scheduled job pings a check UUID on completion; silence
+            becomes a page. Concrete next step: create checks for the devlog,
+            implementer, X writer and watchdog, add one
+            <code>curl</code> to each job's success path, and document the
+            wiring in pi-cicd. Friday's three silent failures are the entire
+            business case.
+          </li>
+          <li>
+            <strong>ntfy as the notification backbone</strong> — self-hosted
+            pub/sub on the Pi so radar shipped/blocked pings and backup
+            results land on my phone instead of in a log nobody reads. Next
+            step: systemd unit, a topic-per-job convention, first subscriber
+            over the tailnet, then point the radar implementer's outcome
+            messages at it.
+          </li>
+          <li>
+            <strong>Deduplicated backups with borgmatic</strong> — portal,
+            dashboards and configs into encrypted, deduplicated archives, with
+            healthchecks.io hooks so a dead backup alerts exactly like a dead
+            cron job. Next step: install borgmatic, define one source set and
+            retention policy, run the first archive to a USB target, and wire
+            the heartbeat from day one.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.morphllm.com/best-ai-coding-agents-2026" target="_blank" rel="noopener">Best AI Coding Agents (August 2026): Scored Leaderboard</a> —
+            Terminal-Bench 2.1 has GPT-5.6 Sol and Claude Opus 5 within half a
+            point of each other, and the open-source agent table (OpenCode at
+            172k stars, Gemini CLI, Codex CLI) keeps growing. Useful context
+            for anyone — like me — outsourcing their side projects to agents
+            three jobs at a time.
+          </li>
+          <li>
+            <a href="https://spectrum.ieee.org/ram-shortage-price-increase" target="_blank" rel="noopener">Low-Cost Computers Nearly Double in Price as RAM Shortage Hits</a> —
+            IEEE Spectrum on the AI-driven LPDDR4 shortage: the 16 GB Pi 5 has
+            gone from $120 to $205, and Eben Upton is responding with
+            dual-module memory layouts and tiny-RAM variants. Sobering read
+            for anyone whose homelab plans assumed cheap Pis forever. Mine is
+            already bought — timing is everything.
+          </li>
+          <li>
+            <a href="https://rdp.sh/en/blog/self-hosted-backups-with-borgbackup-and-borgmatic-on-a-vps" target="_blank" rel="noopener">Self-Hosted Backups with BorgBackup and borgmatic</a> —
+            a thorough walkthrough that ends the way every backup guide
+            should: by making you actually test a restore. With borgmatic now
+            on my radar board, the section on healthchecks/ntfy monitoring
+            hooks reads like the manual for next month's work.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Evan Dunbar · Cork, Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/evan-dunbar-a184641a1a/" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 0 0 4.13ZM7.12 20.45H3.55V9h3.57v11.45Z"/></svg>
+        </a>
+        <a href="mailto:evandunb@gmail.com" aria-label="Email">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M3 6h18v12H3zM3 7l9 6 9-6"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=4" defer></script>
+</body>
+</html>

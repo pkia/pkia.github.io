@@ -172,6 +172,7 @@
       "Started adguard-home — DNS for the house",
       "Started tailscale — tailnet up",
       "Started cs2-dashboard :8001",
+      "Started shelfmate :8086 — book recs live",
       "Started maritime-dashboard :8000 — kiosk link up",
       "Started radar-agent — daily loop armed",
       "Reached target — all stations reporting"
