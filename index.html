@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -163,7 +163,7 @@
             <span class="stat-label">years building &amp; shipping</span>
           </div>
           <div class="stat reveal">
-            <span class="stat-num"><span data-count="8">0</span></span>
+            <span class="stat-num"><span data-count="13">0</span></span>
             <span class="stat-label">live services on the home-lab Pi</span>
           </div>
           <div class="stat reveal">
@@ -237,19 +237,19 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">devlog → implementer loop, protocol v2</span>
+                    <span class="term-desc">overnight loop: devlog 01:00 · implementer 04:00</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">ais-analysis.service</span>
+                    <span class="term-unit">shelfmate.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">GMSK → HDLC decoder on the capture pile</span>
+                    <span class="term-desc">freshly open-sourced — watching it bed in</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">observability.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">healthchecks + ntfy for every cron job</span>
+                    <span class="term-desc">healthchecks + ntfy + backups — next on the board</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -304,15 +304,36 @@
             <h3>radar</h3>
             <p>
               An autonomous improvement loop for everything else on this page:
-              at 07:00 an agent writes the daily devlog and proposes what's next;
-              at 14:00 a second agent picks one idea and ships it — code, tests,
-              docs, brand-new repos included. The idea ledger, every run and
-              every failure are public.
+              at 01:00 an agent writes the daily devlog and proposes what's
+              next; at 04:00 a second agent picks one idea and ships it —
+              code, tests, docs, brand-new repos included. The idea ledger,
+              every run and every failure are public.
             </p>
             <ul class="chips chips-sm">
               <li>AI agents</li><li>Hermes cron</li><li>pytest</li><li>Autonomy</li>
             </ul>
             <a class="project-link" href="https://github.com/pkia/radar" target="_blank" rel="noopener">View on GitHub
+              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+
+          <article class="project-card reveal">
+            <div class="project-top">
+              <span class="project-badge">Just shipped</span>
+              <span class="project-year">2026</span>
+            </div>
+            <h3>ShelfMate</h3>
+            <p>
+              Paste a Goodreads profile link, get twelve book recommendations
+              with reasons — no account, no API key, no tracking. Built on the
+              public RSS shelf feed Goodreads forgot to wall off and
+              rating-weighted subject profiles from Open Library. Python
+              stdlib only; tests, CI and pull-based deploys included.
+            </p>
+            <ul class="chips chips-sm">
+              <li>Python&nbsp;stdlib</li><li>Open&nbsp;Library</li><li>Recommender</li><li>pytest&nbsp;CI</li>
+            </ul>
+            <a class="project-link" href="https://github.com/pkia/shelfmate" target="_blank" rel="noopener">View on GitHub
               <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
           </article>
@@ -380,15 +401,16 @@
 
           <article class="project-card reveal">
             <div class="project-top">
-              <span class="project-badge subtle">In progress</span>
+              <span class="project-badge subtle">Paused</span>
               <span class="project-year">2026</span>
             </div>
             <h3>ais_analysis</h3>
             <p>
               A from-scratch AIS decoder for the signal pile the rooftop antenna
-              has been collecting: GMSK demodulation, bit-timing recovery, HDLC
-              framing and message parsing in pure Python — built test-first,
-              one radar-agent session at a time.
+              collected: GMSK demodulation, bit-timing recovery, HDLC framing
+              and message parsing in pure Python — built test-first. The
+              synthetic round trip works end to end; decoding the real capture
+              is parked on a branch until I circle back.
             </p>
             <ul class="chips chips-sm">
               <li>DSP</li><li>Python</li><li>pytest</li><li>RTL-SDR</li>
@@ -417,29 +439,11 @@
               <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
           </article>
-
-          <article class="project-card reveal">
-            <div class="project-top">
-              <span class="project-badge subtle">Team of five</span>
-              <span class="project-year">2021</span>
-            </div>
-            <h3>Tweet Guard</h3>
-            <p>
-              Web app that defends against inappropriate and threatening Twitter
-              users: NLP scans of a user's timeline with category filters, plus a
-              community report database. Dockerised Flask deployment.
-            </p>
-            <ul class="chips chips-sm">
-              <li>NLP</li><li>Flask</li><li>Docker</li>
-            </ul>
-            <a class="project-link" href="https://github.com/pkia/Twitter_Threat_Scanner" target="_blank" rel="noopener">View on GitHub
-              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-          </article>
         </div>
 
         <p class="more-link reveal">
-          Also: the <a href="https://github.com/pkia/kiosk-home" target="_blank" rel="noopener">kiosk chooser</a> that flips the touchscreen between dashboards,
+          Also: <a href="https://github.com/pkia/Twitter_Threat_Scanner" target="_blank" rel="noopener">Tweet Guard</a> (NLP timeline scanning from a team-of-five hack build),
+          the <a href="https://github.com/pkia/kiosk-home" target="_blank" rel="noopener">kiosk chooser</a> that flips the touchscreen between dashboards,
           a live <a href="https://github.com/pkia/sat-audio" target="_blank" rel="noopener">satellite-audio tap</a>,
           a <a href="https://github.com/pkia/CoinMarketCap_Scraper" target="_blank" rel="noopener">CoinMarketCap dataset scraper</a>,
           and a graveyard of experiments, archived with honour.
@@ -591,7 +595,7 @@
                 <span class="arch-sub">:8001 · matches + live scores</span>
                 <span class="arch-src">☁ hltv.org</span>
               </div>
-              <div class="arch-card" data-node="hub" style="--x:2.07%;--y:39.87%;--w:46.9%;--h:29.11%">
+              <div class="arch-card" data-node="hub" style="--x:2.07%;--y:39.87%;--w:30.97%;--h:29.11%">
                 <div class="arch-card-top">
                   <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.8" height="6.8" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13.2" y="4" width="6.8" height="6.8" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="4" y="13.2" width="6.8" height="6.8" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13.2" y="13.2" width="6.8" height="6.8" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
                   <span class="arch-led"></span>
@@ -599,7 +603,16 @@
                 <span class="arch-name">PROJECT HUB</span>
                 <span class="arch-sub">:8090 · ops portal</span>
               </div>
-              <div class="arch-card" data-node="kioskhome" style="--x:51.03%;--y:39.87%;--w:46.9%;--h:29.11%">
+              <div class="arch-card" data-node="shelfmate" style="--x:34.48%;--y:39.87%;--w:30.97%;--h:29.11%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10.3 5 7.8 4.5 4.5 4.5v13c3.3 0 5.8.5 7.5 2 1.7-1.5 4.2-2 7.5-2v-13c-3.3 0-5.8.5-7.5 2Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 6.5v13" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">SHELFMATE</span>
+                <span class="arch-sub">:8086 · book recommendations</span>
+                <span class="arch-src">☁ Goodreads · Open Library</span>
+              </div>
+              <div class="arch-card" data-node="kioskhome" style="--x:66.9%;--y:39.87%;--w:30.97%;--h:29.11%">
                 <div class="arch-card-top">
                   <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9 20.5h6M12 16.5v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
                   <span class="arch-led"></span>
@@ -648,7 +661,7 @@
                   <span class="arch-led"></span>
                 </div>
                 <span class="arch-name">CRON · AI AGENTS</span>
-                <span class="arch-sub">07:00 devlog · 14:00 radar</span>
+                <span class="arch-sub">01:00 devlog · 04:00 radar</span>
               </div>
               <div class="arch-card" data-node="watchdog" style="--x:2.07%;--y:65.63%;--w:46.9%;--h:27.5%">
                 <div class="arch-card-top">
@@ -762,7 +775,7 @@
             <div class="tl-body">
               <p class="tl-date">Now</p>
               <h3>Support engineer, ship spotter, agent supervisor</h3>
-              <p>Deep-dive troubleshooting by day; AIS receivers, satellite decoders and ops portals on a Pi by night — now orchestrated by a daily devlog → implementer loop that writes about itself every morning at 07:00.</p>
+              <p>Deep-dive troubleshooting by day; AIS receivers, satellite decoders and ops portals on a Pi by night — now orchestrated by a devlog → implementer loop of agents that ships while the city sleeps.</p>
             </div>
           </li>
           <li class="reveal">
@@ -833,6 +846,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=3" defer></script>
+  <script src="script.js?v=4" defer></script>
 </body>
 </html>
