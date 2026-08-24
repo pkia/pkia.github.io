@@ -1,4 +1,4 @@
-/* Evan Dunbar — personal site interactions */
+/* EV — personal site interactions */
 
 (function () {
   "use strict";
@@ -175,6 +175,7 @@
       "Started shelfmate :8086 — book recs live",
       "Started maritime-dashboard :8000 — kiosk link up",
       "Started radar-agent — daily loop armed",
+      "Started loop-heartbeat — dead-man's switch armed",
       "Reached target — all stations reporting"
     ];
     var bootLinesEl = document.getElementById("boot-lines");

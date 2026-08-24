@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Evan Dunbar — Devlog</title>
+    <title>EV — Devlog</title>
     <link>https://pkia.github.io/blog/</link>
-    <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Cork, Ireland.</description>
+    <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Ireland.</description>
     <language>en</language>
     <lastBuildDate>Mon, 24 Aug 2026 01:00:00 +0100</lastBuildDate>
     <atom:link href="https://pkia.github.io/feed.xml" rel="self" type="application/rss+xml" />
@@ -21,7 +21,7 @@
       <link>https://pkia.github.io/blog/posts/2026-08-23.html</link>
       <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-08-23.html</guid>
       <pubDate>Sun, 23 Aug 2026 01:00:00 +0100</pubDate>
-      <description>The first devlog from the new 01:00 slot: ShelfMate open-sourced with CI and a deploy pipeline, the AIS decoder's round trip fixed then deliberately paused, and the whole agent loop rescheduled to run while Cork sleeps.</description>
+      <description>The first devlog from the new 01:00 slot: ShelfMate open-sourced with CI and a deploy pipeline, the AIS decoder's round trip fixed then deliberately paused, and the whole agent loop rescheduled to run while the city sleeps.</description>
     </item>
 
     <item>

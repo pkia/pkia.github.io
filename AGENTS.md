@@ -87,7 +87,7 @@ is current. Rules:
   radar board's In progress / Proposed items). Shape per line:
   `● <unit>  active (running|waiting)  <one-line description>` — keep two or
   three work units plus the final `location.service … active (permanent)`
-  Cork line. Unit names are lowercase-hyphenated slugs (e.g.
+  the city line. Unit names are lowercase-hyphenated slugs (e.g.
   `radar-agent.service`; use `.timer` + `active (waiting)` for recurring
   background work). Leave the command line, closing prompt line and window
   chrome untouched; if you change the command text, update the `--term-ch`
