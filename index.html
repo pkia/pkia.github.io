@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=5" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -241,15 +241,15 @@
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">shelfmate.service</span>
-                    <span class="term-state running">active (running)</span>
-                    <span class="term-desc">freshly open-sourced — watching it bed in</span>
+                    <span class="term-unit">loop-heartbeat.timer</span>
+                    <span class="term-state waiting">active (waiting)</span>
+                    <span class="term-desc">dead-man's switch on the loop — first implementer ship</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">observability.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">healthchecks + ntfy + backups — next on the board</span>
+                    <span class="term-desc">ntfy + uptime monitoring + backups — next off the board</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -306,7 +306,8 @@
               An autonomous improvement loop for everything else on this page:
               at 01:00 an agent writes the daily devlog and proposes what's
               next; at 04:00 a second agent picks one idea and ships it —
-              code, tests, docs, brand-new repos included. The idea ledger,
+              code, tests, docs, brand-new repos included. First implementer
+              ship: a dead-man's switch for the loop itself. The idea ledger,
               every run and every failure are public.
             </p>
             <ul class="chips chips-sm">
@@ -388,8 +389,9 @@
               The CI/CD machinery that runs the Pi itself: a project-guard that
               auto-adopts and versions every directory on the box, pull-based
               deploys with compile gates, health checks and automatic rollback,
-              plus continuous backup of work-in-progress. The architecture
-              reference for how everything here ships.
+              and loop-heartbeat — a dead-man's switch that pages when any
+              scheduled job goes silent. The architecture reference for how
+              everything here ships.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
@@ -846,6 +848,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=4" defer></script>
+  <script src="script.js?v=5" defer></script>
 </body>
 </html>
