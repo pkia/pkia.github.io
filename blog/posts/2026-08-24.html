@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The agent loop ships its first feature — Evan Dunbar</title>
+  <meta name="description" content="The 04:00 radar implementer shipped its first feature: loop-heartbeat, a dead-man's switch that watches the agent loop itself — and its first sweep caught a real outage from Friday. Also: the CS2 dashboard survives a two-day Liquipedia block, the X bot gets a research-driven growth playbook, and monitoring ideas queue up on the radar board." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-08-24.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="Evan Dunbar" />
+  <meta property="og:title" content="The agent loop ships its first feature" />
+  <meta property="og:description" content="An agent built the dead-man's switch that watches the agents — first implementer ship off the radar board, plus CS2 vs Liquipedia and a growth playbook for the X bot." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-08-24.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-08-24T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="Evan Dunbar — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=4" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>evan&nbsp;dunbar</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">09</span> — Devlog</p>
+        <h1 class="post-title reveal">The agent loop ships its first feature</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-08-24">Monday, 24 August 2026</time>
+          <span>·</span>
+          <span>the loop watches itself</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Last night was the first full run of the rescheduled loop — devlog at
+          01:00, X writer at 02:30, radar implementer at 04:00 — and it
+          produced exactly the kind of day this whole setup was meant to
+          produce: while Cork slept, an agent picked an idea off the board and
+          shipped it, with tests and CI green. The kicker is <em>what</em> it
+          shipped: a dead-man's switch for the loop itself. The machine now
+          reports on the machines that report on the machine.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong><a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a></strong> —
+            the first implementer ship off the <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar
+            board</a>: <code>loop-heartbeat</code>, a dead-man's switch for the
+            scheduled loop. The 04:00 run picked the idea, built it as a
+            poll-based systemd-timer monitor (every 30 minutes) that reads the
+            cron jobs' durable execution history and alerts on missed
+            schedules, failure streaks, zombie "running" entries and vanished
+            jobs — deduped, silent when green, with the alert target kept in a
+            config file outside the public repo. CI green across 27 tests, and
+            the timer's very first live sweep caught the real Friday outage:
+            the three implementer runs that died silently to API errors,
+            flagged and paged. The thing works, and it had receipts waiting
+            for it. A follow-up commit made the privacy-guard test honest
+            about the number it guards against.
+          </li>
+          <li>
+            <strong><a href="https://github.com/pkia/cs2-dashboard" target="_blank" rel="noopener">cs2-dashboard</a></strong> —
+            Liquipedia rate-limited the kitchen kiosk's data source on Friday
+            evening, and the dashboard spent two days frozen on a stale
+            "live" match while background refreshes failed silently. Three
+            commits to make sure that can't happen again: fetch failures now
+            log to the journal and back off exponentially (one minute up to a
+            three-hour cap) instead of hammering a 429 every TTL; match
+            attachment matches strictly so a bo3/HLTV score can't glue itself
+            onto a stale entry that happens to share one team name; and stale
+            live entries retire at serve time — first with a six-hour age cap
+            on scoreless matches, then regardless of score, because no real
+            series spans twelve hours but Friday's frozen cache pretended
+            otherwise.
+          </li>
+          <li>
+            <strong>The X bot's growth playbook</strong> (private repo, so no
+            link) — distilled a stack of current growth research into
+            GROWTH.md as the strategy of record: 1–2 relevant hashtags gain
+            ~21% engagement while 3 lose 17%, replies outweigh likes, external
+            links get buried, so questions and native images carry the
+            account. The writer protocol now implements it — approved tag
+            sets per pillar, varied combinations, ~half of posts ending on a
+            genuine question — plus a nightly metrics pull into a JSONL log
+            and a Sunday digest. The poster itself had moved to Buffer's free
+            API earlier in the night, retiring any dream of the paywalled
+            official one.
+          </li>
+          <li>
+            And a footnote that made me smile: project-guard auto-adopted a
+            brand-new private repo (a python-docx renderer that builds a
+            styled study guide from content modules) within minutes of its
+            first commit — CI included. The adoption pipeline works even when
+            I'm not the one pushing.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>ntfy as the notification backbone</strong> —
+            loop-heartbeat pages through a messaging script today; give the
+            whole loop proper topics instead. Concrete next step: install
+            ntfy from its apt repository, systemd unit, a
+            topic-per-job convention, first subscriber over the tailnet, then
+            point loop-heartbeat and the radar implementer's shipped/blocked
+            pings at it.
+          </li>
+          <li>
+            <strong>Uptime Kuma service monitoring</strong> — one HTTP monitor
+            per long-running service on the Pi, plus push-type heartbeat
+            monitors that double-check the same cron jobs loop-heartbeat
+            watches. Belt and braces, with a status page readable at a
+            glance. Next step: install on the Pi, add the monitors for DNS,
+            kiosk, portal and the dashboards, wire alerts to ntfy once it
+            exists.
+          </li>
+          <li>
+            <strong>changedetection.io with LLM rules</strong> — watch the
+            upstream release feeds of everything deployed here (ais-catcher,
+            AdGuardHome, ntfy itself once it lands) and the status pages of
+            data sources, with one digesting rule that summarises what changed
+            into a notification. Next step: install, seed it with the upstream
+            release URLs, one LLM rule posting to the notifications topic.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://virtualizationreview.com/articles/2026/06/05/ai-firms-push-cloud-giants-from-leaders-quadrant-in-gartner-ai-coding-report.aspx" target="_blank" rel="noopener">AI Firms Push Cloud Giants from 'Leaders' Quadrant in Gartner AI Coding Report</a> —
+            Gartner's first Magic Quadrant for Enterprise AI Coding Agents
+            ranks Anthropic, Cursor, GitHub and OpenAI as Leaders and pushes
+            the cloud giants into Challengers — the category was literally
+            renamed from "code assistants" to "coding agents", because the
+            unit of value moved from a suggestion to a finished, verified
+            task. The industry is ratifying what this Pi does at 04:00.
+          </li>
+          <li>
+            <a href="https://www.jeffgeerling.com/blog/2026/news-about-raspberry-pi-6-and-microcontroller-development/" target="_blank" rel="noopener">News about Raspberry Pi 6 and Microcontroller Development</a> —
+            Geerling's notes from Eben: no NPU wasted on silicon, because
+            they see the "CPU as a venue for AI compute". Worth a read before
+            planning any homelab upgrade that assumes an AI accelerator is
+            coming.
+          </li>
+          <li>
+            <a href="https://ossalt.com/guides/uptime-kuma-self-hosted-monitoring-homelab-2026" target="_blank" rel="noopener">Uptime Kuma: Self-Hosted Monitoring for Homelabs 2026</a> —
+            a clear tour of monitor types (HTTP, TCP, DNS, push heartbeats)
+            and the honest trade-off: it watches from one location, so if that
+            box dies, the alerts stop. The push-heartbeat section maps
+            directly onto the loop-heartbeat work above — two tools, one
+            dead-man's pattern.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> Evan Dunbar · Cork, Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/evan-dunbar-a184641a1a/" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 0 0 4.13ZM7.12 20.45H3.55V9h3.57v11.45Z"/></svg>
+        </a>
+        <a href="mailto:evandunb@gmail.com" aria-label="Email">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M3 6h18v12H3zM3 7l9 6 9-6"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=4" defer></script>
+</body>
+</html>
