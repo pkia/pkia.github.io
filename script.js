@@ -94,34 +94,6 @@
     greetingEl.style.transition = "opacity .3s";
   }
 
-  /* ---------- Copy email ---------- */
-  var copyBtn = document.getElementById("copy-email");
-  var copyLabel = document.getElementById("copy-email-label");
-  if (copyBtn) {
-    copyBtn.addEventListener("click", function () {
-      var email = copyBtn.getAttribute("data-email");
-      var done = function () {
-        copyBtn.classList.add("copied");
-        if (copyLabel) copyLabel.textContent = "Copied — " + email;
-        setTimeout(function () {
-          copyBtn.classList.remove("copied");
-          if (copyLabel) copyLabel.textContent = "Copy email address";
-        }, 2400);
-      };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(email).then(done, done);
-      } else {
-        var ta = document.createElement("textarea");
-        ta.value = email;
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand("copy"); } catch (e) { /* no-op */ }
-        document.body.removeChild(ta);
-        done();
-      }
-    });
-  }
-
   /* ---------- Pi architecture: flow highlighting ---------- */
   var archStage = document.querySelector(".arch-stage");
   if (archStage) {
@@ -176,6 +148,7 @@
       "Started maritime-dashboard :8000 — kiosk link up",
       "Started radar-agent — daily loop armed",
       "Started loop-heartbeat — dead-man's switch armed",
+      "Started ntfy — notifications on tap",
       "Reached target — all stations reporting"
     ];
     var bootLinesEl = document.getElementById("boot-lines");

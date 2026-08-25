@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=6" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -33,11 +33,9 @@
     "jobTitle": "Technical Support Engineer",
     "worksFor": { "@type": "Organization", "name": "an enterprise data-storage company" },
     "url": "https://pkia.github.io/",
-    "email": "mailto:",
     "address": { "@type": "PostalAddress", "addressLocality": "the city", "addressCountry": "IE" },
     "sameAs": [
-      "https://github.com/pkia",
-      ""
+      "https://github.com/pkia"
     ]
   }
   </script>
@@ -162,7 +160,7 @@
             <span class="stat-label">years building &amp; shipping</span>
           </div>
           <div class="stat reveal">
-            <span class="stat-num"><span data-count="13">0</span></span>
+            <span class="stat-num"><span data-count="14">0</span></span>
             <span class="stat-label">live services on the home-lab Pi</span>
           </div>
           <div class="stat reveal">
@@ -185,8 +183,8 @@
         <div class="about-grid">
           <div class="about-copy reveal">
             <p>
-              I'm a Technical Support Engineer at <a href="https://example.com" target="_blank" rel="noopener">an enterprise data-storage company</a>
-              in Ireland. My work is the deep end of troubleshooting: logs,
+              I'm a Technical Support Engineer at an enterprise data-storage
+              company in Ireland. My work is the deep end of troubleshooting: logs,
               traces and configs across enterprise data-management platforms,
               getting customers unstuck and their backups bulletproof.
             </p>
@@ -206,9 +204,10 @@
               with a model.
             </p>
             <p>
-              I got into engineering through hackathons and curiosity — my team won the
-              the university the city Open Data Hackathon with a pool-testing optimisation that cut
-              required COVID-19 tests by 45%.
+              I got into engineering through hackathons and curiosity — my team won
+              the university's Open Data Hackathon in the city with a
+              pool-testing optimisation that cut the COVID-19 tests Ireland
+              needed by 45%.
             </p>
           </div>
           <aside class="about-side reveal">
@@ -240,15 +239,15 @@
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">loop-heartbeat.timer</span>
-                    <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">dead-man's switch on the loop — first implementer ship</span>
+                    <span class="term-unit">ntfy.service</span>
+                    <span class="term-state running">active (running)</span>
+                    <span class="term-desc">notification backbone — one topic per job, deny-all</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">observability.timer</span>
+                    <span class="term-unit">loop-heartbeat.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">ntfy + uptime monitoring + backups — next off the board</span>
+                    <span class="term-desc">dead-man's switch — alerts fan out on two channels</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -305,9 +304,10 @@
               An autonomous improvement loop for everything else on this page:
               at 01:00 an agent writes the daily devlog and proposes what's
               next; at 04:00 a second agent picks one idea and ships it —
-              code, tests, docs, brand-new repos included. First implementer
-              ship: a dead-man's switch for the loop itself. The idea ledger,
-              every run and every failure are public.
+              code, tests, docs, brand-new repos included. Two ships in: a
+              dead-man's switch, and an ntfy notification backbone so the
+              loop can page me. The idea ledger, every run and every failure
+              are public.
             </p>
             <ul class="chips chips-sm">
               <li>AI agents</li><li>Hermes cron</li><li>pytest</li><li>Autonomy</li>
@@ -388,9 +388,10 @@
               The CI/CD machinery that runs the Pi itself: a project-guard that
               auto-adopts and versions every directory on the box, pull-based
               deploys with compile gates, health checks and automatic rollback,
-              and loop-heartbeat — a dead-man's switch that pages when any
-              scheduled job goes silent. The architecture reference for how
-              everything here ships.
+              loop-heartbeat — a dead-man's switch that pages when any
+              scheduled job goes silent — and an ntfy notification backbone:
+              one topic per job, deny-all auth. The architecture reference
+              for how everything here ships.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
@@ -428,7 +429,7 @@
             </div>
             <h3>Covid Pool Testing</h3>
             <p>
-              Winning entry at the the university the city Open Data Hackathon (sponsored by Riot
+              Winning entry at the university's Open Data Hackathon in the city (sponsored by Riot
               Games, CSO and Lero). A binary-splitting pool-testing optimisation,
               grounded in published research, that reduced the number of COVID-19
               tests Ireland needed by 45%.
@@ -463,7 +464,9 @@
           the city — a ship-tracking RF station and weather-satellite receiver, the
           DNS for the whole house, a CS2 match tracker, pull-based deploys with
           auto-rollback, and a pair of AI agents that write the devlog and ship
-          improvements while I sleep.
+          improvements while I sleep — with a dead-man's switch and a
+          notification server so the whole arrangement can page me when it
+          needs to.
         </p>
 
         <div class="arch-stage reveal">
@@ -633,7 +636,7 @@
 
             <div class="arch-band arch-band-ops" style="--x:3.2%;--y:66.94%;--w:93.5%;--h:32.65%">
               <span class="arch-band-tag">OPS &amp; AGENTS</span>
-              <div class="arch-card" data-node="cd" style="--x:2.07%;--y:6.88%;--w:46.9%;--h:27.5%">
+              <div class="arch-card" data-node="cd" style="--x:2.07%;--y:2%;--w:46.9%;--h:21%">
                 <div class="arch-card-top">
                   <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 0 1 13-5.1M19.5 12a7.5 7.5 0 0 1-13 5.1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M17.6 3.4v3.6H14M6.4 20.6V17H10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
@@ -641,14 +644,14 @@
                 <span class="arch-sub">3-min poll · auto-rollback</span>
                 <span class="arch-src">☁ GitHub Actions</span>
               </div>
-              <div class="arch-card" data-node="guard" style="--x:51.03%;--y:6.88%;--w:46.9%;--h:27.5%">
+              <div class="arch-card" data-node="guard" style="--x:51.03%;--y:2%;--w:46.9%;--h:21%">
                 <div class="arch-card-top">
                   <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5.5v11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="7" cy="4" r="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="7" cy="18.5" r="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="17" cy="6.5" r="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7 9.5h5.5a3 3 0 0 0 3-3v-.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
                 </div>
                 <span class="arch-name">PROJECT-GUARD</span>
                 <span class="arch-sub">adopts repos · adds CI</span>
               </div>
-              <div class="arch-card" data-node="hermes" style="--x:2.07%;--y:36.25%;--w:46.9%;--h:27.5%">
+              <div class="arch-card" data-node="hermes" style="--x:2.07%;--y:27%;--w:46.9%;--h:21%">
                 <div class="arch-card-top">
                   <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="8" width="14" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 8V5.2M9.4 5.2h5.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="9.4" cy="13" r="1" fill="currentColor"/><circle cx="14.6" cy="13" r="1" fill="currentColor"/></svg>
                   <span class="arch-led"></span>
@@ -656,7 +659,7 @@
                 <span class="arch-name">HERMES GATEWAY</span>
                 <span class="arch-sub">agents · tools · messaging</span>
               </div>
-              <div class="arch-card" data-node="cron" style="--x:51.03%;--y:36.25%;--w:46.9%;--h:27.5%">
+              <div class="arch-card" data-node="cron" style="--x:51.03%;--y:27%;--w:46.9%;--h:21%">
                 <div class="arch-card-top">
                   <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.4V12l3.1 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   <span class="arch-led"></span>
@@ -664,7 +667,7 @@
                 <span class="arch-name">CRON · AI AGENTS</span>
                 <span class="arch-sub">01:00 devlog · 04:00 radar</span>
               </div>
-              <div class="arch-card" data-node="watchdog" style="--x:2.07%;--y:65.63%;--w:46.9%;--h:27.5%">
+              <div class="arch-card" data-node="watchdog" style="--x:2.07%;--y:52%;--w:46.9%;--h:21%">
                 <div class="arch-card-top">
                   <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2-5 4 10 2-5h6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   <span class="arch-led"></span>
@@ -672,13 +675,29 @@
                 <span class="arch-name">HEALTH WATCHDOG</span>
                 <span class="arch-sub">every 30m · no-agent script</span>
               </div>
-              <div class="arch-card" data-node="pipeline" style="--x:51.03%;--y:65.63%;--w:46.9%;--h:27.5%">
+              <div class="arch-card" data-node="pipeline" style="--x:51.03%;--y:52%;--w:46.9%;--h:21%">
                 <div class="arch-card-top">
                   <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.2l1.8 1.8 3.2-3.4M4 16.2l1.8 1.8 3.2-3.4M12.5 7h7.5M12.5 16.8h7.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   <span class="arch-led"></span>
                 </div>
                 <span class="arch-name">PIPELINE CHECK</span>
                 <span class="arch-sub">hourly · CI compliance audit</span>
+              </div>
+              <div class="arch-card" data-node="ntfy" style="--x:2.07%;--y:77%;--w:46.9%;--h:21%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="12" height="16" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10 2.6c0 1 1 1.4 2 1.4s2-.4 2-1.4M10 21.4c0-1 1-1.4 2-1.4s2 .4 2 1.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">NTFY BUS</span>
+                <span class="arch-sub">topic per job · deny-all</span>
+              </div>
+              <div class="arch-card" data-node="funnel" style="--x:51.03%;--y:77%;--w:46.9%;--h:21%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M9 5v5.2c0 1-.6 1.9-1.5 2.3L6 13.6V19h12v-5.4l-1.5-1.1c-.9-.4-1.5-1.3-1.5-2.3V5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">TS FUNNEL</span>
+                <span class="arch-sub">public HTTPS · /shelfmate</span>
               </div>
             </div>
           </div>
@@ -715,7 +734,7 @@
           <span><i class="dim"></i>remote / agents</span>
         </div>
         <ul class="chips chips-sm arch-chips reveal">
-          <li>Pi 5 · 8 GB</li><li>7 network services</li><li>4 hermes cron jobs</li>
+          <li>Pi 5 · 8 GB</li><li>14 network services</li><li>12 cron jobs</li>
           <li>Tailscale VPN</li><li>AdGuard DNS</li><li>auto-rollback CD</li><li>pytest on every push</li>
         </ul>
       </div>
@@ -751,8 +770,8 @@
                 <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 4 2 9l10 5 10-5-10-5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
               </div>
               <div>
-                <h3>University College the city</h3>
-                <p class="exp-org">Ireland</p>
+                <h3>University in the city</h3>
+                <p class="exp-org">Ireland · Computer Science</p>
               </div>
               <span class="exp-dates">2018 – 2022</span>
             </div>
@@ -776,7 +795,7 @@
             <div class="tl-body">
               <p class="tl-date">Now</p>
               <h3>Support engineer, ship spotter, agent supervisor</h3>
-              <p>Deep-dive troubleshooting by day; AIS receivers, satellite decoders and ops portals on a Pi by night — now orchestrated by a devlog → implementer loop of agents that ships while the city sleeps.</p>
+              <p>Deep-dive troubleshooting by day; AIS receivers, satellite decoders and ops portals on a Pi by night — now orchestrated by a devlog → implementer loop of agents that ships while the city sleeps and pages me when something breaks.</p>
             </div>
           </li>
           <li class="reveal">
@@ -792,7 +811,7 @@
             <div class="tl-body">
               <p class="tl-date">2021</p>
               <h3>Hackathon win &amp; first team projects</h3>
-              <p>Won the the university the city Open Data Hackathon with a 45% pool-testing optimisation; built Tweet Guard, an NLP abuse scanner, with four teammates.</p>
+              <p>Won the university's Open Data Hackathon in the city with a 45% pool-testing optimisation; built Tweet Guard, an NLP abuse scanner, with four teammates.</p>
             </div>
           </li>
           <li class="reveal">
@@ -814,15 +833,15 @@
         <h2 class="section-title reveal">Let's talk.</h2>
         <p class="contact-copy reveal">
           Happy to talk reliability engineering, Raspberry Pi experiments, radio,
-          or the city's maritime traffic. Or we can just have a
-.
+          or the city's maritime traffic. The fastest way to reach me is
+          GitHub — I read everything.
         </p>
         <div class="contact-actions reveal">
-          <button class="btn btn-primary" id="copy-email" type="button" data-email="">
-            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5" y="5" width="8" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 5V4a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 4v5.5A1.5 1.5 0 0 0 4 11h1" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-            <span id="copy-email-label">Copy email address</span>
-          </button>
-          <a class="btn btn-ghost" href="https://github.com/pkia" target="_blank" rel="noopener">GitHub</a>
+          <a class="btn btn-primary" href="https://github.com/pkia" target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 .4A7.6 7.6 0 0 0 .4 8a7.6 7.6 0 0 0 5.2 7.2c.4.1.5-.2.5-.4v-1.3c-2.1.5-2.6-1-2.6-1-.4-.9-.9-1.1-.9-1.1-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.2 1.8.8 2.2.6.1-.5.3-.8.5-1-1.7-.2-3.5-.9-3.5-3.8 0-.8.3-1.5.8-2-.1-.2-.4-1 .1-2 0 0 .6-.2 2.1.8a7.3 7.3 0 0 1 3.9 0c1.5-1 2.1-.8 2.1-.8.4 1 .2 1.8.1 2 .5.5.8 1.2.8 2 0 2.9-1.8 3.6-3.5 3.8.3.3.5.7.5 1.4v2.1c0 .2.1.5.6.4A7.6 7.6 0 0 0 15.6 8 7.6 7.6 0 0 0 8 .4Z"/></svg>
+            Find me on GitHub
+          </a>
+          <a class="btn btn-ghost" href="/blog/">Read the devlog</a>
         </div>
       </div>
     </section>
@@ -840,6 +859,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=5" defer></script>
+  <script src="script.js?v=6" defer></script>
 </body>
 </html>
