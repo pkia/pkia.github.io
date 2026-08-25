@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The loop can page me now — EV</title>
+  <meta name="description" content="The 04:00 radar implementer shipped its second feature: a locked-down ntfy notification backbone for the whole loop — deny-all auth, a topic per job, heartbeat alerts on two channels, 50 tests green. Also: two new repos auto-adopted by project-guard, and an identity scrub across this site." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-08-25.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="The loop can page me now" />
+  <meta property="og:description" content="Implementer ship #2: an ntfy notification backbone for the agent loop — topic per job, dual-channel heartbeat alerts, 7/7 live checks. Plus two new adopted repos and an identity scrub of this site." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-08-25.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-08-25T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=6" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">09</span> — Devlog</p>
+        <h1 class="post-title reveal">The loop can page me now</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-08-25">Tuesday, 25 August 2026</time>
+          <span>·</span>
+          <span>notifications everywhere</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Night two of the rescheduled loop, and the 04:00 implementer has
+          shipped its second feature. The board said "ntfy as the notification
+          backbone"; by breakfast there was a locked-down notification server
+          on the Pi, a topic per job, and the heartbeat fanning its alerts out
+          onto two channels — with a green test suite behind all of it. The
+          loop now has a voice: when a cron job dies or goes quiet, my phone
+          hears about it. Given that ship number one was the dead-man's
+          switch, the watchmen now carry radios.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong><a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a></strong> —
+            implementer ship #2 off the <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar
+            board</a>: the ntfy notification backbone. It installed ntfy from
+            the plain Debian package (no third-party apt repo), bound the
+            server to the tailnet only, and locked it down — deny-all default
+            access, a write-only publisher user for scripts, a read-only
+            subscriber for the phone, tokens kept outside the public repo. A
+            topic-per-job convention (radar, loop-heartbeat, backups — ACLs
+            provisioned already) is documented with a runbook, and a small
+            <code>ntfy-notify</code> helper means every job publishes its
+            outcome in one line. loop-heartbeat now alerts on two channels at
+            once, delivered if either accepts. 50 tests pass locally and on
+            CI across three runs, and a committed live-check script went
+            7/7 against the production server: deny-all enforced, the
+            publisher can't read, the subscriber can't write, publish and
+            read-back round trip. En route it fixed two latent e2e tests that
+            flipped at midnight — wall-clock assumptions, the classic. The
+            one remaining step is mine: subscribing the phone. A follow-up
+            scrub commit genericised a tailnet hostname that had crept into
+            the docs.
+          </li>
+          <li>
+            <strong>A new service, adopted before I'd finished coffee</strong>
+            (private repo, so no link) — a single-file Python service that
+            renders a live capabilities page for the box: real systemd unit
+            states and /proc telemetry instead of a hardcoded brag list,
+            published through the funnel. project-guard auto-adopted the
+            repo — CI included — within minutes of its first commit. The
+            adoption pipeline remains the best-behaved employee on this Pi.
+          </li>
+          <li>
+            <strong>The Fantasy Premier League assistant got a repo</strong>
+            (private) — the Monday-night report → confirm → apply job now
+            lives in version control with tests on push, instead of being a
+            loose script only the cron job knew about. Also adopted on
+            arrival, naturally.
+          </li>
+          <li>
+            <strong>This site got an identity scrub</strong> — the byline
+            collapsed to EV everywhere, the og image regenerated without my
+            name on it, and the Currently panel no longer says exactly where
+            in Ireland the Pi lives. The public pages now reveal exactly as
+            much as I want them to; git history keeps the rest. Quiet,
+            boring, and overdue.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Uptime Kuma service monitoring</strong> — now that alerts
+            have a backbone, give them something to say. Concrete next step:
+            install Uptime Kuma on the Pi, add one HTTP monitor per
+            long-running service (DNS, portal, dashboards) plus push-type
+            heartbeat monitors that double-check the same cron jobs
+            loop-heartbeat watches, and wire the alert channel to the new
+            ntfy server.
+          </li>
+          <li>
+            <strong>changedetection.io with LLM rules</strong> — watch the
+            upstream release pages of everything deployed here (ais-catcher,
+            AdGuardHome, ntfy itself) and the status pages of the data
+            sources, with one digesting rule that summarises what changed
+            into a single notification. Next step: install, seed it with the
+            upstream release URLs, one LLM rule posting to the
+            notifications topic.
+          </li>
+          <li>
+            <strong>Deduplicated backups with healthchecks hooks</strong> —
+            borgmatic (or restic) snapshots of the portal, dashboards and
+            configs to USB storage, a healthchecks-style ping on success,
+            failures published to the ntfy <code>backups</code> topic whose
+            ACL is already provisioned. Next step: install, configure
+            retention, then do a restore drill before calling it done — a
+            backup that's never been restored is a rumour.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://jacar.es/en/how-to-install-changedetection-with-docker/" target="_blank" rel="noopener">How to Monitor Website Changes with changedetection.io in Docker</a> —
+            a careful walkthrough that pins the image version instead of
+            floating on <code>:latest</code>, binds the UI to loopback only,
+            and routes alerts to ntfy over Apprise URLs. If the
+            changedetection idea gets picked off the board, this is roughly
+            the shape it should take on this box.
+          </li>
+          <li>
+            <a href="https://selfhosting.sh/compare/restic-vs-borgmatic" target="_blank" rel="noopener">Restic vs Borgmatic: Which Backup Tool Fits?</a> —
+            a sober comparison of the two philosophies: restic's single
+            binary with native S3/B2 targets versus borgmatic's YAML wrapper
+            around Borg with retention, hooks and scheduling built in. The
+            hooks table is what matters here — it's the difference between a
+            backup job and a backup job that tells you it succeeded.
+          </li>
+          <li>
+            <a href="https://coding-agents-matrix.dev/" target="_blank" rel="noopener">AI Coding Agents Matrix</a> —
+            25 coding agents compared in one filterable table, updated
+            mid-August: open source or not, BYO LLM, MCP support, plan mode,
+            subagents — and <code>AGENTS.md</code> support as a first-class
+            column. Instruction files for agents started as a convention;
+            now they're a shopping-criteria checkbox.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=6" defer></script>
+</body>
+</html>

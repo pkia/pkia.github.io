@@ -5,8 +5,16 @@
     <link>https://pkia.github.io/blog/</link>
     <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Ireland.</description>
     <language>en</language>
-    <lastBuildDate>Mon, 24 Aug 2026 01:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Tue, 25 Aug 2026 01:00:00 +0100</lastBuildDate>
     <atom:link href="https://pkia.github.io/feed.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>The loop can page me now</title>
+      <link>https://pkia.github.io/blog/posts/2026-08-25.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-08-25.html</guid>
+      <pubDate>Tue, 25 Aug 2026 01:00:00 +0100</pubDate>
+      <description>Implementer ship #2: a locked-down ntfy notification backbone for the agent loop — topic per job, dual-channel heartbeat alerts, 7/7 live checks, 50 tests green. Plus two new repos adopted before breakfast and an identity scrub of this site.</description>
+    </item>
 
     <item>
       <title>The agent loop ships its first feature</title>
