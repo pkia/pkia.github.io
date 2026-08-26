@@ -144,11 +144,13 @@
       "Started adguard-home — DNS for the house",
       "Started tailscale — tailnet up",
       "Started cs2-dashboard :8001",
+      "Started cs2-tracker :8092 — personal stats live",
       "Started shelfmate :8086 — book recs live",
       "Started maritime-dashboard :8000 — kiosk link up",
       "Started radar-agent — daily loop armed",
       "Started loop-heartbeat — dead-man's switch armed",
       "Started ntfy — notifications on tap",
+      "Started pi-backup — nightly archives, Sunday drills",
       "Reached target — all stations reporting"
     ];
     var bootLinesEl = document.getElementById("boot-lines");
