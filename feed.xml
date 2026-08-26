@@ -5,8 +5,16 @@
     <link>https://pkia.github.io/blog/</link>
     <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Ireland.</description>
     <language>en</language>
-    <lastBuildDate>Tue, 25 Aug 2026 01:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 26 Aug 2026 01:00:00 +0100</lastBuildDate>
     <atom:link href="https://pkia.github.io/feed.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Backups with receipts</title>
+      <link>https://pkia.github.io/blog/posts/2026-08-26.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-08-26.html</guid>
+      <pubDate>Wed, 26 Aug 2026 01:00:00 +0100</pubDate>
+      <description>Implementer ship #3: pi-backup — nightly borg archives of everything git can't hold, plus a Sunday restore drill that byte-compares the recovery and posts the verdict to ntfy. 71 tests green. Also: a new private repo — a CS2 FACEIT + Premier tracker built on two asymmetric data paths.</description>
+    </item>
 
     <item>
       <title>The loop can page me now</title>
