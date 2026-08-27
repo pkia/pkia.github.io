@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="stylesheet" href="styles.css?v=8" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -160,7 +160,7 @@
             <span class="stat-label">years building &amp; shipping</span>
           </div>
           <div class="stat reveal">
-            <span class="stat-num"><span data-count="15">0</span></span>
+            <span class="stat-num"><span data-count="17">0</span></span>
             <span class="stat-label">live services on the home-lab Pi</span>
           </div>
           <div class="stat reveal">
@@ -245,9 +245,15 @@
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">pi-backup.timer</span>
+                    <span class="term-unit">release-watch.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">nightly borg archives · Sunday restore drill</span>
+                    <span class="term-desc">upstream release digests · twice daily</span>
+                  </li>
+                  <li>
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-unit">pi-doctor.timer</span>
+                    <span class="term-state waiting">active (waiting)</span>
+                    <span class="term-desc">07:00 audit of every project on the box</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -390,9 +396,10 @@
               deploys with compile gates, health checks and automatic rollback,
               loop-heartbeat — a dead-man's switch that pages when any
               scheduled job goes silent — an ntfy notification backbone with
-              one topic per job, and pi-backup: nightly borg archives with a
-              weekly restore drill that byte-compares the recovery. The
-              architecture reference for how everything here ships.
+              one topic per job, pi-backup with a weekly restore drill that
+              byte-compares the recovery, release-watch digesting upstream
+              releases, and pi-doctor auditing every project each morning.
+              The architecture reference for how everything here ships.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
@@ -676,7 +683,7 @@
                   <span class="arch-led"></span>
                 </div>
                 <span class="arch-name">CRON · AI AGENTS</span>
-                <span class="arch-sub">01:00 devlog · 04:00 radar</span>
+                <span class="arch-sub">devlog · radar · 07:00 doctor</span>
               </div>
               <div class="arch-card" data-node="watchdog" style="--x:2.07%;--y:52%;--w:46.9%;--h:21%">
                 <div class="arch-card-top">
@@ -806,7 +813,7 @@
             <div class="tl-body">
               <p class="tl-date">Now</p>
               <h3>Support engineer, ship spotter, agent supervisor</h3>
-              <p>Deep-dive troubleshooting by day; AIS receivers, satellite decoders and ops portals on a Pi by night — now orchestrated by a devlog → implementer loop of agents that ships while the city sleeps, pages me when something breaks, and proves its own backups in a Sunday restore drill.</p>
+              <p>Deep-dive troubleshooting by day; AIS receivers, satellite decoders and ops portals on a Pi by night — now orchestrated by a devlog → implementer loop of agents that ships while the city sleeps, pages me when something breaks, proves its own backups in a Sunday restore drill, and audits every project on the box over breakfast.</p>
             </div>
           </li>
           <li class="reveal">
@@ -870,6 +877,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=7" defer></script>
+  <script src="script.js?v=8" defer></script>
 </body>
 </html>

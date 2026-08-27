@@ -151,6 +151,8 @@
       "Started loop-heartbeat — dead-man's switch armed",
       "Started ntfy — notifications on tap",
       "Started pi-backup — nightly archives, Sunday drills",
+      "Started release-watch — upstream digests armed",
+      "Started pi-doctor — morning audits armed",
       "Reached target — all stations reporting"
     ];
     var bootLinesEl = document.getElementById("boot-lines");
