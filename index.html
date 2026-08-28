@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=8" />
+  <link rel="stylesheet" href="styles.css?v=9" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -239,21 +239,15 @@
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">ntfy.service</span>
-                    <span class="term-state running">active (running)</span>
-                    <span class="term-desc">notification backbone — one topic per job, deny-all</span>
-                  </li>
-                  <li>
-                    <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">release-watch.timer</span>
+                    <span class="term-unit">service-probe.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">upstream release digests · twice daily</span>
+                    <span class="term-desc">12 probes every 5 min · scoreboard in the portal</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">pi-doctor.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">07:00 audit of every project on the box</span>
+                    <span class="term-desc">07:00 audit of every project · SDR auto-reset</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -310,9 +304,10 @@
               An autonomous improvement loop for everything else on this page:
               at 01:00 an agent writes the daily devlog and proposes what's
               next; at 04:00 a second agent picks one idea and ships it —
-              code, tests, docs, brand-new repos included. Three ships in:
-              a dead-man's switch, an ntfy notification backbone, and
-              borg backups with a weekly restore drill. The idea ledger,
+              code, tests, docs, brand-new repos included. Five ships in:
+              a dead-man's switch, an ntfy notification backbone, borg
+              backups with a weekly restore drill, an upstream release
+              watcher, and a service uptime scoreboard. The idea ledger,
               every run and every failure are public.
             </p>
             <ul class="chips chips-sm">
@@ -372,9 +367,10 @@
             <h3>Project Hub</h3>
             <p>
               Single-page operations portal for my Raspberry Pi home server: live
-              port and systemd health for every project on the box, host vitals,
-              pull-based CD with auto-rollback. The bookmark I actually use dozens
-              of times a day.
+              port and systemd health for every project on the box, an uptime
+              scoreboard fed by five-minute probes, host vitals, pull-based CD
+              with auto-rollback. The bookmark I actually use dozens of times a
+              day.
             </p>
             <ul class="chips chips-sm">
               <li>Flask</li><li>systemd</li><li>Self-hosted</li><li>CI/CD</li>
@@ -398,7 +394,8 @@
               scheduled job goes silent — an ntfy notification backbone with
               one topic per job, pi-backup with a weekly restore drill that
               byte-compares the recovery, release-watch digesting upstream
-              releases, and pi-doctor auditing every project each morning.
+              releases, service-probe taking the box's pulse every five
+              minutes, and pi-doctor auditing every project each morning.
               The architecture reference for how everything here ships.
             </p>
             <ul class="chips chips-sm">
@@ -473,7 +470,8 @@
           DNS for the whole house, pro and personal CS2 trackers, pull-based
           deploys with auto-rollback, and a pair of AI agents that write the
           devlog and ship improvements while I sleep — watched over by a
-          dead-man's switch, paged through a notification server, and backed
+          dead-man's switch, probed every five minutes, paged through a
+          notification server, audited over breakfast, and backed
           up nightly to deduplicated archives that prove themselves in a
           weekly restore drill.
         </p>
@@ -813,7 +811,7 @@
             <div class="tl-body">
               <p class="tl-date">Now</p>
               <h3>Support engineer, ship spotter, agent supervisor</h3>
-              <p>Deep-dive troubleshooting by day; AIS receivers, satellite decoders and ops portals on a Pi by night — now orchestrated by a devlog → implementer loop of agents that ships while the city sleeps, pages me when something breaks, proves its own backups in a Sunday restore drill, and audits every project on the box over breakfast.</p>
+              <p>Deep-dive troubleshooting by day; AIS receivers, satellite decoders and ops portals on a Pi by night — now orchestrated by a devlog → implementer loop of agents that ships while the city sleeps, pages me when something breaks, takes the box's pulse every five minutes, proves its own backups in a Sunday restore drill, and audits every project on the box over breakfast.</p>
             </div>
           </li>
           <li class="reveal">
@@ -877,6 +875,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=8" defer></script>
+  <script src="script.js?v=9" defer></script>
 </body>
 </html>
