@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Twelve probes and a scoreboard — EV</title>
+  <meta name="description" content="Implementer ship #5: service-probe — twelve probes every five minutes across every endpoint on the Pi, anti-flap DOWN calls, recovery notices with downtime attached, and an Uptime Scoreboard in the portal. Plus the morning doctor learning to reset a wedged RTL-SDR by itself, and CI hermeticity fixes found the hard way." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-08-28.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Twelve probes and a scoreboard" />
+  <meta property="og:description" content="Implementer ship #5: service-probe — twelve probes every five minutes, anti-flap alerts, and a scoreboard panel in the ops portal. Plus the morning doctor learning to reset a wedged RTL-SDR itself." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-08-28.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-08-28T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">12</span> — Devlog</p>
+        <h1 class="post-title reveal">Twelve probes and a scoreboard</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-08-28">Friday, 28 August 2026</time>
+          <span>·</span>
+          <span>ship five: the box takes its own pulse</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Night five of the loop, and the radar board went after the one
+          question left unanswered by the audit layer: not "is the paperwork
+          in order" but "are the services actually up, right now?" The 04:00
+          implementer shipped number five — a stdlib prober that asks every
+          endpoint on this box how it's doing every five minutes and files
+          complaints through the notification backbone. By breakfast the
+          portal had a scoreboard for it. The morning doctor, one day into
+          the job, turned out to need a doctor itself — and got one by
+          07:20.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong><a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a></strong> —
+            implementer ship #5 off the <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar
+            board</a>: <code>service-probe</code>, the concretised version of
+            the Uptime Kuma idea (the app needs containers, which this box
+            forbids — the underlying need doesn't). Every five minutes it
+            runs twelve probes: HTTP checks against the seven local web
+            services — gated on the HEALTHZ contract where one exists, so a
+            polite 200 with an error page doesn't count as up — three
+            public funnel endpoints, an ntfy self-check, and a hand-built
+            UDP DNS query for AdGuardHome, because DNS has no HTTP to
+            negotiate with. DOWN is only declared after two consecutive
+            failures so a flappy restart stays quiet; recovery notices
+            arrive with the downtime duration attached. Alerts go to a new
+            ntfy <code>services</code> topic under the same ACL discipline
+            as every other topic — publisher write-only, subscriber
+            read-only, anonymous denied — and state lands atomically in a
+            <code>status.json</code> something else can read. First live
+            sweep: 12/12 up. Then the committed drill: seed a dead port,
+            watch the DOWN alert and the recovery notice arrive, read both
+            back with the subscriber token. 139/139 tests locally and CI
+            green.
+          </li>
+          <li>
+            <strong>The portal grew a scoreboard</strong> —
+            <a href="https://github.com/pkia/project-hub" target="_blank" rel="noopener">project-hub</a>
+            commit <code>1c2b9f3</code>: a new Uptime Scoreboard panel fed
+            by service-probe's <code>status.json</code> over an
+            <code>/api/probes</code> endpoint, deployed by the pull-based
+            pipeline like everything else. The bookmark I open dozens of
+            times a day now answers "is anything broken" at a glance,
+            instead of "which tab was that".
+          </li>
+          <li>
+            <strong>Two CI bugs found the hard way</strong> — tests in
+            pi-cicd that depended on the live tracker port and on live DNS
+            had the suite red on runners since 08-26 while staying green
+            locally, which is the worst kind of lie a test suite can tell.
+            Both are hermetic now (or skip cleanly where the dependency
+            can't be faked). Credit where due: the implementer's own
+            done-means-green gate is what flushed them out — the audit
+            layer auditing the audit layer.
+          </li>
+          <li>
+            <strong>pi-doctor's first house calls</strong> — the 07:00
+            audit crashed on its own bookkeeping: <code>save_state</code>
+            referenced a variable that didn't exist, so any run with
+            findings died before it could alert anyone. Fixed, along with
+            two genuinely useful additions. A wedged RTL-SDR has a
+            signature — thirty timeouts in ten minutes — and the sysfs
+            authorize toggle does <em>not</em> clear it, but a
+            <code>USBDEVFS_RESET</code> does; the doctor now resets the
+            dongle itself, skips the manoeuvre during NOAA captures, and
+            restarts the SDR consumers around the reset. And the AIS
+            revive check waits ten seconds before declaring "start
+            failed", because the dongle is shared and normal stop/start
+            cycles were being read as outages. The X bot's data feed stops
+            crying wolf.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Alert-storm kill switch and notifier timeouts</strong> —
+            yesterday's ntfy read suggested two details worth stealing: a
+            one-variable global mute for alert storms, and a timeout on
+            every notification request so a dead notification server can't
+            hang the job that was trying to report its own success. Next
+            step: add both to the shared ntfy helper in pi-cicd — a mute
+            flag checked before publish, connect+read timeouts on every
+            request, tests for the storm path and the hang path — and let
+            service-probe, release-watch, pi-backup, heartbeat and the
+            doctor inherit them for free.
+          </li>
+          <li>
+            <strong>Prometheus + Grafana + node_exporter from Debian
+            packages</strong> — the last monitoring idea still on the board
+            from the original research batch: real graphs for these posts
+            to cite — CPU temperature against load, service health over
+            time, disk and network throughput. Next step: install all
+            three from apt with systemd units (the no-container way this
+            box does things), point Prometheus at node_exporter and the
+            long-running services, pin one dashboard with the graphs the
+            devlog actually quotes, and route alerting through the
+            existing ntfy topics.
+          </li>
+          <li>
+            <strong>Grow pi-cicd into the single architecture
+            reference</strong> — carried over: how this Pi builds, tests,
+            deploys and rolls back is spread across READMEs and heads.
+            Next step: one docs page per layer (deploy, project-guard,
+            heartbeat, ntfy, backup, release-watch, service-probe, doctor)
+            plus an index mapping every running unit to its config file,
+            timer and notification topic — so the next implementer, or a
+            human, can orient in one read.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://explainx.ai/blog/cursor-event-driven-cloud-agents-isolated-vms-august-2026" target="_blank" rel="noopener">Cursor's cloud agents learned to subscribe</a> —
+            as of the August 19 update, cloud agents can hold standing
+            subscriptions to PRs, Slack threads and cron schedules, waking
+            when there's movement, and can fan subagents out onto isolated
+            VMs that each get their own copy of the project. The primitive
+            — agents that start on a schedule and stop themselves — is
+            exactly what the radar loop runs on, except this box's version
+            costs one Raspberry Pi and a crontab. The number in the
+            coverage that jumped out: a third of Cursor's internally
+            merged PRs are now agent-created.
+          </li>
+          <li>
+            <a href="https://uptimepage.dev/" target="_blank" rel="noopener">Uptimepage — an uptime monitor and status page in one</a> —
+            Rust, AGPL, self-hostable: per-monitor channels with dedupe
+            and flap suppression, incidents that open themselves on a down
+            check, a JSON API and RSS out of the box. Yesterday's
+            scoreboard covers the private half of that feature list; if it
+            ever goes public, this is the spec to steal from — minus the
+            multi-region probes, which are slightly beyond one Pi.
+          </li>
+          <li>
+            <a href="https://cnx-software.com/2026/08/25/firehat-open-source-firewire-dv-capture-hat-pcie-sbc-raspberry-pi-5-radxa-rock-2f" target="_blank" rel="noopener">Firehat — an open-source FireWire capture HAT for the Pi 5</a> —
+            a VIA IEEE 1394 controller on a HAT that digitises MiniDV and
+            Digital8 tapes through the Pi 5's PCIe FFC connector, with
+            KiCad files under CERN OHL-S and GPL software. Nobody on this
+            tailnet needs it, which is precisely the charm: the Pi 5's
+            PCIe lane keeps spawning odd, fully-open hardware that would
+            have been a desktop PCI card five years ago.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>

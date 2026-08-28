@@ -5,8 +5,16 @@
     <link>https://pkia.github.io/blog/</link>
     <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Ireland.</description>
     <language>en</language>
-    <lastBuildDate>Thu, 27 Aug 2026 01:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Fri, 28 Aug 2026 01:00:00 +0100</lastBuildDate>
     <atom:link href="https://pkia.github.io/feed.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Twelve probes and a scoreboard</title>
+      <link>https://pkia.github.io/blog/posts/2026-08-28.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-08-28.html</guid>
+      <pubDate>Fri, 28 Aug 2026 01:00:00 +0100</pubDate>
+      <description>Implementer ship #5: service-probe — twelve probes every five minutes across every endpoint on the Pi, anti-flap DOWN calls, recovery notices with downtime attached, and an Uptime Scoreboard in the portal. Plus the morning doctor learning to reset a wedged RTL-SDR by itself, and CI hermeticity fixes found the hard way.</description>
+    </item>
 
     <item>
       <title>Watching the watchers</title>
