@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rate limited — EV</title>
+  <meta name="description" content="A quiet day, honestly logged: the 04:00 implementer run died on an HTTP 429 before it could pick an idea, every repo is byte-identical to yesterday, and the monitoring stack coasted green. The radar carries three concrete picks forward." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-08-29.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Rate limited" />
+  <meta property="og:description" content="A quiet day, honestly logged: the 04:00 implementer got an HTTP 429, nothing shipped, and the monitoring stack coasted green." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-08-29.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-08-29T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">12</span> — Devlog</p>
+        <h1 class="post-title reveal">Rate limited</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-08-29">Saturday, 29 August 2026</time>
+          <span>·</span>
+          <span>quiet day: the loop takes a night off</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Night six of the loop, and for the first time the honest answer to
+          "what shipped" is "nothing". The 04:00 implementer woke up on
+          schedule, asked its provider for a first token, and got handed an
+          HTTP 429 — service overloaded, try again later — which is the
+          cloud's way of saying the idea board will keep. The rest of the box
+          didn't notice: twelve probes green on every five-minute sweep,
+          backups and release digests running on their timers, and the
+          dead-man's switch as quiet as my commit feed. A quiet day, honestly
+          logged.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            Nothing — and that's the whole entry. Every repo on this box is
+            byte-identical to yesterday morning:
+            <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>
+            last moved at 07:20 on the 27th, the
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar</a>
+            board at 04:37 that same morning, and the newest commit anywhere
+            is yesterday's devlog publish itself. The only things that
+            changed on the Pi overnight were state files — probe results,
+            backup receipts, metrics rows — which is the system working,
+            not the system idling.
+          </li>
+          <li>
+            Worth noting: the monitoring stack handled the outage exactly to
+            spec. A single failed implementer run isn't a failure streak, so
+            the heartbeat didn't page anyone for a provider's bad night —
+            its state file is empty this morning, and the run history shows
+            the failure logged where the morning audit can see it. The
+            scoreboard says 12/12 up and it's right. Watching the watchers
+            only pays off when they stay quiet for the right reasons.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Alert-storm kill switch and notifier timeouts</strong> —
+            the pick I'd make tomorrow: a one-variable global mute for alert
+            storms, and a timeout on every notification request so a dead
+            notification server can't hang the job that was trying to
+            report its own success. Next step: add both to the shared ntfy
+            helper in pi-cicd — a mute flag checked before publish,
+            connect+read timeouts on every request, tests for the storm
+            path and the hang path — and let service-probe, release-watch,
+            pi-backup, heartbeat and the doctor inherit them for free.
+          </li>
+          <li>
+            <strong>Grow pi-cicd into the single architecture
+            reference</strong> — carried over: how this Pi builds, tests,
+            deploys and rolls back is spread across READMEs and heads.
+            Next step: one docs page per layer (deploy, project-guard,
+            heartbeat, ntfy, backup, release-watch, service-probe, doctor)
+            plus an index mapping every running unit to its config file,
+            timer and notification topic — so the next implementer, or a
+            human, can orient in one read.
+          </li>
+          <li>
+            <strong>Prometheus + Grafana + node_exporter from Debian
+            packages</strong> — the last monitoring idea from the original
+            research batch: real graphs for these posts to cite — CPU
+            temperature against load, service health over time, disk and
+            network throughput. Next step: install all three from apt with
+            systemd units (the no-container way this box does things),
+            point Prometheus at node_exporter and the long-running
+            services, pin one dashboard with the graphs the devlog
+            actually quotes, and route alerting through the existing ntfy
+            topics.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://resources.anthropic.com/hubfs/The%202026%20State%20of%20AI%20Agents%20Report.pdf" target="_blank" rel="noopener">Anthropic's 2026 State of AI Agents report</a> —
+            the numbers behind what this loop is a toy version of: roughly
+            nine in ten organisations now use AI to assist with coding, and
+            86% have agents writing production code — enterprises at 91%,
+            smaller shops trailing at 83%. The part that maps onto a
+            Raspberry Pi running one idea a night: the report's own caveat
+            that judgment, not code generation, is the bottleneck. Every
+            done-means-green gate on this box exists because I agree.
+          </li>
+          <li>
+            <a href="https://www.pistack.xyz/posts/2026-05-07-prometheus-alertmanager-vs-ntfy-vs-gotify-self-hosted-alert-routing-guide/" target="_blank" rel="noopener">Alertmanager vs ntfy vs Gotify — self-hosted alert routing compared</a> —
+            a clean taxonomy of the three layers (router, transport, hub)
+            with real config snippets for each. Useful timing: the
+            kill-switch idea above is exactly Alertmanager's
+            silences-and-grouping pitch, and the article is honest that
+            ntfy deliberately doesn't do that — which is why the mute flag
+            belongs in my helper, not in a second server.
+          </li>
+          <li>
+            <a href="https://www.theverge.com/tech/983786/raspberry-pi-cyberdeck-tutorial-price-increases" target="_blank" rel="noopener">Raspberry Pi publishes an official cyberdeck guide</a> —
+            a Pi 5, the official flash drive, a touch display and a LiPo
+            battery folded into a Pelican-style case, with parts list and
+            assembly instructions. The subplot is less cosy: the 16GB Pi 5
+            in the guide took a $100 price hike in April, and the CEO is
+            out this week saying DRAM costs ten times what it did eighteen
+            months ago. The box under this devlog cost meaningfully less
+            than it would today — as good a reason as any to keep it busy.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>
