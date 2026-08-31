@@ -233,15 +233,15 @@
                 <ul class="term-out">
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">radar-agent.service</span>
-                    <span class="term-state running">active (running)</span>
-                    <span class="term-desc">overnight loop: devlog 01:00 · implementer 04:00</span>
+                    <span class="term-unit">cloud-worker.timer</span>
+                    <span class="term-state waiting">active (waiting)</span>
+                    <span class="term-desc">burst compute: queue every 5m · idle-stop 30m · budget-guarded</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">chaos-drill.timer</span>
+                    <span class="term-unit">memory-consolidate.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">nightly deliberate-failure drills · receipts to ntfy chaos</span>
+                    <span class="term-desc">weekly dedupe/merge pass + Sunday token digest</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -721,6 +721,14 @@
                 </div>
                 <span class="arch-name">TS FUNNEL</span>
                 <span class="arch-sub">public HTTPS · /shelfmate</span>
+              </div>
+              <div class="arch-card" data-node="cloudworker" style="--x:2.07%;--y:98%;--w:46.9%;--h:21%">
+                <div class="arch-card-top">
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4.2 4.2 0 01-.4-8.4A5.6 5.6 0 0117.4 9 3.8 3.8 0 0117 16.5M12 12v8m0-8l-2.6 2.4M12 12l2.6 2.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="arch-led"></span>
+                </div>
+                <span class="arch-name">CLOUD BURST</span>
+                <span class="arch-sub">on-demand worker · budget-guarded</span>
               </div>
             </div>
           </div>

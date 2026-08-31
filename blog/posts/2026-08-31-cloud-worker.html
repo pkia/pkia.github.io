@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud burst worker + a self-improvement pass — EV's devlog</title>
+  <meta name="description" content="Disposable GitHub Codespaces compute for the Pi: provider abstraction, Docker jobs, auto routing, budget guard — plus weekly memory consolidation and a project store.">
+  <meta property="og:title" content="Cloud burst worker + a self-improvement pass">
+  <meta property="og:description" content="Disposable GitHub Codespaces compute for the Pi: provider abstraction, Docker jobs, auto routing, budget guard.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-08-31-cloud-worker.html">
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-08-31-cloud-worker.html">
+  <link rel="stylesheet" href="/styles.css?v=9">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/#about">About</a>
+    <a href="/#projects">Projects</a>
+    <a href="/#architecture">Architecture</a>
+    <a href="/#experience">Experience</a>
+    <a href="/#journey">Journey</a>
+    <a href="/blog/">Blog</a>
+    <a href="/#contact">Contact</a>
+  </nav>
+
+  <main class="post-wrap">
+    <header class="post-header">
+      <p class="section-label">Devlog · 31 August 2026</p>
+      <h1>Cloud burst worker + a self-improvement pass</h1>
+      <p class="post-summary">The Pi stays the brain; a disposable cloud worker takes the heavy jobs. Also: weekly memory consolidation, token digests, and a project store.</p>
+    </header>
+
+    <article class="post-body">
+      <p>Two threads today: giving the Pi on-demand cloud compute without letting it depend on the cloud, and a long-planned self-improvement pass on the assistant itself — memory consolidation, observability, resource trimming.</p>
+
+      <h2>Shipped</h2>
+      <ul>
+        <li><strong>Cloud burst worker, phases 1–3.</strong> A provider abstraction (<code>CloudWorkerProvider</code>) with four implementations: GitHub Codespaces (live), Oracle OCI Always Free (built, pending signup), generic SSH, and local. The Codespaces worker is a disposable 2-core/8 GB box with Docker preinstalled: jobs run in resource-capped containers, artifacts come back to the Pi, the worker auto-stops after 30 minutes idle. A task router decides LOCAL vs CLOUD from real Pi load (CPU ≥75% or RAM &lt;1 GB free and the job is remote-safe → cloud), a job queue retries with backoff and dead-letters, and a budget ledger estimates free-tier burn — provisioning is refused at 95% of the monthly free core-hours so the tier can never be silently exhausted. Zero exposed ports: everything tunnels through the gh CLI.</li>
+        <li><strong>Self-improvement pass.</strong> Hermes updated, agent loop capped at 120 turns with retry limits, a signed-out remote-access daemon retired for 1.7 GB of RAM back (56% → 35% used). Memory now consolidates weekly on a DeepSeek pass (dedupe/merge/contradict-resolve, backup-before-write), a Sunday digest reports the token economy, and a SQLite project store tracks status/decisions/next-steps per project.</li>
+        <li><strong>Maintenance.</strong> Three CI failures fixed across repos (a non-hermetic test, a missing dependency pin, an unresolved import), and the hourly pipeline audit now self-heals — re-running flakes, pushing stranded commits — instead of paging.</li>
+      </ul>
+
+      <h2>On the radar</h2>
+      <ul>
+        <li><strong>First real burst workload.</strong> Route an actual heavy job (a cross-repo analysis or a big container build) through the auto-router and record the honest numbers — provision latency, wall-clock vs local, budget burn.</li>
+        <li><strong>Worker-pool provider.</strong> A pool of two codespaces for genuinely parallel jobs, with the budget ledger splitting burn across slots.</li>
+        <li><strong>Digest-driven tuning.</strong> Feed the weekly insights digest back into routing thresholds: if the token economy says cron jobs are drifting expensive, retune model/toolset choices.</li>
+      </ul>
+
+      <h2>Interesting reads</h2>
+      <ul>
+        <li><a href="https://github.blog/news-insights/research/disposable-compute-environments-for-ai-agents/">GitHub's research on disposable compute environments for AI agents</a> — the pattern behind why Codespaces makes a surprisingly good burst worker.</li>
+        <li><a href="https://dl.acm.org/doi/10.1145/3373396">Borg at ten</a> — the paper that convinced me job queues, budgets and bin-packing belong together in any small scheduler too.</li>
+        <li><a href="https://research.google/pubs/pub48969/">Autopilot: workload autoscaling at Google</a> — a reminder that routing signals should be headroom-based, not panic-based.</li>
+      </ul>
+    </article>
+
+    <footer class="post-footer">
+      <p><a href="/blog/">← All posts</a></p>
+    </footer>
+  </main>
+</body>
+</html>
