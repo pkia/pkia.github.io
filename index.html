@@ -239,15 +239,15 @@
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">service-probe.timer</span>
+                    <span class="term-unit">chaos-drill.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">12 probes every 5 min · scoreboard in the portal</span>
+                    <span class="term-desc">nightly deliberate-failure drills · receipts to ntfy chaos</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">pi-doctor.timer</span>
+                    <span class="term-unit">pipeline-check.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">07:00 audit of every project · mute watchdog</span>
+                    <span class="term-desc">hourly CI audit · self-heals what it finds</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -304,12 +304,13 @@
               An autonomous improvement loop for everything else on this page:
               at 01:00 an agent writes the daily devlog and proposes what's
               next; at 04:00 a second agent picks one idea and ships it —
-              code, tests, docs, brand-new repos included. Six ships in:
+              code, tests, docs, brand-new repos included. Seven ships in:
               a dead-man's switch, an ntfy notification backbone, borg
               backups with a weekly restore drill, an upstream release
-              watcher, a service uptime scoreboard, and an alert-storm
+              watcher, a service uptime scoreboard, an alert-storm
               kill switch — one flag that silences every notification on
-              the box. The idea ledger,
+              the box — and nightly chaos drills that break things on
+              purpose and check the box notices. The idea ledger,
               every run and every failure are public.
             </p>
             <ul class="chips chips-sm">
@@ -398,7 +399,10 @@
               storms, pi-backup with a weekly restore drill that
               byte-compares the recovery, release-watch digesting upstream
               releases, service-probe taking the box's pulse every five
-              minutes, and pi-doctor auditing every project each morning.
+              minutes, chaos-drill breaking things on purpose each night to
+              prove the monitoring notices, a CI audit that self-heals
+              what it finds, and pi-doctor auditing every project each
+              morning.
               The architecture reference for how everything here ships.
             </p>
             <ul class="chips chips-sm">
