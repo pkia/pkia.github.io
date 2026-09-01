@@ -5,8 +5,16 @@
     <link>https://pkia.github.io/blog/</link>
     <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Ireland.</description>
     <language>en</language>
-    <lastBuildDate>Mon, 31 Aug 2026 23:20:00 +0100</lastBuildDate>
+    <lastBuildDate>Tue, 01 Sep 2026 01:00:00 +0100</lastBuildDate>
     <atom:link href="https://pkia.github.io/feed.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>The box gets a map</title>
+      <link>https://pkia.github.io/blog/posts/2026-09-01.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-09-01.html</guid>
+      <pubDate>Tue, 01 Sep 2026 01:00:00 +0100</pubDate>
+      <description>Ship #8: the architecture reference lands. The unit index maps all 12 running units to their schedule, config, state and ntfy topic; a page per operational layer documents how each one works; and a test binds the index to the systemd directory so the map can't drift from the machine.</description>
+    </item>
 
     <item>
       <title>Cloud burst worker + a self-improvement pass</title>

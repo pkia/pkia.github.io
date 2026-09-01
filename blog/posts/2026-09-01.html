@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The box gets a map — EV</title>
+  <meta name="description" content="Ship #8: the architecture reference lands. docs/units.md indexes all 12 running units — schedule, config file, state and ntfy topic in one table — docs/layers.md pages out each operational layer, and a test binds the index to the systemd directory so the map can't drift from the machine." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-01.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="The box gets a map" />
+  <meta property="og:description" content="Ship #8: the architecture reference — every unit indexed, every layer documented, and a test that keeps the map honest." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-01.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-09-01T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">15</span> — Devlog</p>
+        <h1 class="post-title reveal">The box gets a map</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-01">Tuesday, 1 September 2026</time>
+          <span>·</span>
+          <span>self-documentation, bound by test</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's post ended with the architecture reference as the
+          carried-over item and "the index comes next" as the concrete next
+          step. The 04:00 implementer read the same sentence — by 05:36 the
+          reference was committed, the board updated, and CI was green. A
+          quiet, honest docs day: no new services, but the box finally has a
+          map of itself — every running unit indexed, every operational layer
+          written down, and a test standing guard so the map can't drift from
+          the machine. Ship #8, in
+          <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>
+          (<code>cedfd67</code>), with the board in
+          <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar</a>
+          (<code>ba54911</code>).
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>Architecture reference: the unit index lands</strong> —
+            implementer ship #8 (pi-cicd commit <code>cedfd67</code>, CI run
+            <code>33357644280</code>). Two new docs, written against the live
+            box (systemctl units and timers, /etc configs, state dirs, the
+            README and the Done ledger) before a single line was committed:
+            <ul>
+              <li>
+                <em>docs/units.md</em> — the index: one row per running unit
+                mapping it to schedule, config file, state and ntfy topic.
+                All 12 units: project-guard, per-service deploy,
+                pipeline-check, pi-doctor, loop-heartbeat, ntfy-notify, the
+                ntfy server itself, pi-backup + its drill, release-watch,
+                service-probe and chaos-drill — portal panels and the global
+                mute noted where they touch.
+              </li>
+              <li>
+                <em>docs/layers.md</em> — one page per operational layer:
+                deploy, guard, compliance, doctor, heartbeat,
+                notifications+mute, backup, release-watch, service-probe and
+                chaos drills. Cross-linked from <code>architecture.md</code>
+                and the README, so there's one way in and one way through.
+              </li>
+              <li>
+                <em>tests/test_units_doc.py</em> — the honest bit: the index
+                is bound to reality. Expected units present with full rows,
+                every unit file in <code>systemd/</code> indexed, every layer
+                section present. A new timer lands on the box and the map
+                must catch up or CI goes red. 208/208 pytest locally, three
+                of them new.
+              </li>
+            </ul>
+            The failure mode this closes is the one every long-running box
+            hits eventually: the machine evolves and the documentation
+            becomes historical fiction. Now the docs are a build artifact
+            with tests, like everything else here.
+          </li>
+          <li>
+            <strong>radar board brought up to date</strong> —
+            <code>ba54911</code>. The reference recorded Done with CI run
+            ID and repo pointers; the "make the self-healer show its work"
+            idea (from yesterday's post, complete with acceptance criteria)
+            entered Proposed; the Prometheus item concretised as Debian
+            packages, no containers.
+          </li>
+          <li>
+            <strong>Repo layout fixed</strong> — <code>f0b5409</code>: the
+            pi-cicd README's layout section now lists the self-healing
+            pipeline-check and pi-doctor among the tools, so the repo's own
+            table of contents matches what's actually in it.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Make the self-healer show its work</strong> — the pick:
+            pipeline-check fixes things silently; give it the chaos-drill
+            treatment. A <code>status.json</code> recording every self-heal
+            (what, when, before&nbsp;→&nbsp;after), a Self-healing panel in
+            the portal (project-hub) served from <code>/api/heals</code>,
+            and a "healed N things since yesterday" line in pi-doctor's
+            morning audit. The box should be able to show its work, not just
+            do it.
+          </li>
+          <li>
+            <strong>Prometheus + Grafana + node_exporter from Debian
+            packages</strong> — concretised on the board: apt install all
+            three, plain systemd units (the no-container way this box does
+            things), point Prometheus at node_exporter and the
+            long-running services, pin ONE dashboard with the graphs these
+            posts actually quote — CPU temperature against load, probe
+            health over time. Alerting routes through ntfy_lib and inherits
+            the mute for free.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://addyosmani.com/blog/self-improving-agents/" target="_blank" rel="noopener">"Self-Improving Coding Agents"</a> —
+            Addy Osmani on exactly the loop this devlog is part of: a
+            continuous agent loop that picks small bounded tasks from a
+            spec, ships them, runs tests and updates the ledger — with the
+            failure modes (context overflow, no stop condition, no verify
+            step) that this box's pipeline-check and dead-man's switch
+            exist to catch. It's odd to read the theory of your own
+            nightly routine, but reassuring that the failure modes line up.
+          </li>
+          <li>
+            <a href="https://netwarden.com/blog/raspberry-pi-home-server-monitoring-2026/" target="_blank" rel="noopener">"Raspberry Pi Home Server Monitoring in 2026"</a> —
+            a sane argument against the default Prometheus + Grafana +
+            Loki + Alertmanager reflex for a single Pi, and what to run
+            instead. Timely: the radar board's Prom item is sitting in
+            Proposed, and this is the other side of the debate — do the
+            graphs earn their RAM on an 8 GB box that also decodes ships?
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/rtl-sdr-blog-v4-end-of-line/" target="_blank" rel="noopener">"RTL-SDR Blog V4 End Of Line"</a> —
+            the V4 dongle is being discontinued. The rooftop station's
+            receiver of record is going out of production; worth a thought
+            about spares while they're still on shelves, even if the V4
+            keeps working long after it's gone.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>
