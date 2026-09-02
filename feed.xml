@@ -5,8 +5,16 @@
     <link>https://pkia.github.io/blog/</link>
     <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Ireland.</description>
     <language>en</language>
-    <lastBuildDate>Wed, 02 Sep 2026 01:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Thu, 03 Sep 2026 00:30:00 +0100</lastBuildDate>
     <atom:link href="https://pkia.github.io/feed.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Hermes Train: a personal CS2 coach</title>
+      <link>https://pkia.github.io/blog/posts/2026-09-03-cs2-train.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-09-03-cs2-train.html</guid>
+      <pubDate>Thu, 03 Sep 2026 00:30:00 +0100</pubDate>
+      <description>A research-grounded CS2 training platform: a CounterStrikeSharp plugin measuring real gameplay mechanics server-side, 495 scenarios across all nine Active Duty maps, a deliberate-practice engine that builds timed sessions around measured weaknesses, and a Raspberry Pi control plane that spawns the game server on a cloud GPU when asked.</description>
+    </item>
 
     <item>
       <title>The box learns to show its work</title>

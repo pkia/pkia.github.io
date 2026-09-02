@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hermes Train: a personal CS2 coach — EV</title>
+  <meta name="description" content="A research-grounded CS2 training platform: a CounterStrikeSharp plugin measuring real gameplay mechanics (crosshair offset at fire, counter-strafe stop quality, burst discipline), 495 data-driven scenarios across all nine Active Duty maps, a deliberate-practice engine that builds timed sessions around measured weaknesses, and a Raspberry Pi control plane that spawns the whole server on a GPU in the cloud when asked." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-03-cs2-train.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Hermes Train: a personal CS2 coach" />
+  <meta property="og:description" content="A research-grounded CS2 training platform: real gameplay telemetry from a CounterStrikeSharp plugin, 495 scenarios across all nine Active Duty maps, and a deliberate-practice engine that builds timed sessions around measured weaknesses." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-03-cs2-train.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-09-03T00:30:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">17</span> — Project</p>
+        <h1 class="post-title reveal">Hermes Train: a personal CS2 coach</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">project</span>
+          <time datetime="2026-09-03">Thursday, 3 September 2026</time>
+          <span>·</span>
+          <span>CS2, CounterStrikeSharp, deliberate practice, RunPod</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          I play Counter-Strike, and like everyone who plays Counter-Strike,
+          I wanted to get better at it without the part where you
+          mindlessly grind deathmatch for two hours and call it practice.
+          So I built the thing properly: a personal training platform that
+          measures real gameplay mechanics server-side, grounds its drills
+          in motor-learning research instead of vibes, and builds timed
+          sessions around whatever the data says I'm worst at. The whole
+          thing is orchestrated by the same Raspberry Pi that runs the
+          rest of my setup, and the actual game server spins up on a
+          rented GPU only when it's needed — €0.22 an hour, and nothing
+          runs when nobody's training.
+        </p>
+
+        <h2>What it actually does</h2>
+        <ul>
+          <li>
+            <strong>Real measurement, not a stopwatch.</strong> A custom
+            CounterStrikeSharp plugin hooks the game's own events and
+            reads server state directly: crosshair offset at the moment
+            of firing, counter-strafe stop quality (your velocity at the
+            fire tick), burst discipline via the recoil index, hit
+            placement, time-to-kill per bot. Workshop aim maps show you
+            a HUD number and keep it; this writes every attempt to a
+            database.
+          </li>
+          <li>
+            <strong>495 scenarios across the entire Active Duty pool.</strong>
+            Nine maps, three disciplines (prefire, aim, recoil), three
+            difficulty tiers — 6,315 bot placements, converted from
+            an MIT-licensed open route dataset with an original
+            converter. Every common position has a prefire angle; every
+            drill has a stated training purpose.
+          </li>
+          <li>
+            <strong>Sessions built around measured weakness.</strong> The
+            plan engine reads your per-skill ratings (recency-weighted,
+            ELO-style) and generates a structured block — warmup,
+            mechanical work on the focus skill, targeted weakness reps,
+            a game-like transfer block, and a fixed benchmark that never
+            changes so progress is comparable week to week. Ask for 30
+            minutes, you get a 30-minute session with a reason behind
+            every block.
+          </li>
+          <li>
+            <strong>Scoring that can't be gamed.</strong> Speed and
+            accuracy are coupled multiplicatively — a fast-but-sloppy
+            run mathematically cannot outscore a slower accurate one.
+            There's a regression test that proves it. Consistency
+            (coefficient of variation) and headshot ratio are scored as
+            their own dimensions, and a data-quality gate flags
+            impossible records at the ingest boundary instead of
+            quietly keeping them.
+          </li>
+          <li>
+            <strong>It knows when to stop.</strong> Fatigue detection
+            watches accuracy trend and variance across a session and
+            will tell you to take the break — because grinding reps
+            while tilted isn't training, it's just noise.
+          </li>
+        </ul>
+
+        <h2>How it's built</h2>
+        <p>
+          Three layers. On the game server: the plugin, written in C#,
+          plus Metamod and the CounterStrikeSharp runtime, deployed as
+          one self-contained bundle the server container pulls at boot.
+          On the Pi: a FastAPI control plane — session management,
+          analytics endpoints, the plan and progression engines, a
+          dashboard — backed by SQLite, with 65 tests keeping it
+          honest. Between them: a spend-tracked RunPod integration that
+          deploys the cheapest available GPU under a hard cost ceiling,
+          streams the game logs, and drives the server over RCON.
+        </p>
+        <p>
+          The research layer is the part I'm most pleased with. Before
+          writing a single scoring formula I had the training
+          methodology researched and written up — deliberate practice,
+          skill isolation vs transfer, spacing, adaptive difficulty —
+          with every design rule tagged by evidence tier
+          (peer-reviewed, coaching consensus, or engineering
+          assumption) and traced to the code that implements it. When
+          the plan engine picks "weakness block" over "more reps",
+          there's a citation behind that decision.
+        </p>
+
+        <h2>Honest status</h2>
+        <p>
+          What's proven: the full engine (65/65 tests), the control
+          plane and API running live, the cloud lifecycle — deploy,
+          log-watch, RCON control, teardown — exercised end to end
+          across four live server deployments, and the API ingest chain
+          verified with real sessions landing in the database. What
+          isn't: the final plugin-load on a fresh server install was
+          still being validated when I called time on the budget, so
+          the last link — plugin load on boot, then a real player
+          killing real bots — is built and staged but not yet
+          demonstrated live. It's the next thing on the list, and
+          when it lands, the whole chain from "start me a session"
+          to "here's what you improved at" runs unattended.
+        </p>
+
+        <h2>The stack, briefly</h2>
+        <ul>
+          <li>C# / CounterStrikeSharp plugin, Metamod:Source, .NET 10</li>
+          <li>Python: FastAPI, SQLite, 65-test suite, CI</li>
+          <li>RunPod GPU cloud (on-demand, spend-capped), RCON, Tailscale</li>
+          <li>Raspberry Pi 5 control plane + dashboard</li>
+          <li>~75KB of research docs grounding every training decision</li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>
