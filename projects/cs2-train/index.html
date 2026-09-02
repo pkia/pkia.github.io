@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hermes Train — a personal CS2 coach</title>
+<meta name="description" content="A research-grounded CS2 training platform: real server-side skill measurement, 495 scenarios across every competitive map, and training sessions built around your measured weaknesses.">
+<link rel="canonical" href="https://pkia.github.io/projects/cs2-train/">
+<meta name="theme-color" content="#0a0e14">
+<meta property="og:title" content="Hermes Train — a personal CS2 coach">
+<meta property="og:description" content="Real skill measurement, 495 scenarios, sessions built around your weaknesses. A CS2 training platform that measures how you actually play.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://pkia.github.io/projects/cs2-train/">
+<style>
+:root{
+  --bg:#0a0e14; --panel:#111722; --panel2:#151d2b; --line:#1f2a3d;
+  --ink:#e8edf4; --dim:#8b98ab; --faint:#5c6a7e;
+  --acc:#ffb454; --acc2:#4ec9b0; --red:#f14c4c; --blue:#569cd6;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,Segoe UI,sans-serif;line-height:1.6;overflow-x:hidden}
+.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+a{color:var(--acc2);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* hero */
+.hero{position:relative;padding:88px 0 60px;text-align:center;overflow:hidden;
+  background:
+    radial-gradient(600px 300px at 20% 0%,rgba(255,180,84,.07),transparent 60%),
+    radial-gradient(700px 350px at 80% 10%,rgba(78,201,176,.06),transparent 60%);}
+.hero .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:var(--acc);text-transform:uppercase;margin-bottom:18px}
+.hero h1{font-size:clamp(34px,5.4vw,56px);font-weight:800;letter-spacing:-.02em;line-height:1.08}
+.hero h1 .grad{background:linear-gradient(92deg,var(--acc) 0%,var(--acc2) 70%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{max-width:640px;margin:22px auto 0;color:var(--dim);font-size:18px}
+.stats{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:38px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 26px;min-width:130px}
+.stat b{display:block;font-size:30px;font-weight:800;font-family:var(--mono);color:var(--acc)}
+.stat span{font-size:12px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+
+/* crosshair */
+.xhair{position:relative;height:340px;margin-top:10px}
+.xhair svg{position:absolute;inset:0;width:100%;height:100%}
+
+/* sections */
+section{padding:64px 0;border-top:1px solid var(--line)}
+h2.sec{font-size:26px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px}
+p.sec-sub{color:var(--dim);margin-bottom:30px;max-width:640px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px}
+.card h3{font-size:17px;font-weight:700;margin-bottom:8px}
+.card p{color:var(--dim);font-size:14.5px}
+.card .num{font-family:var(--mono);font-size:13px;color:var(--acc);margin-bottom:10px;display:block}
+
+/* plan builder */
+.plan{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.plan-head{padding:20px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.plan-head .t{font-weight:700}
+.chips{display:flex;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--dim);border:1px solid var(--line);border-radius:99px;padding:5px 13px;cursor:pointer;transition:.15s}
+.chip.on{color:var(--bg);background:var(--acc);border-color:var(--acc);font-weight:600}
+.chip:hover:not(.on){border-color:var(--acc);color:var(--acc)}
+.plan-rows{padding:14px 24px 20px}
+.prow{display:flex;align-items:center;gap:16px;padding:13px 4px;border-bottom:1px dashed var(--line)}
+.prow:last-child{border-bottom:0}
+.pbar{height:8px;border-radius:6px;flex:0 0 auto}
+.prow .ph{flex:0 0 118px;font-size:13.5px;font-weight:600}
+.prow .why{flex:1;color:var(--faint);font-size:13px;min-width:0}
+.prow .mins{font-family:var(--mono);font-size:12px;color:var(--dim);flex:0 0 auto}
+
+/* radar chart */
+.radar-card{display:flex;flex-direction:column;align-items:center;gap:16px}
+.legend{display:flex;gap:18px;font-size:12.5px;color:var(--dim)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+/* scoreboard */
+table.score{width:100%;border-collapse:collapse;font-size:14px}
+table.score th{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+table.score td{padding:11px 12px;border-bottom:1px solid var(--line)}
+table.score tr:last-child td{border-bottom:0}
+.tag{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:6px;font-weight:600}
+.tag.pre{background:rgba(255,180,84,.12);color:var(--acc)}
+.tag.aim{background:rgba(86,156,214,.12);color:var(--blue)}
+.tag.rec{background:rgba(78,201,176,.12);color:var(--acc2)}
+.good{color:var(--acc2);font-weight:700}
+.bad{color:var(--red);font-weight:700}
+
+/* maps strip */
+.maps{display:grid;grid-template-columns:repeat(9,1fr);gap:10px;margin-top:8px}
+@media(max-width:820px){.maps{grid-template-columns:repeat(3,1fr)}}
+.map{background:var(--panel2);border:1px solid var(--line);border-radius:10px;text-align:center;padding:14px 6px}
+.map b{display:block;font-size:13px;font-weight:700}
+.map span{font-family:var(--mono);font-size:11px;color:var(--faint)}
+
+/* pipeline */
+.pipe{display:flex;flex-direction:column;gap:0;margin-top:6px}
+.pstep{display:flex;gap:18px;align-items:flex-start}
+.pstep .dot{flex:0 0 34px;height:34px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:15px}
+.pstep .body{padding-bottom:26px;border-left:1px dashed var(--line);margin-left:-26px;padding-left:44px;transform:translateX(26px)}
+.pstep:last-child .body{border-left-color:transparent}
+.pstep b{display:block;font-size:15px}
+.pstep span{color:var(--dim);font-size:13.5px}
+
+footer{padding:44px 0 60px;border-top:1px solid var(--line);color:var(--faint);font-size:13.5px;text-align:center}
+.note{font-size:12.5px;color:var(--faint);margin-top:18px;text-align:center}
+.badge-row{display:flex;gap:10px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:12px;color:var(--dim);border:1px solid var(--line);border-radius:8px;padding:6px 12px;background:var(--panel)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="kicker">Personal CS2 training platform</div>
+    <h1>Stop grinding.<br><span class="grad">Start training.</span></h1>
+    <p class="sub">Hermes Train measures how you <em>actually</em> play — crosshair placement, counter-strafing, spray discipline, prefire angles — and builds every session around the skill you're worst at. No vibes. Just data.</p>
+    <div class="stats">
+      <div class="stat"><b>495</b><span>scenarios</span></div>
+      <div class="stat"><b>9</b><span>competitive maps</span></div>
+      <div class="stat"><b>6,315</b><span>bot placements</span></div>
+      <div class="stat"><b>65</b><span>automated tests</span></div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec">Your coach knows exactly what you did wrong</h2>
+    <p class="sec-sub">A plugin inside the game server reads the engine's own state every time you pull the trigger. Not a stopwatch. Not a kill counter. The physics.</p>
+    <div class="grid3">
+      <div class="card">
+        <span class="num">01 · crosshair</span>
+        <h3>Crosshair placement</h3>
+        <p>The angle between your crosshair and the enemy's head at the exact moment you fired. Good pre-aim means you're already on target when the angle opens — the difference between a flick and a micro-correction.</p>
+      </div>
+      <div class="card">
+        <span class="num">02 · movement</span>
+        <h3>Counter-strafe quality</h3>
+        <p>Your velocity at the fire tick. If you shoot while still sliding, the game adds inaccuracy — the engine penalises you and so does the score. Train the stop, not just the shot.</p>
+      </div>
+      <div class="card">
+        <span class="num">03 · recoil</span>
+        <h3>Spray discipline</h3>
+        <p>Burst length and recoil index per bullet. The system knows when you should have reset your spray instead of dragging bullet 20 into the ceiling.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec">"Give me 30 minutes"</h2>
+    <p class="sec-sub">Ask for a session and the coach reads your skill ratings and builds one with a reason behind every block. Try it:</p>
+    <div class="plan">
+      <div class="plan-head">
+        <div class="t">Session plan</div>
+        <div class="chips">
+          <div class="chip" data-m="15">15 min</div>
+          <div class="chip on" data-m="30">30 min</div>
+          <div class="chip" data-m="60">60 min</div>
+          <div class="chip" data-m="90">90 min</div>
+        </div>
+      </div>
+      <div class="plan-rows" id="plan-rows"></div>
+    </div>
+    <p class="note">The real engine picks the focus from your measured weakest skill — this is the same structure it generates.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap grid2" style="align-items:center">
+    <div>
+      <h2 class="sec">Fast but sloppy loses</h2>
+      <p class="sec-sub" style="margin-bottom:18px">Speed and accuracy are coupled in the score. Finishing 40% faster at half the accuracy scores <em>worse</em>, always — there's a regression test that proves it.</p>
+      <table class="score">
+        <tr><th>Run</th><th>Time</th><th>Accuracy</th><th>Score</th></tr>
+        <tr><td>Sprint</td><td>0:42</td><td class="bad">38%</td><td class="bad">54</td></tr>
+        <tr><td>Controlled</td><td>0:58</td><td class="good">81%</td><td class="good">88</td></tr>
+      </table>
+      <p class="note" style="text-align:left">Same drill, same bots — only the discipline differs.</p>
+    </div>
+    <div class="card radar-card">
+      <svg id="radar" width="320" height="300" viewBox="0 0 320 300"></svg>
+      <div class="legend">
+        <span><i style="background:#4ec9b0"></i>your ratings</span>
+        <span><i style="background:#2b3a52"></i>target</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec">Every map in the pool. Every common angle.</h2>
+    <p class="sec-sub">Prefire routes for all nine Active Duty maps, three disciplines, three difficulty tiers — 55 scenarios per map, 6,315 bot placements in total.</p>
+    <div class="maps">
+      <div class="map"><b>Mirage</b><span>55</span></div>
+      <div class="map"><b>Inferno</b><span>55</span></div>
+      <div class="map"><b>Nuke</b><span>55</span></div>
+      <div class="map"><b>Overpass</b><span>55</span></div>
+      <div class="map"><b>Ancient</b><span>55</span></div>
+      <div class="map"><b>Anubis</b><span>55</span></div>
+      <div class="map"><b>Dust2</b><span>55</span></div>
+      <div class="map"><b>Train</b><span>55</span></div>
+      <div class="map"><b>Vertigo</b><span>55</span></div>
+    </div>
+    <div class="grid3" style="margin-top:22px">
+      <div class="card"><span class="num">prefire</span><h3>Walk the angles</h3><p>Enemies placed at every common position along real routes. Clear the site like you're actually executing — because you are.</p></div>
+      <div class="card"><span class="num">aim</span><h3>Precision under pressure</h3><p>One-shot scenarios that punish sloppy crosshair placement and reward the first bullet landing where it should.</p></div>
+      <div class="card"><span class="num">recoil</span><h3>Spray control</h3><p>Buried bots with doubled HP force full-spray transfers — first ten bullets on point, resets where they belong.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec">How a session runs</h2>
+    <p class="sec-sub">From "start me a session" to measured progress — the whole chain is automated.</p>
+    <div class="pipe" style="max-width:560px">
+      <div class="pstep"><div class="dot">🎯</div><div class="body"><b>You ask for a session</b><span>"30 minutes, work on my aim" — the coach reads your ratings and picks the focus.</span></div></div>
+      <div class="pstep"><div class="dot">⚡</div><div class="body"><b>A server appears</b><span>A cloud GPU boots a private CS2 server with the training plugin already loaded. It exists only for your session.</span></div></div>
+      <div class="pstep"><div class="dot">🎮</div><div class="body"><b>You connect and play</b><span>Real game, real bots, real recoil. Every shot is measured server-side and streamed to your profile.</span></div></div>
+      <div class="pstep"><div class="dot">📈</div><div class="body"><b>The coach adapts</b><span>Scores update your skill ratings; difficulty moves up only when you've earned it across sessions.</span></div></div>
+      <div class="pstep"><div class="dot">💤</div><div class="body"><b>Everything shuts down</b><span>Idle server stops itself. You pay for the minutes you trained — nothing idles, nothing leaks.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Hermes Train — built by <a href="/">EV</a> on a Raspberry Pi control plane, a cloud GPU that only exists when you're training, and about 75KB of motor-learning research.</p>
+    <div class="badge-row">
+      <span class="badge">C# · CounterStrikeSharp</span>
+      <span class="badge">Python · FastAPI</span>
+      <span class="badge">65 tests green</span>
+      <span class="badge">research-grounded scoring</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* plan builder — mirrors engine/plans.py PHASES exactly */
+const PHASES = [
+  ["warmup", .15, "light reps, low cognitive load", "#569cd6"],
+  ["mechanical", .35, "core skill reps at your level", "#ffb454"],
+  ["weakness", .25, "data-identified weakest skill", "#f14c4c"],
+  ["game-like", .15, "transfer: mechanic in context", "#4ec9b0"],
+  ["assessment", .10, "fixed benchmark (comparable weekly)", "#8b98ab"],
+];
+const rows = document.getElementById('plan-rows');
+function render(total){
+  let maxw = 0;
+  const mins = PHASES.map(p => Math.max(1, Math.round(total * p[1])));
+  maxw = Math.max(...mins);
+  rows.innerHTML = PHASES.map((p, i) => `
+    <div class="prow">
+      <div class="ph">${p[0].replace('-',' ')}</div>
+      <div class="pbar" style="width:${Math.max(10, mins[i]/maxw*260)}px;background:${p[3]}"></div>
+      <div class="why">${p[2]}</div>
+      <div class="mins">${mins[i]} min</div>
+    </div>`).join('');
+}
+render(30);
+document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+  document.querySelectorAll('.chip').forEach(x => x.classList.remove('on'));
+  c.classList.add('on');
+  render(+c.dataset.m);
+}));
+
+/* radar */
+(function(){
+  const skills = ["AIM","PREFIRE","SPRAY","MOVEMENT","CROSSHAIR"];
+  const vals = [.72,.44,.58,.61,.49];        // illustrative profile
+  const cx=160, cy=150, R=105, N=skills.length;
+  const svg = document.getElementById('radar');
+  const pt = (i, v) => {
+    const a = -Math.PI/2 + i * 2*Math.PI/N;
+    return [cx + Math.cos(a)*R*v, cy + Math.sin(a)*R*v];
+  };
+  let s = '';
+  [.25,.5,.75,1].forEach(g => {
+    s += `<polygon points="${skills.map((_,i)=>pt(i,g).join(',')).join(' ')}" fill="none" stroke="#1f2a3d" stroke-width="1"/>`;
+  });
+  skills.forEach((_,i)=>{ const [x,y]=pt(i,1); s += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#1f2a3d"/>`; });
+  s += `<polygon points="${skills.map((_,i)=>pt(i,.75)).map(p=>p.join(',')).join(' ')}" fill="rgba(43,58,82,.35)" stroke="#2b3a52"/>`;
+  s += `<polygon points="${vals.map((v,i)=>pt(i,v)).map(p=>p.join(',')).join(' ')}" fill="rgba(78,201,176,.18)" stroke="#4ec9b0" stroke-width="2"/>`;
+  vals.forEach((v,i)=>{ const [x,y]=pt(i,v); s += `<circle cx="${x}" cy="${y}" r="3.5" fill="#4ec9b0"/>`; });
+  skills.forEach((lab,i)=>{
+    const [x,y]=pt(i,1.22);
+    s += `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" fill="#8b98ab" font-size="10.5" font-family="JetBrains Mono,monospace" letter-spacing="1">${lab}</text>`;
+  });
+  svg.innerHTML = s;
+})();
+</script>
+</body>
+</html>
