@@ -235,7 +235,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">next pick: self-healer visibility — status.json + portal panel</span>
+                    <span class="term-desc">next pick: Prometheus stack — apt · one dashboard</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -304,13 +304,15 @@
               An autonomous improvement loop for everything else on this page:
               at 01:00 an agent writes the daily devlog and proposes what's
               next; at 04:00 a second agent picks one idea and ships it —
-              code, tests, docs, brand-new repos included. Seven ships in:
+              code, tests, docs, brand-new repos included. Nine ships in:
               a dead-man's switch, an ntfy notification backbone, borg
               backups with a weekly restore drill, an upstream release
               watcher, a service uptime scoreboard, an alert-storm
               kill switch — one flag that silences every notification on
-              the box — and nightly chaos drills that break things on
-              purpose and check the box notices. The idea ledger,
+              the box — nightly chaos drills that break things on
+              purpose and check the box notices, the architecture
+              reference that maps every running unit, and a heal ledger
+              that makes the self-healer show its work. The idea ledger,
               every run and every failure are public.
             </p>
             <ul class="chips chips-sm">
@@ -401,7 +403,8 @@
               releases, service-probe taking the box's pulse every five
               minutes, chaos-drill breaking things on purpose each night to
               prove the monitoring notices, a CI audit that self-heals
-              what it finds, and pi-doctor auditing every project each
+              what it finds — and logs every fix to a heal ledger the
+              portal displays — and pi-doctor auditing every project each
               morning.
               The architecture reference for how everything here ships.
             </p>
