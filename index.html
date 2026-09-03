@@ -233,21 +233,21 @@
                 <ul class="term-out">
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-unit">prometheus.service</span>
+                    <span class="term-state running">active (running)</span>
+                    <span class="term-desc">ship #10: node + systemd scrape, loopback-bound — ~102 MB</span>
+                  </li>
+                  <li>
+                    <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">next pick: Prometheus stack — apt · one dashboard</span>
+                    <span class="term-desc">next pick: Prom step 2 — Grafana, one dashboard, ntfy alerting</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">prometheus-stack.timer</span>
+                    <span class="term-unit">train-control.service</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Debian packages · one pinned dashboard</span>
-                  </li>
-                  <li>
-                    <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">pipeline-check.timer</span>
-                    <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">hourly CI audit · self-heals what it finds</span>
+                    <span class="term-desc">final link staged: fresh-install plugin-load proof</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -304,21 +304,47 @@
               An autonomous improvement loop for everything else on this page:
               at 01:00 an agent writes the daily devlog and proposes what's
               next; at 04:00 a second agent picks one idea and ships it —
-              code, tests, docs, brand-new repos included. Nine ships in:
+              code, tests, docs, brand-new repos included. Ten ships in:
               a dead-man's switch, an ntfy notification backbone, borg
               backups with a weekly restore drill, an upstream release
               watcher, a service uptime scoreboard, an alert-storm
               kill switch — one flag that silences every notification on
               the box — nightly chaos drills that break things on
               purpose and check the box notices, the architecture
-              reference that maps every running unit, and a heal ledger
-              that makes the self-healer show its work. The idea ledger,
+              reference that maps every running unit, a heal ledger
+              that makes the self-healer show its work, and a
+              Prometheus + node_exporter scrape backbone that answers
+              the RAM question with ~102 MB. The idea ledger,
               every run and every failure are public.
             </p>
             <ul class="chips chips-sm">
               <li>AI agents</li><li>Hermes cron</li><li>pytest</li><li>Autonomy</li>
             </ul>
             <a class="project-link" href="https://github.com/pkia/radar" target="_blank" rel="noopener">View on GitHub
+              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+
+          <article class="project-card reveal">
+            <div class="project-top">
+              <span class="project-badge">Just shipped</span>
+              <span class="project-year">2026</span>
+            </div>
+            <h3>Hermes Train</h3>
+            <p>
+              A personal CS2 coach that measures real gameplay mechanics
+              server-side — crosshair offset at fire, counter-strafe stop
+              quality, burst discipline — via a CounterStrikeSharp
+              plugin, 495 scenarios across all nine Active Duty maps, and
+              a deliberate-practice engine that builds timed sessions
+              around measured weaknesses. The game server spawns on a
+              rented GPU only while you train; the control plane lives on
+              the Pi.
+            </p>
+            <ul class="chips chips-sm">
+              <li>CS2</li><li>CounterStrikeSharp</li><li>Deliberate&nbsp;practice</li><li>RunPod</li>
+            </ul>
+            <a class="project-link" href="/projects/cs2-train/" target="_blank" rel="noopener">View the tour
               <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
           </article>
@@ -436,30 +462,11 @@
               <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
           </article>
-
-          <article class="project-card reveal">
-            <div class="project-top">
-              <span class="project-badge win">🏆 Hackathon winner</span>
-              <span class="project-year">2021</span>
-            </div>
-            <h3>Covid Pool Testing</h3>
-            <p>
-              Winning entry at the university's Open Data Hackathon in the city (sponsored by Riot
-              Games, CSO and Lero). A binary-splitting pool-testing optimisation,
-              grounded in published research, that reduced the number of COVID-19
-              tests Ireland needed by 45%.
-            </p>
-            <ul class="chips chips-sm">
-              <li>Python</li><li>Optimisation</li><li>Data science</li>
-            </ul>
-            <a class="project-link" href="https://github.com/pkia/Covid-Pool-Testing" target="_blank" rel="noopener">View on GitHub
-              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-          </article>
         </div>
 
         <p class="more-link reveal">
-          Also: <a href="https://github.com/pkia/Twitter_Threat_Scanner" target="_blank" rel="noopener">Tweet Guard</a> (NLP timeline scanning from a team-of-five hack build),
+          Also: the 🏆 <a href="https://github.com/pkia/Covid-Pool-Testing" target="_blank" rel="noopener">Covid Pool Testing optimiser</a> that won the 2021 university hackathon,
+          <a href="https://github.com/pkia/Twitter_Threat_Scanner" target="_blank" rel="noopener">Tweet Guard</a> (NLP timeline scanning from a team-of-five hack build),
           the <a href="https://github.com/pkia/kiosk-home" target="_blank" rel="noopener">kiosk chooser</a> that flips the touchscreen between dashboards,
           a live <a href="https://github.com/pkia/sat-audio" target="_blank" rel="noopener">satellite-audio tap</a>,
           a <a href="https://github.com/pkia/CoinMarketCap_Scraper" target="_blank" rel="noopener">CoinMarketCap dataset scraper</a>,
