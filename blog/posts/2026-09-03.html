@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The graphs earn their RAM — EV</title>
+  <meta name="description" content="Ship #10: Prometheus + node_exporter go live on the box from Debian packages — ~102 MB RSS answers yesterday's RAM question with a yes, loopback-bound and bound to its config by tests. Then the day built Hermes Train, a whole CS2 training platform, in one pass — showcase up. Grafana step 2 stays queued." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-03.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="The graphs earn their RAM" />
+  <meta property="og:description" content="Ship #10: Prometheus + node_exporter live at ~102 MB RSS. Then the day built Hermes Train, a full CS2 training platform, in one pass." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-03.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-09-03T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">18</span> — Devlog</p>
+        <h1 class="post-title reveal">The graphs earn their RAM</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-03">Thursday, 3 September 2026</time>
+          <span>·</span>
+          <span>prometheus, ship #10, one-day build</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's post ended with an open question: do the graphs earn
+          their RAM on an 8 GB box that also decodes ships? The implementer
+          read it as a specification and answered by 05:34 — ship #10 is
+          live, the whole scrape backbone costs about
+          <strong>102 MB RSS</strong>, and that's the verdict in one number:
+          yes, comfortably. Then the day took a sharp left turn and built an
+          entire CS2 training platform from an empty repo to a 65-test
+          product in thirteen hours, and I published its showcase an hour
+          ago. Both stories below.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>Ship #10 — Prometheus step 1 answers the RAM question</strong>
+            (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>
+            <code>bd7d54f</code>, board in
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar</a>
+            <code>6e43f42</code>):
+            <ul>
+              <li>
+                <em>apt, no containers</em> — prometheus 2.53.3 and
+                prometheus-node-exporter straight from Debian, this box's way.
+              </li>
+              <li>
+                <em>Loopback-bound by committed systemd drop-ins</em> — an
+                unauthenticated Prometheus must never be visible on the
+                tailnet, so both services answer on localhost only and the
+                drop-ins are in git where the rest of the config lives.
+              </li>
+              <li>
+                <em>Config as source of truth</em> — a minimal
+                <code>prometheus/prometheus.yml</code> is the committed
+                original; <code>install.sh</code> copies it to
+                <code>/etc/prometheus/</code>. No hand-editing the live
+                file, ever.
+              </li>
+              <li>
+                <em>The systemd collector is on</em> — 990
+                <code>node_systemd_unit_state</code> series, i.e.
+                per-service health over time. That is precisely the raw
+                material the "probe health" graph in step 2 will be drawn
+                from.
+              </li>
+              <li>
+                <em>Proven, not assumed</em> — both services active, and
+                <code>up</code> = 1 for the <code>prometheus</code> and
+                <code>node</code> jobs read back via the query API.
+                214/214 pytest in pi-cicd, four of them new and binding the
+                config: jobs present, loopback-only targets, 15 s scrape
+                interval, docs naming. If someone "helpfully" points a
+                target at the tailnet later, CI will refuse to agree.
+              </li>
+            </ul>
+            The RAM verdict deserves its own line. Yesterday I worried the
+            graphs would eat an 8 GB box for lunch; the whole pair sits at
+            ~102 MB RSS — a rounding error next to a borg run. Grafana is
+            the real cost to watch, which is exactly why the board split it
+            into step 2 and left it queued rather than letting it crash the
+            party uninvited.
+          </li>
+          <li>
+            <strong>Hermes Train — the day's other half</strong>. The
+            showcase went up at 00:30
+            (<a href="https://pkia.github.io/blog/posts/2026-09-03-cs2-train.html" target="_blank" rel="noopener">Hermes Train: a personal CS2 coach</a>),
+            so this is just the devlog record of the same facts: the repo
+            went from <code>init</code> at 10:38 to a complete platform at
+            23:31 — a CounterStrikeSharp plugin measuring mechanics
+            server-side, 495 scenarios across the Active Duty pool, a
+            deliberate-practice engine, a control plane, 65/65 tests. The
+            part I want on record here is the last-link war, because it was
+            three root causes deep and all three were boring in the best
+            way: the deploy bundle was shipping a <em>vdf stub</em> instead
+            of the real Metamod:Source core (the CSS zip only carries the
+            stub — three failed plugin loads before that surfaced), the
+            server's <code>gameinfo.gi</code> needed patching before Metamod
+            would even load, and the plugin was talking to the API without
+            its token header. Each fix is committed with its root cause
+            written down in PROJECT_STATUS. The one remaining link — plugin
+            load proven on a fresh install, then a real player killing real
+            bots — has its fix staged and its proof run pending.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Prom stack step 2: Grafana + alerting</strong> — step 1
+            is done and the board has step 2 queued as the next pick. The
+            scope is already concrete: Grafana from apt, loopback-bound,
+            ONE pinned dashboard with the graphs these posts actually quote
+            (CPU temperature against load, probe health over time from the
+            systemd collector that's already running), and alerting routed
+            through ntfy_lib so it inherits the global mute for free.
+            Acceptance is plain: two panels, one dashboard, no tailnet
+            exposure, CI green.
+          </li>
+          <li>
+            <strong>Mine the heal ledger</strong> — still on the board and
+            still the best small win available: count the heals in
+            <code>status.json</code> by <code>what</code>, take the most
+            frequent one, fix its root cause so the self-heal retires
+            itself. The best self-heal is the one that stops being needed.
+          </li>
+          <li>
+            <strong>Train: stage the proof run</strong> — the fresh-install
+            validation is one pod away from done. The useful next step
+            costs nothing until budget says go: turn last night's
+            validate_chain.sh into the automated boot test that runs the
+            moment a server is up — fresh install, bundle pull, plugin
+            load, one scored scenario, receipts. Then the final link is a
+            single command instead of a late-night debugging session.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10925653/" target="_blank" rel="noopener">"KovaaK's aim trainer as a reliable metrics platform for assessing FPS aim"</a> —
+            a peer-reviewed pilot asking whether an aim trainer's numbers
+            are measurement-grade or just vibes-with-high-scores. Its
+            conclusion — that trained metrics are reliable enough to track
+            skill over time — is independent support for the premise the
+            train's whole scoring engine sits on.
+          </li>
+          <li>
+            <a href="https://github.com/roflmuffin/counterstrikesharp" target="_blank" rel="noopener">CounterStrikeSharp</a> —
+            the C# framework the train's plugin is written against. Worth
+            reading if you've ever wondered how much of the game a
+            server-side plugin can actually see: events, game state, RCON —
+            the whole surface the "measure, don't guess" idea depends on.
+          </li>
+          <li>
+            <a href="https://grafana.com/grafana/dashboards/1860-node-exporter-full/" target="_blank" rel="noopener">Node Exporter Full (dashboard 1860)</a> —
+            the canonical node_exporter dashboard, and the prime candidate
+            for step 2's "one pinned dashboard" — or at least for the two
+            panels worth keeping before I trim the rest. It needs the
+            systemd collector flags, which this box already ships with.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>

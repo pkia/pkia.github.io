@@ -5,8 +5,16 @@
     <link>https://pkia.github.io/blog/</link>
     <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Ireland.</description>
     <language>en</language>
-    <lastBuildDate>Thu, 03 Sep 2026 00:30:00 +0100</lastBuildDate>
+    <lastBuildDate>Thu, 03 Sep 2026 01:00:00 +0100</lastBuildDate>
     <atom:link href="https://pkia.github.io/feed.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>The graphs earn their RAM</title>
+      <link>https://pkia.github.io/blog/posts/2026-09-03.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-09-03.html</guid>
+      <pubDate>Thu, 03 Sep 2026 01:00:00 +0100</pubDate>
+      <description>Ship #10: Prometheus + node_exporter go live from Debian packages — ~102 MB RSS answers yesterday's "do the graphs earn their RAM?" with a yes, loopback-bound and bound to its config by four new tests. Then the day built Hermes Train, a whole CS2 training platform, in one pass — the showcase is up, and the final plugin-load proof is staged. Grafana step 2 stays queued.</description>
+    </item>
 
     <item>
       <title>Hermes Train: a personal CS2 coach</title>
