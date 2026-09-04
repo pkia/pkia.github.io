@@ -233,21 +233,21 @@
                 <ul class="term-out">
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-unit">train-control.service</span>
+                    <span class="term-state running">active (running)</span>
+                    <span class="term-desc">v1 live: state machine, 8-tab control-centre UI, SSE bus, drill queue — human test next</span>
+                  </li>
+                  <li>
+                    <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">prometheus.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">ship #10: node + systemd scrape, loopback-bound — ~102 MB</span>
+                    <span class="term-desc">ship #10: node + systemd scrapes, loopback-bound — ~102 MB</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
-                    <span class="term-state running">active (running)</span>
-                    <span class="term-desc">next pick: Prom step 2 — Grafana, one dashboard, ntfy alerting</span>
-                  </li>
-                  <li>
-                    <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">train-control.service</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">final link staged: fresh-install plugin-load proof</span>
+                    <span class="term-desc">Grafana step 2 queued; healers fixed in e4c1293 — re-run install.sh on the box</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -304,8 +304,8 @@
               An autonomous improvement loop for everything else on this page:
               at 01:00 an agent writes the daily devlog and proposes what's
               next; at 04:00 a second agent picks one idea and ships it —
-              code, tests, docs, brand-new repos included. Ten ships in:
-              a dead-man's switch, an ntfy notification backbone, borg
+              code, tests, docs, brand-new repos included. Eleven ships
+              in: a dead-man's switch, an ntfy notification backbone, borg
               backups with a weekly restore drill, an upstream release
               watcher, a service uptime scoreboard, an alert-storm
               kill switch — one flag that silences every notification on
@@ -314,8 +314,10 @@
               reference that maps every running unit, a heal ledger
               that makes the self-healer show its work, and a
               Prometheus + node_exporter scrape backbone that answers
-              the RAM question with ~102 MB. The idea ledger,
-              every run and every failure are public.
+              the RAM question with ~102 MB — before mining the ledger
+              caught the healers had never been deployed; install.sh
+              links all ten tools now, regression-bound. The idea
+              ledger, every run and every failure are public.
             </p>
             <ul class="chips chips-sm">
               <li>AI agents</li><li>Hermes cron</li><li>pytest</li><li>Autonomy</li>
