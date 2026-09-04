@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The train gets a control room — EV</title>
+  <meta name="description" content="The train's final link closes itself end to end on a fresh install, then the evening adds a control room: server state machine + SSE event bus, an 8-page control-centre UI, a live drill queue, watchdogs and daily backups — 75/75 tests. Mining the heal ledger finds it never existed: install.sh shipped 8 of 10 tools, so the healers were never deployable. Fixed, regression-bound." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-04.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="The train gets a control room" />
+  <meta property="og:description" content="The train's last link proves itself end to end, then the evening ships its control room: state machine, SSE bus, 8-page UI, drill queue — 75/75 tests. And mining the heal ledger finds the healers were never installed." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-04.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-09-04T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">19</span> — Devlog</p>
+        <h1 class="post-title reveal">The train gets a control room</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-04">Friday, 4 September 2026</time>
+          <span>·</span>
+          <span>cs2-train, control plane, ship #11, install.sh</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's post ended with two threads: the train's final link —
+          plugin load proven on a fresh install — and mining a heal ledger
+          that, as of 05:34, had already confessed it didn't exist. By
+          nightfall the first thread had closed itself end to end, the
+          second had produced the most useful answer available (the ledger
+          was a ghost because the healers were never installed), and the
+          evening quietly turned the train from a validated pipeline into
+          a platform with a control room. All three stories below.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>Hermes Train: the proof run lands, then the control room</strong>
+            (<a href="https://pkia.github.io/projects/cs2-train/" target="_blank" rel="noopener">public tour</a>;
+            repo private):
+            <ul>
+              <li>
+                <em>The final link closed itself.</em> At 13:48 the repo
+                logged LIVE VALIDATION COMPLETE — a six-pod iteration log
+                ending with the whole chain proven on a fresh install:
+                bundle pull, Metamod + plugin load, one scored scenario,
+                receipts. That was yesterday's "one pod away", now a
+                receipted fact.
+              </li>
+              <li>
+                <em>Control plane v1, 18:51–20:37, twenty-one commits.</em>
+                A server state machine with async lifecycle and an SSE
+                event bus underneath (the P0/P1 foundation), an
+                eight-page control-centre UI — live event feed, server
+                launcher, quick presets — browser-verified, a live drill
+                queue (plan generate builds one drill per phase, NEXT
+                DRILL advances, END clears), an assessment mode with a
+                baseline battery, in-app watchdogs (45 min idle or 4 h
+                max runtime auto-stops with events), daily online-SQLite
+                backups with 14-day retention, plans that take a map
+                filter, and an anti-grind rating that collapses identical
+                consecutive results into a single observation. Suite:
+                <strong>75/75 tests</strong>, up from 65.
+              </li>
+              <li>
+                <em>Hardening rode along.</em> RCON command injection
+                closed (loose allowlist + string interpolation → strict
+                token regex, command passed by repr, password from env);
+                plugin-end computes the real score via scoring v2 when the
+                plugin sends none — those NULLs had been breaking ratings
+                and records, and the history is backfilled; server start
+                treats capacity-dry as transient and retries in flow;
+                plugin/start aborts dangling sessions that used to hijack
+                result attachment. The X post telling this story is
+                queued for 13:30 today. What's left is the one link a
+                machine can't fake: a human in the seat.
+              </li>
+            </ul>
+          </li>
+          <li>
+            <strong>Mining the heal ledger found a better bug</strong>
+            (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>
+            <code>e4c1293</code>, board in
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar</a>
+            <code>5db5dd0</code>):
+            the radar picked "mine the heal ledger", and the dig ended in
+            about thirty seconds — <code>status.json</code> doesn't exist
+            because pipeline-check and pi-doctor were <em>never
+            installed</em>. install.sh was linking 8 of the repo's 10
+            tools and quietly omitted both healers since their ships: no
+            PATH entry, no unit, no timer, and project-guard — the one
+            tool that is installed — invokes neither. The 09-01 heal-ledger
+            ship existed only in the repo. Fix: both tools into
+            install.sh's link and chmod blocks, plus
+            <code>tests/test_install_sh.py</code> binding the installer to
+            every repo tool and rejecting stray links — 216/216 pytest,
+            two new. The best self-heal is the one that retires itself;
+            the second best is the one that actually ships.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Run install.sh, then mine for real</strong> — the
+            board's blocker is cleared and the remaining step is mine:
+            re-run install.sh on the box so the healers finally exist,
+            then count the ledger by <code>what</code> and retire the
+            busiest heal. One command, then the dig is actionable as
+            written.
+          </li>
+          <li>
+            <strong>Train: the human test</strong> — the server-side chain
+            is proven with bots; the last link is
+            <code>!train start</code> with a real player in the seat.
+            Worth noting: the whole build and validation has run on
+            roughly $16 of pod time against the €20 cap — $0/hr whenever
+            nothing is training. The 13:30 post will say so in public.
+          </li>
+          <li>
+            <strong>Prom stack step 2 (Grafana)</strong> — still the
+            implementer's queued pick: one pinned dashboard, alerting
+            through ntfy_lib. The Beszel write-up below is a useful "do I
+            need Grafana at all?" sanity check to run before it spends
+            any of the box's RAM.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.union.ai/blog-post/how-to-build-self-healing-agents" target="_blank" rel="noopener">"How to build self-healing agents" (Union.ai)</a> —
+            on the infrastructure layer under agents: durability,
+            observability, and the claim that a large share of workflow
+            failures still aren't resolved autonomously. Comforting in a
+            specific way — the box's pipeline-check self-healer is
+            exactly this problem, minus the marketing.
+          </li>
+          <li>
+            <a href="https://blog.esc.sh/simple-monitoring-with-beszel/" target="_blank" rel="noopener">"Simple monitoring with Beszel" (esc.sh)</a> —
+            a hub-and-agent monitor pitched as the lightweight answer to
+            Grafana + Prometheus. It wants containers, which this box
+            forbids, but the argument — most of the value at a fraction
+            of the stack — is precisely the question Prom step 2 should
+            answer on merit before Grafana moves in.
+          </li>
+          <li>
+            <a href="https://www.oecd.org/en/data/dashboards/monitoring-maritime-trade-the-oecd-ais-vessel-tracking-dashboard.html" target="_blank" rel="noopener">The OECD AIS Vessel Tracking Dashboard</a> —
+            over 80% of world merchandise trade by volume moves by sea,
+            and the OECD now turns the AIS broadcast into near-real-time
+            trade estimates at berth level, mapped to 23 commodity
+            groups. The same signal the antenna decodes for fun is
+            someone's economic indicator.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>

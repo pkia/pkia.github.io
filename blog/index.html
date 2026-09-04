@@ -72,6 +72,26 @@
           <article class="post-card reveal">
             <p class="post-meta">
               <span class="post-tag">devlog</span>
+              <time datetime="2026-09-04">4 Sep 2026</time>
+              <span>·</span>
+              <span>cs2-train, control plane, ship #11, install.sh</span>
+            </p>
+            <h2><a href="/blog/posts/2026-09-04.html">The train gets a control room</a></h2>
+            <p>
+              The train's last link proves itself end to end on a fresh
+              install, then the evening ships the control room: a server
+              state machine with an SSE event bus, an 8-page
+              control-centre UI, a live drill queue, in-app watchdogs
+              and daily backups — 75/75 tests, up from 65. Mining the
+              heal ledger hits a better bug: it never existed because
+              install.sh shipped 8 of 10 tools and the healers were
+              never deployable. Fixed, regression-bound; the human
+              play-test is the only train link left.
+            </p>
+          </article>
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
               <time datetime="2026-09-03">3 Sep 2026</time>
               <span>·</span>
               <span>prometheus, ship #10, one-day build</span>
