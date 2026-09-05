@@ -235,19 +235,13 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-control.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">v1 live: state machine, 8-tab control-centre UI, SSE bus, drill queue — human test next</span>
-                  </li>
-                  <li>
-                    <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">prometheus.service</span>
-                    <span class="term-state running">active (running)</span>
-                    <span class="term-desc">ship #10: node + systemd scrapes, loopback-bound — ~102 MB</span>
+                    <span class="term-desc">coach brain v2: skill genome, adaptive sessions, demo coach — Hetzner CPU provider, 149 tests, human test next</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Grafana step 2 queued; healers fixed in e4c1293 — re-run install.sh on the box</span>
+                    <span class="term-desc">Grafana step 2 next; heal-ledger verdict corrected 09-04 — healers were Hermes-cron all along</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -304,20 +298,22 @@
               An autonomous improvement loop for everything else on this page:
               at 01:00 an agent writes the daily devlog and proposes what's
               next; at 04:00 a second agent picks one idea and ships it —
-              code, tests, docs, brand-new repos included. Eleven ships
-              in: a dead-man's switch, an ntfy notification backbone, borg
-              backups with a weekly restore drill, an upstream release
-              watcher, a service uptime scoreboard, an alert-storm
-              kill switch — one flag that silences every notification on
-              the box — nightly chaos drills that break things on
-              purpose and check the box notices, the architecture
-              reference that maps every running unit, a heal ledger
-              that makes the self-healer show its work, and a
+              code, tests, docs, brand-new repos included. Twelve ledger
+              entries in: a dead-man's switch, an ntfy notification
+              backbone, borg backups with a weekly restore drill, an
+              upstream release watcher, a service uptime scoreboard, an
+              alert-storm kill switch — one flag that silences every
+              notification on the box — nightly chaos drills that break
+              things on purpose and check the box notices, the
+              architecture reference that maps every running unit, a heal
+              ledger that makes the self-healer show its work, and a
               Prometheus + node_exporter scrape backbone that answers
-              the RAM question with ~102 MB — before mining the ledger
-              caught the healers had never been deployed; install.sh
-              links all ten tools now, regression-bound. The idea
-              ledger, every run and every failure are public.
+              the RAM question with ~102 MB — then a ledger dig that
+              corrected itself: the 09-03 "healers never deployed"
+              verdict was wrong, they were Hermes-cron jobs, live and
+              green all along; the empty heal ledger just means a
+              healthy box. The idea ledger, every run and every failure
+              are public.
             </p>
             <ul class="chips chips-sm">
               <li>AI agents</li><li>Hermes cron</li><li>pytest</li><li>Autonomy</li>
@@ -329,7 +325,7 @@
 
           <article class="project-card reveal">
             <div class="project-top">
-              <span class="project-badge">Just shipped</span>
+              <span class="project-badge">In progress</span>
               <span class="project-year">2026</span>
             </div>
             <h3>Hermes Train</h3>
@@ -339,12 +335,16 @@
               quality, burst discipline — via a CounterStrikeSharp
               plugin, 495 scenarios across all nine Active Duty maps, and
               a deliberate-practice engine that builds timed sessions
-              around measured weaknesses. The game server spawns on a
-              rented GPU only while you train; the control plane lives on
-              the Pi.
+              around measured weaknesses. A coach brain on top — skill
+              genome, adaptive sessions, demo analysis, weekly reports —
+              decides what to train and says "not enough data" when it
+              can't. The game server spawns on a rented cloud box only
+              while you train; Hetzner CPU boxes are the default now —
+              a practice server never needed the GPU — and the control
+              plane lives on the Pi.
             </p>
             <ul class="chips chips-sm">
-              <li>CS2</li><li>CounterStrikeSharp</li><li>Deliberate&nbsp;practice</li><li>RunPod</li>
+              <li>CS2</li><li>CounterStrikeSharp</li><li>Deliberate&nbsp;practice</li><li>Hetzner&nbsp;/&nbsp;RunPod</li>
             </ul>
             <a class="project-link" href="/projects/cs2-train/" target="_blank" rel="noopener">View the tour
               <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
