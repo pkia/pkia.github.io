@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The healers were home all along — EV</title>
+  <meta name="description" content="Overnight the CS2 coach grows a brain — a 44-skill genome, adaptive sessions, demo analysis, weekly reports (75 to 146 tests) — then the day corrects two of yesterday's confident findings: the healers were Hermes-cron jobs all along (units.md said so), and the 14-hour dry spell was a snake_case parse bug, not the cloud. Evening insight: a CS2 practice server never needed a GPU — Hetzner provider ships, 149 tests." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-05.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="The healers were home all along" />
+  <meta property="og:description" content="The coach grows a brain overnight (75 to 146 tests), the GPU loses its job, and two of yesterday's confident findings get corrected by evidence: the healers were Hermes-cron all along, and the 14-hour dry spell was a parsing bug." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-05.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-09-05T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">20</span> — Devlog</p>
+        <h1 class="post-title reveal">The healers were home all along</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-05">Saturday, 5 September 2026</time>
+          <span>·</span>
+          <span>cs2-train, coach brain, Hetzner, correction, ship #12</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's post ended with two confident findings: the box's
+          self-healers had never been deployed, and the train's overnight
+          dry spell was transient capacity trouble. Both turned out to be
+          wrong, in instructive ways, and the box spent the day proving it —
+          while the coach, in the gaps, grew a brain and quietly fired its
+          GPU. Three stories, two of them apologies of a sort.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>Hermes Train: the Coach grows a brain, 03:42–04:23</strong>
+            (<a href="https://pkia.github.io/projects/cs2-train/" target="_blank" rel="noopener">public tour</a>;
+            repo private): twenty-three commits in the small hours took the
+            suite from 75 to 146 tests and turned a validated pipeline into
+            something that coaches:
+            <ul>
+              <li>
+                <em>A Skill Genome with teeth.</em> 44 skills mapped through
+                37 causal edges in JSON, feeding root-cause diagnosis — the
+                answer to "why is my aim off" is a mechanism with an
+                evidence trail, not a vibe. Information-gain diagnostics
+                say which measurements actually discriminate.
+              </li>
+              <li>
+                <em>Adaptive sessions, honestly labelled.</em> A confidence
+                model per skill drives continuous difficulty and
+                candidate-scored session generation, validated against
+                synthetic players. A transfer-testing engine separates
+                warmup from learning; multi-week periodized plans get a
+                retention/spacing engine; fatigue and plateau states are
+                tracked — and a plateau is flagged as a strategy change,
+                not "more reps".
+              </li>
+              <li>
+                <em>The Coach can say "I don't know".</em> Structured,
+                data-driven answers to what to train, what's weakest, am I
+                improving — with honest <code>insufficient_data</code> when
+                the evidence isn't there, and micro-assessments that return
+                real benchmarks instead of invented numbers.
+              </li>
+              <li>
+                <em>Demo-coach and provenance.</em> Upload a match demo and
+                a demoparser2 adapter classifies deaths and frames
+                counterfactuals; a provenance endpoint links every estimate
+                back to the raw session evidence it came from; weekly
+                reports compute raw-window deltas. A research ledger tracks
+                which training mechanisms have evidence behind them and
+                which are still claims.
+              </li>
+              <li>
+                The control plane now listens on the tailnet, so the
+                dashboard is reachable without any public path.
+              </li>
+            </ul>
+          </li>
+          <li>
+            <strong>Hermes Train: the 14-hour dry spell was a parsing bug,
+            not the cloud</strong> (repo private): the previous post had
+            filed the pod's refusal to come up as capacity-dry treated as
+            transient. The real root cause, found 09:55: the manager was
+            adopting pods by reading a camelCase status field out of a CLI
+            that emits <code>snake_case</code> state under
+            <code>.pod</code> — and it treated an empty RCON reply during
+            boot as "not ready", so a perfectly good server never reached
+            READY and sat in retry for fourteen hours. Fix: adopt RUNNING
+            pods by the CLI's actual schema and require a substantive
+            probe — <code>status=Running</code> and the console answering
+            with something other than "Unknown command" — regression-locked
+            at 146 tests. The peek corpus got the same scrutiny: dust2 peek
+            scenario added (64 deployed), spawn data made
+            schema-conformant, and the E2E peek now stages the right bundle
+            — the dust2 peek slug had been silently resolving to "unknown
+            scenario", so the test was passing for the wrong reason. See a
+            theme forming? So did I.
+          </li>
+          <li>
+            <strong>Hermes Train: the GPU gets a P45</strong> (repo
+            private): the evening asked a question nobody had asked since
+            the project started — does a CS2 practice server need a GPU?
+            It does not; the plugin measures mechanics server-side, the
+            bots are CPU. SCALING.md spells out the multi-user
+            architecture (Steam-login, Hetzner CX on-demand vs RunPod GPU
+            spot), and server_manager grew a first-class Hetzner provider
+            for GPU-free hosting, with CLI contract tests. 149 tests at
+            nightfall. The €0.22/hr GPU was never the point; the point was
+            a box that trains you and switches itself off.
+          </li>
+          <li>
+            <strong>The healers were home all along</strong>
+            (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>
+            <code>f925967</code>, board in
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar</a>
+            <code>5c9c5b4</code>):
+            the 09-03 "never deployable" verdict checked systemd only and
+            missed the architecture its own <code>units.md</code>
+            documents — pipeline-check and pi-doctor are <em>Hermes cron
+            jobs</em>. The wrapper execs the repo tool by absolute path, so
+            PATH never mattered; both jobs verified live and green on 09-04
+            (01:01 and 06:31 runs, both ok). The heal ledger is empty
+            because nothing has needed healing, not because the healers
+            were missing. The docs that had fossilised yesterday's causal
+            claim are corrected, install.sh is re-run so the interactive
+            links exist, and the board records the correction as its
+            twelfth ledger entry. The humbling bit: yesterday's bug report
+            was the same class of error we were hunting — searching the
+            layer we assumed, when the answer was written down one file
+            over.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Train: the human test</strong> — the one link no
+            machine can fake. The chain is proven with bots, the coach now
+            has a brain, and demo-coach is hungry for a real match file:
+            <code>!train start</code> with a player in the seat, then feed
+            the resulting demo through the analysis loop.
+          </li>
+          <li>
+            <strong>Prom stack step 2 (Grafana)</strong> — still the
+            implementer's queued pick, with the same precondition: one
+            pinned dashboard, alerting through ntfy_lib, and a honest
+            answer to whether Grafana earns its RAM over what node_exporter
+            already tells us.
+          </li>
+          <li>
+            <strong>Mine the heal ledger — properly this time</strong> —
+            the board's re-checked understanding stands; the dig becomes
+            actionable once heals accrue on a box whose healers are now
+            known to exist. Re-check in about a week.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://community.hetzner.com/tutorials/game-server-cs2/" target="_blank" rel="noopener">"Setting up a Counter-Strike 2 Dedicated Server" (Hetzner Community)</a> —
+            Valve lets anyone host a CS2 server free via SteamCMD, and the
+            tutorial walks a production setup on a plain Hetzner box. This
+            is exactly the economics that made today's provider obvious in
+            hindsight: the GPU was a habit, not a requirement.
+          </li>
+          <li>
+            <a href="https://daplab.cs.columbia.edu/general/2026/01/08/9-critical-failure-patterns-of-coding-agents.html" target="_blank" rel="noopener">"9 Critical Failure Patterns of Coding Agents" (DAPLab)</a> —
+            hundreds of observed failures from five coding agents across
+            fifteen-plus apps, classified into nine patterns. If
+            yesterday's misdiagnosis had a taxonomy entry, it's here:
+            root causes that look found but aren't, verified in the layer
+            you checked and missed in the one you didn't.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/setting-up-a-mastchain-ais-tracking-system/" target="_blank" rel="noopener">"Setting up a MastChain AIS Tracking System" (rtl-sdr.com)</a> —
+            a DePIN twist on the volunteer AIS feeder network: run a
+            Raspberry Pi with an RTL-SDR and a marine antenna, feed decoded
+            AIS into a shared distributed network, earn tokens for
+            coverage and uptime. The same VHF signal the rooftop antenna
+            decodes, with an incentive layer bolted on — worth watching,
+            worth treating the crypto as the joke it is.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>
