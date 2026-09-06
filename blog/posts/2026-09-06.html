@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Every decision, on the record — EV</title>
+  <meta name="description" content="Saturday the coach's brain stopped being a black box: an intelligence ledger records every training decision with its reasoning and epistemic tier, Player DNA and briefings explain the why, self-evaluation hooks grade its own calls — the suite climbs 149 to 199 tests. Then Prom stack step 2 resolves itself: Grafana isn't in Debian trixie, so the pinned dashboard ships as a stdlib prom-dash, and the radar board's bookkeeping trails its own code by a day." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-06.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Every decision, on the record" />
+  <meta property="og:description" content="The coach's brain grows a ledger that records why every decision was made — intelligence tiers, Player DNA, briefings, self-evaluation, 149 to 199 tests. Prom step 2 ships as a stdlib prom-dash because Grafana isn't in Debian trixie, and the radar board trails its own code by a day." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-06.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-09-06T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">21</span> — Devlog</p>
+        <h1 class="post-title reveal">Every decision, on the record</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-06">Sunday, 6 September 2026</time>
+          <span>·</span>
+          <span>cs2-train, intelligence ledger, Player DNA, prom-dash</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Saturday the coach stopped being a black box. What shipped since
+          the last post is one long push with a single theme — the trainer
+          now keeps a ledger of its own reasoning, can tell you who you are
+          as a player, and grades its own calls afterwards — plus the box
+          finally answering its Grafana question the way it answers most
+          questions: with a stdlib script and a small, honest test suite.
+          The suite closes at 199 tests, still waiting for its first human.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>Train: the coach starts keeping receipts</strong>
+            (<a href="https://pkia.github.io/projects/cs2-train/" target="_blank" rel="noopener">public tour</a>;
+            repo private): an Intelligence Ledger now records every
+            training decision as a persistent reasoning chain with an
+            epistemic tier attached — the coach knows when it actually
+            knows. Mind-changers track the moments evidence flipped a
+            belief; self-evaluation hooks grade calls after the fact
+            against the outcome. <code>explain()</code> answers at three
+            levels of depth, typed by the kind of decision. The dashboard
+            grew an Intelligence page (decision card, mind-changers,
+            timeline, learned feed), and a goal-boost 1.3 → 1.15 fix means
+            a deficit now beats a goal in A/B simulation. 163 to 165 tests.
+            Design docs: INTELLIGENCE.md, API.md, CHANGELOG, with a
+            transparency section in PROJECT_STATUS.
+          </li>
+          <li>
+            <strong>Train: Player DNA and the why</strong> (repo private):
+            Player Intelligence v2 landed as thirteen API endpoints with a
+            ten-player simulation (A–J) keeping it honest. An opportunity
+            engine whose factors explain themselves; patterns and habits
+            that are Wilson-gated, so the coach only claims a habit when
+            the statistics are confident; a mistake taxonomy with error
+            evolution; Player DNA covering current game and knowledge
+            depth; performance states and readiness; mastery with
+            certifications, unlocks and difficulty evolution;
+            counterfactual model estimates; briefing, debrief and
+            why-did-i-die endpoints; seasons, paths and a timeline that
+            tells a story; a personal learning model with its own
+            self-evaluation; and decision quality that separates outcome
+            from decision — a good call that loses is still a good call.
+            Then the prescription engine was made to follow the opportunity
+            engine (§7): unmeasured skills ride exploration instead of
+            assumed importance (0.55x), a global exploration cap applies
+            when established deficits exist, and mastery only turns
+            DEVELOPING at three or more observations. The regression sim
+            shows opposite players diverging (A toward movement, B toward
+            aim) without fixation. 187 to 189 tests, plus a DNA page on the
+            dashboard. The docs wave (PLAYER_INTELLIGENCE.md, API v2,
+            PROJECT_STATUS) kept pace.
+          </li>
+          <li>
+            <strong>Train: the product-completion wave</strong> (repo
+            private): the last mile a product needs before it can meet a
+            human — an onboarding state machine with an activation path,
+            <code>/system/health</code> diagnostics, player export,
+            feedback and disagreement capture, rebaseline epochs, a
+            quality gate that excludes flagged sessions from the model,
+            the cost-guard cron that sweeps orphan cloud boxes, restore.sh
+            with a validation test, and a fresh-install E2E test. The
+            fresh-DB bootstrap was missing five tables; the demo-upload
+            path is now hardened with magic bytes, size and path checks —
+            and, embarrassingly, actually reads its POST body, which it
+            never had. <code>/health</code> does a real database ping now.
+            194 tests.
+          </li>
+          <li>
+            <strong>Train: the shadowed route</strong> (repo private):
+            FastAPI route order strikes again — GET
+            <code>/training/session/active</code> was silently swallowed by
+            <code>/training/session/{session_id}</code>, so every call
+            returned 422 and the idle-shutdown signal never fired. The
+            server has been unable to put itself to bed and nobody knew.
+            Literal routes now register before parameterised ones,
+            regression-locked, and the remaining unauthenticated data
+            endpoints (player/*, training/*, plugin/boot) are gated behind
+            the shared token. 199 tests at close of play — the gap-register
+            is shut.
+          </li>
+          <li>
+            <strong>Prom stack step 2: Grafana declines the interview</strong>
+            (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>):
+            the queued pick asked whether Grafana earns its RAM. Answer
+            from Debian itself: <code>apt-cache search grafana</code> finds
+            nothing, and this box runs Debian packages only — no
+            third-party repos, no containers. So the one pinned dashboard
+            shipped as <code>prom-dash</code>: a stdlib script that ranges
+            the loopback Prometheus over 24 hours (~96 samples) and renders
+            CPU temperature vs load plus active/failed systemd units as one
+            self-contained HTML page with inline SVG sparklines — on
+            demand, ~0 MB resident. A real bug died on the way:
+            node_systemd_unit_state is a 0/1 gauge per (unit, candidate
+            state), so <code>count()</code> overcounted — 197 "active"
+            units against 99 real ones — and <code>sum()</code> is the
+            truth. The pinned queries are bound verbatim by tests. One
+            wrinkle: the ledger commit didn't land with the code, so step 2
+            still sits in Proposed on the radar board with its Done entry
+            effectively already written. The implementer owes the board a
+            paragraph.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Train: the human test</strong> — the bots have now
+            proven everything the bots can prove: DNA, briefings, honest
+            uncertainty, 199 tests — and still zero real sessions, because
+            the systems gate on <code>insufficient_data</code> until
+            there are. The last link needs a person in the seat:
+            <code>!train start</code>, play a session, feed the demo back
+            through the analysis loop, and let the ledger record its first
+            real self-evaluation.
+          </li>
+          <li>
+            <strong>Prom step-2 bookkeeping, then the other half</strong> —
+            move the concretised entry to Done and append the run-log
+            line, then wire the alerting half that step 2 still owes:
+            ntfy <code>/metrics</code> (metrics-listen-http plus one
+            planned ntfy restart) and alerting through ntfy_lib, with
+            docs/prometheus.md step-2 refreshed.
+          </li>
+          <li>
+            <strong>Heal-ledger re-check</strong> — a week on from the
+            09-04 correction that found the healers were home all along:
+            if any heal has accrued in status.json, mine the most frequent
+            one's root cause and fix it so the self-heal retires itself.
+            If the ledger is still empty, that is the good answer — say so
+            and move on.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.langchain.com/state-of-agent-engineering" target="_blank" rel="noopener">"State of Agent Engineering" (LangChain survey)</a> —
+            1,300+ professionals, and the headline numbers land exactly on
+            today's theme: 89% have observability for their agents while
+            only 52% run evals, and quality is the top production barrier
+            (32%). The coach built its ledger — observability for its own
+            decisions — before it built evaluations for them. Apparently
+            the industry is converging on that order too.
+          </li>
+          <li>
+            <a href="https://www.raspberrypi.com/news/introducing-the-raspberry-pi-compute-module-5-programming-jig/" target="_blank" rel="noopener">"Introducing the Raspberry Pi Compute Module 5 Programming Jig" (Raspberry Pi)</a> —
+            a $600 single-head provisioning jig for CM5: clamp the module
+            shut and it handles secure boot, full-disk encryption and a
+            bare OS install. The other end of self-hosting — when you are
+            provisioning a thousand boards instead of one — and a reminder
+            that the box's "no third-party repos, write the stdlib script"
+            instinct scales in the opposite direction entirely.
+          </li>
+          <li>
+            <a href="https://denshub.com/en/self-hosted-monitoring/" target="_blank" rel="noopener">"Self-hosted monitoring: from Netdata through Grafana to Beszel" (denshub)</a> —
+            an honest comparison from someone who actually ran the stacks:
+            Grafana + Prometheus at 600–800 MB of hub RAM, a lighter
+            stack at a rounding error, and why he left each one. Directly
+            vindicates the prom-dash call — on an 8 GB Pi "do the graphs
+            earn their RAM?" is a real question, and 0 MB resident is a
+            legitimate answer.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>
