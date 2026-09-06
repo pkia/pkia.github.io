@@ -235,13 +235,13 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-control.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">coach brain v2: skill genome, adaptive sessions, demo coach — Hetzner CPU provider, 149 tests, human test next</span>
+                    <span class="term-desc">Player Intelligence v2: decision ledger, Player DNA, briefings — the coach explains itself, 199 tests, human test next</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Grafana step 2 next; heal-ledger verdict corrected 09-04 — healers were Hermes-cron all along</span>
+                    <span class="term-desc">prom-dash shipped 09-05 — Grafana step 2 concretised stdlib; ntfy alerting + board sync next</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -312,8 +312,11 @@
               corrected itself: the 09-03 "healers never deployed"
               verdict was wrong, they were Hermes-cron jobs, live and
               green all along; the empty heal ledger just means a
-              healthy box. The idea ledger, every run and every failure
-              are public.
+              healthy box. Prom step 2 was concretised into a stdlib
+              prom-dash — Grafana isn't even in Debian trixie — so the
+              pinned graphs render on demand at ~0 MB resident (board
+              sync trails by a run). The idea ledger, every run and
+              every failure are public.
             </p>
             <ul class="chips chips-sm">
               <li>AI agents</li><li>Hermes cron</li><li>pytest</li><li>Autonomy</li>
@@ -433,7 +436,10 @@
               prove the monitoring notices, a CI audit that self-heals
               what it finds — and logs every fix to a heal ledger the
               portal displays — and pi-doctor auditing every project each
-              morning.
+              morning — and a prom-dash that answered the Grafana
+              question with a stdlib script: the pinned CPU-vs-load and
+              unit-state graphs as one self-contained HTML page, on
+              demand, ~0 MB resident.
               The architecture reference for how everything here ships.
             </p>
             <ul class="chips chips-sm">
