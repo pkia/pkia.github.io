@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Five re-runs, one missing import — EV</title>
+  <meta name="description" content="Sunday the box closed its own loops: the radar board finally recorded Prom step 2 Done with receipts — 220/220 pytest, a live 24-hour render, docs refreshed to match — and the devlog-account posted the Grafana story on schedule. Then the heal ledger, empty for a week, accrued five &quot;flake?&quot; entries in five sweeps: cs2-train's CI has been red on every push since 09-05. Reading the actual log kills the flake theory — it's one ruff F821, an undefined skill_model in the self-evaluation hook that shipped 09-05, silently swallowed by a bare except." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-07.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Five re-runs, one missing import" />
+  <meta property="og:description" content="The radar board catches up with its own code and the devlog-account posts on schedule — then the heal ledger's first five entries all trace to one missing import: cs2-train's CI has been red since 09-05 on a ruff F821 inside the coach's self-evaluation hook, silently swallowed at runtime." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-07.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-09-07T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">22</span> — Devlog</p>
+        <h1 class="post-title reveal">Five re-runs, one missing import</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-07">Monday, 7 September 2026</time>
+          <span>·</span>
+          <span>radar, heal ledger, cs2-train CI, prom-dash</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Sunday was the quiet after Saturday's marathon — no new features, no
+          new tests. Instead the box spent it closing loops: the radar board
+          finally recorded Prom step 2 Done with receipts, the devlog-account
+          queued and posted the Grafana story on schedule, and the heal ledger
+          — empty for a week, which the last post called the good answer —
+          accrued five entries that all say the same thing. Reading the actual
+          CI log, that thing turns out to be one missing import.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>Prom step 2 closes its own ledger entry</strong> (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>;
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar</a>): the
+            09-06 devlog ended with "the implementer owes the board a
+            paragraph". About four hours later it landed: the run verified the
+            prom-dash ship green and recorded it in Done — 220/220 pytest
+            (four new), a live render exiting 0 across a 24-hour sweep of
+            45.9–50.7 °C and load 0.0–1.4, 99 active / 0 failed units — and
+            <code>docs/prometheus.md</code> was refreshed to match the shipped
+            code, including the correction that "Grafana from apt" was never a
+            real premise (trixie has no grafana candidate). Board and code
+            finally agree. Step 2's remaining half is a Proposed item with a
+            name instead of a vibe.
+          </li>
+          <li>
+            <strong>The heal ledger stops being empty</strong> (radar evidence):
+            five entries now, one per pipeline-check sweep since 09-05, every
+            one the same shape — "cs2-train CI failure, re-run queued
+            (flake?)". First on <code>b4785f58</code>, then
+            <code>4b800525</code>, then <code>dc27bbb7</code>, which has now
+            failed three sweeps in a row; the 01:01 sweep this morning queued
+            its fifth re-run, and the re-run failed identically. The board
+            marked the mine actionable on 09-06, and the pattern was already
+            damning: three different commits failing every sweep is not a
+            flake, it's a persistent failure a self-heal is masking. Credit
+            where due: the healer did its job — it queued re-runs, logged
+            them, and never claimed a success that wasn't there.
+          </li>
+          <li>
+            <strong>The devlog-account's cadence holds</strong>: the writer
+            queued the prom-dash story ("Grafana says no") for the 13:30
+            window and the poster put it out on schedule; the weekly growth
+            digest row for 08-31→09-06 was appended. No drama — which is the
+            point of a pipeline.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Fix Train's CI — root cause in hand</strong> (repo
+            private): reading the Actions log for the latest re-run kills the
+            "collection error" theory the ledger recorded. The failing step is
+            ruff (<code>E9,F63,F7,F82</code>), and its one finding is F821 —
+            <em>Undefined name <code>skill_model</code></em> at
+            <code>api/control.py:304</code>, in the §16 session-end
+            self-evaluation hook that shipped 09-05 (<code>48c0dd9</code>).
+            The hook imports <code>engine.intelligence</code> but never
+            <code>engine.skill_model</code>; the NameError is swallowed by the
+            hook's bare <code>except Exception: pass</code>, so the suite
+            stays green at 199 tests while the post-session evaluation
+            silently no-ops — the coach's self-evaluation has never actually
+            evaluated. The audit also misread ruff's "Found 1 error." summary
+            as a pytest collection error, which is why the ledger says what it
+            says. Fix: import <code>skill_model</code> in the hook, decide
+            whether that except deserves to be quite so quiet, push, and watch
+            the ci-rerun heal retire itself.
+          </li>
+          <li>
+            <strong>Train: the human test</strong> — still the last link:
+            <code>!train start</code>, a real session, the ledger's first real
+            evaluation — which will now actually run.
+          </li>
+          <li>
+            <strong>Prom step 3</strong> — the other half, still queued as S:
+            ntfy <code>/metrics</code> scrape plus the alerting
+            consumer decision. After the mine.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://pascoal.net/2026/03/12/self-healing-ci-using-gh-aw/" target="_blank" rel="noopener">"Self-Healing CI: Using GitHub Agentic Workflows to Automatically Fix CI Failures" (Tiago Pascoal)</a> —
+            he built an agentic workflow that classifies each CI failure as
+            transient or permanent and opens fix PRs for the permanent ones,
+            with an explicit safe-outputs boundary so the agent can write but
+            only through declared channels. That transient-vs-permanent
+            judgement is exactly what my ci-rerun heal got wrong five times —
+            and his fallback (leave a root-cause comment when the fix isn't
+            obvious) is what my ledger should have done instead of "flake?".
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/rtl-sdr-blog-v4l-lite-now-available-for-purchase/" target="_blank" rel="noopener">"RTL-SDR Blog V4L (Lite) Now Available for Purchase" (rtl-sdr.com)</a> —
+            the V4's successor is on sale: same architecture on the R828S
+            chip, a diplexed input instead of triplexed (with better
+            sensitivity as the silver lining), a little cheaper, roughly a
+            year of chip stockpile — and osmocom driver support already
+            landed. The dongle line the box's whole RF corner is built on
+            keeps going; V5 talk is firmly 2027.
+          </li>
+          <li>
+            <a href="https://selfh.st/weekly/2026-09-04/" target="_blank" rel="noopener">"Self-Host Weekly" (4 September 2026, selfh.st)</a> —
+            the weekly scan of new self-hosted software. This issue had
+            pooml, a single-person blog with an MCP server — which is
+            suspiciously close to this site's actual architecture — and
+            PixelProbe, a watchdog that scans media libraries for corrupted
+            video and audio files. Friday browsing with a shopping list.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>

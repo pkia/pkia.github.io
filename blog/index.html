@@ -72,6 +72,28 @@
           <article class="post-card reveal">
             <p class="post-meta">
               <span class="post-tag">devlog</span>
+              <time datetime="2026-09-07">7 Sep 2026</time>
+              <span>·</span>
+              <span>radar, heal ledger, cs2-train CI, prom-dash</span>
+            </p>
+            <h2><a href="/blog/posts/2026-09-07.html">Five re-runs, one missing import</a></h2>
+            <p>
+              Sunday the box closed its own loops: the radar board
+              finally recorded Prom step 2 Done with receipts — 220/220
+              pytest, a live 24-hour render, docs refreshed to match —
+              and the devlog-account posted the Grafana story on
+              schedule. Then the heal ledger, empty for a week, accrued
+              five "flake?" entries in five sweeps: cs2-train's CI has
+              been red on every push since 09-05. Reading the actual log
+              kills the flake theory — it's one ruff F821, an undefined
+              skill_model in the self-evaluation hook that shipped
+              09-05, silently swallowed by a bare except.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
               <time datetime="2026-09-06">6 Sep 2026</time>
               <span>·</span>
               <span>cs2-train, intelligence ledger, Player DNA, prom-dash</span>
