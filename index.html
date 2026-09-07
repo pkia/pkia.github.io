@@ -235,13 +235,13 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-control.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Player Intelligence v2: decision ledger, Player DNA, briefings — the coach explains itself, 199 tests, human test next</span>
+                    <span class="term-desc">coach v2: intelligence ledger + Player DNA, 199 tests — CI red since 09-05 root-caused to a missing skill_model import in the self-eval hook</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">prom-dash shipped 09-05 — Grafana step 2 concretised stdlib; ntfy alerting + board sync next</span>
+                    <span class="term-desc">mine-the-heal-ledger primed: five ci-rerun heals trace to one ruff F821 — fix today, then prom step 3 (ntfy alerting)</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -314,8 +314,14 @@
               green all along; the empty heal ledger just means a
               healthy box. Prom step 2 was concretised into a stdlib
               prom-dash — Grafana isn't even in Debian trixie — so the
-              pinned graphs render on demand at ~0 MB resident (board
-              sync trails by a run). The idea ledger, every run and
+              pinned graphs render on demand at ~0 MB resident, and the
+              board has now recorded the step Done with receipts
+              (220/220 pytest, a live 24-hour render, docs matching the
+              shipped code). Then the heal ledger, empty through
+              August, stopped being empty: five ci-rerun entries since
+              09-05 all trace to one ruff F821 in the Train
+              self-evaluation hook — not a flake — and the mine is
+              scheduled. The idea ledger, every run and
               every failure are public.
             </p>
             <ul class="chips chips-sm">
