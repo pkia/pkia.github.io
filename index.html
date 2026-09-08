@@ -235,13 +235,13 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-control.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">coach v2: intelligence ledger + Player DNA, 199 tests — CI red since 09-05 root-caused to a missing skill_model import in the self-eval hook</span>
+                    <span class="term-desc">release candidate: 54/54 live E2E on real Hetzner CS2, customer accounts + SPA up, 251 tests — CI 248/250; last gate is the human test</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">mine-the-heal-ledger primed: five ci-rerun heals trace to one ruff F821 — fix today, then prom step 3 (ntfy alerting)</span>
+                    <span class="term-desc">heal-ledger mine paid out (F821 root cause, fix 9e78d03); next: hermeticise the last two CI tests, then prom step 3 (ntfy alerting)</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -298,7 +298,7 @@
               An autonomous improvement loop for everything else on this page:
               at 01:00 an agent writes the daily devlog and proposes what's
               next; at 04:00 a second agent picks one idea and ships it —
-              code, tests, docs, brand-new repos included. Twelve ledger
+              code, tests, docs, brand-new repos included. Thirteen ledger
               entries in: a dead-man's switch, an ntfy notification
               backbone, borg backups with a weekly restore drill, an
               upstream release watcher, a service uptime scoreboard, an
@@ -320,8 +320,12 @@
               shipped code). Then the heal ledger, empty through
               August, stopped being empty: five ci-rerun entries since
               09-05 all trace to one ruff F821 in the Train
-              self-evaluation hook — not a flake — and the mine is
-              scheduled. The idea ledger, every run and
+              self-evaluation hook — not a flake — and the mine
+              paid out on 09-07 with a one-line import fix
+              (<code>9e78d03</code>): ruff + 250/250 green locally,
+              CI back to 248/250, two pre-existing CI-only
+              hermeticity tests left before the heal retires
+              itself. The idea ledger, every run and
               every failure are public.
             </p>
             <ul class="chips chips-sm">
@@ -334,7 +338,7 @@
 
           <article class="project-card reveal">
             <div class="project-top">
-              <span class="project-badge">In progress</span>
+              <span class="project-badge">Release candidate</span>
               <span class="project-year">2026</span>
             </div>
             <h3>Hermes Train</h3>
@@ -342,14 +346,20 @@
               A personal CS2 coach that measures real gameplay mechanics
               server-side — crosshair offset at fire, counter-strafe stop
               quality, burst discipline — via a CounterStrikeSharp
-              plugin, 495 scenarios across all nine Active Duty maps, and
+              plugin, 497 scenarios across the Active Duty pool, and
               a deliberate-practice engine that builds timed sessions
-              around measured weaknesses. A coach brain on top — skill
-              genome, adaptive sessions, demo analysis, weekly reports —
-              decides what to train and says "not enough data" when it
-              can't. The game server spawns on a rented cloud box only
-              while you train; Hetzner CPU boxes are the default now —
-              a practice server never needed the GPU — and the control
+              around measured weaknesses. A coach brain on top — an
+              intelligence ledger, Player DNA, adaptive sessions, demo
+              analysis — decides what to train and says "not enough
+              data" when it can't. It reached release candidate with
+              receipts: 54/54 live scenario runs passed on a real
+              server (6 maps × 3 modes), fourteen release gates green,
+              and a customer side went up with it — public landing
+              page, real accounts, a Train library with history and
+              progress. The last gate is a human in the seat. The
+              game server spawns on a rented cloud box only while you
+              train; Hetzner CPU boxes are the default now — a
+              practice server never needed the GPU — and the control
               plane lives on the Pi.
             </p>
             <ul class="chips chips-sm">
