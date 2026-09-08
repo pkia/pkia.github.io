@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The train pulls into the station — EV</title>
+  <meta name="description" content="Monday the marathon grew a second day and ended at a platform: Hermes Train is a release candidate — 54/54 live scenario runs passed on a real Hetzner CS2 box, fourteen release gates green, verdict &quot;human acceptance required&quot; — and the customer side went up the same morning (landing page, real accounts, SPA). Before breakfast the heal-ledger mine shipped yesterday's prescribed fix: one ruff F821, one missing import, CI back to 248/250." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-08.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="The train pulls into the station" />
+  <meta property="og:description" content="Hermes Train is a release candidate: 54/54 live scenario runs on a real Hetzner CS2 box, fourteen release gates green, customer accounts and SPA up the same morning — then the heal-ledger mine ships yesterday's prescribed fix before breakfast: one ruff F821, one missing import, CI back to 248/250." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-08.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-09-08T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">23</span> — Devlog</p>
+        <h1 class="post-title reveal">The train pulls into the station</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-08">Tuesday, 8 September 2026</time>
+          <span>·</span>
+          <span>cs2-train, release candidate, E2E, customer accounts, radar</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Monday the marathon grew a second day — and this time it ended at a
+          platform. The production-gate wave rolled through overnight: 54/54
+          live scenario executions passed on a real Hetzner CS2 box, fourteen
+          release gates went green, and the verdict file now says the words
+          "release candidate". The customer-facing side of the Train went up
+          the same morning — landing page, real accounts, the whole SPA — and
+          before breakfast the heal-ledger mine shipped the exact fix
+          yesterday's post prescribed. The last link is a person in the seat.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>Hermes Train is a release candidate</strong>
+            (<a href="https://pkia.github.io/projects/cs2-train/" target="_blank" rel="noopener">public tour</a>;
+            repo private): the day's spine was the production-gate wave. A
+            LIVE E2E runner drove 54/54 scenario executions through a real
+            Hetzner CS2 server — 6 maps × 3 modes × difficulties D1–D3,
+            plugin green, changelevel verified after every run — and a
+            human-E2E harness proved the full loop end to end through the
+            real plugin API with a synthetic player: telemetry → attempt →
+            provenance → model → recommendation → adaptation. It caught a
+            real integrity bug on the way: quality-flagged records were still
+            feeding the coach's skill history, so flagged telemetry was
+            quietly teaching the model. They now propagate to session notes
+            and <code>skill_history</code> excludes them. Above that sit
+            eight false-progress/retention/transfer locks and a
+            failure-injection suite (auth, malformed payloads, AI-down,
+            DB-down, demo magic). The maps side got honest too: a canonical
+            Map Registry with pool versioning — Active Duty v2 is seven
+            maps, the cache map has zero scenarios and says so (excluded
+            from availability until content lands), legacy overpass/train/
+            vertigo are preserved, and the adaptive generator now rotates
+            all six content maps instead of living on mirage. Upstream
+            verdict: OpenPrefirePrac has no <code>de_cache</code> at all, so
+            the external demo cache is BLOCKED, with CACHE_AUTHORING.md
+            recording why. <code>release_check.sh</code> runs fourteen gates
+            — PASS; the gap register holds twenty evidence-backed items;
+            PRODUCTION_READINESS_FINAL says release candidate, human
+            acceptance required. The suite climbed 215 → 251 tests along the
+            way.
+          </li>
+          <li>
+            <strong>The customer side went up the same morning</strong> (repo
+            private): the public landing page is server-rendered from the
+            live scenario registry — counts derived from the 497 scenario
+            files themselves (7 Active Duty maps, 6,321 placements), an
+            honest content-pending chip on the cache map, legacy maps
+            grouped at the bottom, no player data anywhere, operator
+            dashboard still token-gated. Behind it, real accounts: stdlib
+            scrypt password hashing, hashed bearer sessions, rate limits,
+            FREE/PRO/ADMIN plans, SteamID normalisation — a sixteen-test
+            account suite covering isolation, dedupe, rate-lock and expiry
+            (and one decontamination of a dev DB the first accounts run
+            polluted; backup kept, lesson logged). Then the SPA:
+            sign-in/register, a Steam onboarding link, a home view with
+            server state, coach recommendation and top drills, a Train
+            library with mode/map/difficulty/search/favourite filters over
+            the live registry, history, progress with an honest
+            "not enough data" state, and settings covering password, data
+            export and logout. The landing CTA points at it; the operator
+            dashboard is untouched. 251 tests, all green.
+          </li>
+          <li>
+            <strong>The heal-ledger mine paid out by breakfast</strong>
+            (<a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar</a>;
+            fix in a private repo): the board recorded it at 05:34 — the CI
+            storm was exactly yesterday's diagnosis. One ruff F821,
+            <code>skill_model</code> unimported in the §16 self-evaluation
+            hook (api/control.py), swallowed by the hook's bare
+            <code>except Exception: pass</code>, so the suite stayed green
+            locally while the ruff gate killed every push before pytest even
+            ran. The fix (<code>9e78d03</code>) is a one-line local import;
+            locally it's ruff + byte-compile + 250/250 under the exact CI
+            gates. CI is 248/250 now — the two leftovers are pre-existing,
+            CI-only hermeticity failures in tests/test_hetzner.py that
+            pytest finally gets to run: one reads <code>~/.hermes/.env</code>
+            raw, one goes mute under CI's python 3.13.15 but speaks JSON
+            fine on local 3.13.5. The ci-rerun heal should retire itself on
+            the next sweep. And the competitor research landed while I
+            wasn't looking: SCL.gg and Refrag.gg deep-research specs — 40
+            sections each, ZCode-ready, every claim labelled CONFIRMED or
+            INFERRED — plus a per-feature FEATURE_PARITY matrix
+            (DONE/PARTIAL/GAP/BLOCKED, evidence-linked), CUSTOMER_FLOWS and
+            a ROADMAP. Refrag's 22-mode surface and .smart Elo are now
+            concrete reference points instead of vibes, and the gap matrix
+            makes the next feature decision a reading exercise.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Retire the ci-rerun heal for good</strong> (repo
+            private): hermeticise tests/test_hetzner.py — no raw
+            <code>~/.hermes</code> reads, isolated HOME via
+            <code>tmp_path</code> fixtures — and find out why the CLI
+            subprocess goes mute on CI's python 3.13.15. Push that and Train
+            CI is 251/251, and the heal that has fired five times since
+            09-05 finally has no job to do.
+          </li>
+          <li>
+            <strong>The human test — the last gate</strong>:
+            PRODUCTION_READINESS_FINAL says human acceptance required, and
+            the FIRST_HUMAN_E2E operator procedure is written. The remaining
+            step is <code>!train start</code> with a real player in the
+            seat, then the coach's self-evaluation — the very hook that
+            caused the F821 — gets its first real session to grade. After
+            that, Train is live.
+          </li>
+          <li>
+            <strong>Prom step 3 (S)</strong> (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>):
+            the queued half of the stack: ntfy <code>/metrics</code> scrape —
+            <code>metrics-listen-http</code> pinned to loopback :9091 in the
+            server config, one planned restart at a quiet hour, an
+            <code>ntfy</code>
+            job in prometheus.yml — plus the metric-alerting consumer
+            decision (Alertmanager vs a stdlib rule-check) and an answer to
+            the mute gap: ntfy_lib's global mute covers pi-cicd publishers,
+            not server-side webhooks.
+          </li>
+          <li>
+            <strong>Train's first post-release feature: moving practice
+            bots</strong> (repo private): the FEATURE_PARITY matrix marks
+            bot behaviour as the biggest gap against both competitors.
+            Concrete next step: prototype xfire-style bots — peeks,
+            counter-strafes and swings instead of standing targets —
+            starting by mapping what CounterStrikeSharp actually exposes for
+            bot control. Static targets have had a good run.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://addyosmani.com/blog/agentic-code-review/" target="_blank" rel="noopener">"Agentic Code Review" (Addy Osmani)</a> —
+            the hard part of engineering moved from writing code to deciding
+            whether to trust it, and review is now the most leveraged skill
+            in software. His numbers land hard: roughly four times the raw
+            output for a tenth more delivered value, churn up 861%, review
+            duration up 441%. His solo-with-no-users tier is basically this
+            site's operating manual — lighter review, but never skip
+            verification — and "no users is permission to defer review, not
+            to skip it" is the F821 story in one sentence: the suite was
+            green while the hook silently no-oped.
+          </li>
+          <li>
+            <a href="https://engineering.salesforce.com/maintaining-code-quality-at-agent-speed-7-patterns-for-agentic-engineering/" target="_blank" rel="noopener">"Maintaining Code Quality at Agent Speed: 7 Patterns" (Salesforce Engineering)</a> —
+            the pattern list my release-gate wave keeps re-deriving from
+            first principles: separate author from judge (when the same
+            agent writes the code and the tests, the tests inherit the
+            misunderstanding — the F821 shipped because the hook's author
+            also "passed" it), replace prompts with quality gates (a gate
+            outlives context; the ruff gate caught what the suite missed),
+            and grade the tests, not just the code. Mutation testing is the
+            one idea in there I don't have an excuse for not trying on
+            Train.
+          </li>
+          <li>
+            <a href="https://www.garykessler.net/library/ais_pi.html" target="_blank" rel="noopener">"AIS &amp; Raspberry Pi" (Gary C. Kessler, 2026 update)</a> —
+            a proper single-page research guide for turning a Pi into an
+            AIS station, refreshed June 2026: hardware, the dAISy HAT,
+            OpenCPN, raw data sources, a decoder round-up. The kind of
+            primer I wish had existed when the rooftop antenna went up —
+            and the box's maritime corner is built on exactly this stack,
+            so it earns a re-read to see what changed.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>
