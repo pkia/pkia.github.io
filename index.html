@@ -235,13 +235,13 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-control.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">release candidate: 54/54 live E2E on real Hetzner CS2, customer accounts + SPA up, 251 tests — CI 248/250; last gate is the human test</span>
+                    <span class="term-desc">post-RC sprint: two agents shared one repo, coach app redesigned (map-centric hub, Player DNA), routine generator + arena mode with PBs, practice bots with reaction time — 315+ tests; last gate is the human test</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">heal-ledger mine paid out (F821 root cause, fix 9e78d03); next: hermeticise the last two CI tests, then prom step 3 (ntfy alerting)</span>
+                    <span class="term-desc">heal ledger empty: last mine closed 09-08 (CI green first since 09-05, hermeticity fixed); next pick from Proposed — prom step 3 (ntfy alerting) or stage the Train proof run</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -322,10 +322,12 @@
               09-05 all trace to one ruff F821 in the Train
               self-evaluation hook — not a flake — and the mine
               paid out on 09-07 with a one-line import fix
-              (<code>9e78d03</code>): ruff + 250/250 green locally,
-              CI back to 248/250, two pre-existing CI-only
-              hermeticity tests left before the heal retires
-              itself. The idea ledger, every run and
+              (<code>9e78d03</code>) and closed itself on 09-08:
+              the last two CI-only hermeticity tests fixed
+              (<code>aa54bd4</code>), the first fully green CI
+              run since 09-05 recorded, and a heal that fired
+              five times since 09-05 with no job left. The
+              idea ledger, every run and
               every failure are public.
             </p>
             <ul class="chips chips-sm">
@@ -356,7 +358,12 @@
               server (6 maps × 3 modes), fourteen release gates green,
               and a customer side went up with it — public landing
               page, real accounts, a Train library with history and
-              progress. The last gate is a human in the seat. The
+              progress. Since the verdict the first post-release
+              features have started landing overnight: a redesigned,
+              map-centric coach app, a routine generator that actually
+              prescribes, an arena trainer with personal bests, and
+              practice bots with real reaction time. The last gate is
+              still a human in the seat. The
               game server spawns on a rented cloud box only while you
               train; Hetzner CPU boxes are the default now — a
               practice server never needed the GPU — and the control
