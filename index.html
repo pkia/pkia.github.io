@@ -235,13 +235,13 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-control.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">post-RC sprint: two agents shared one repo, coach app redesigned (map-centric hub, Player DNA), routine generator + arena mode with PBs, practice bots with reaction time — 315+ tests; last gate is the human test</span>
+                    <span class="term-desc">validity pass: scenario truth-audit over all 581 (honest labels, contracts), crosshair-placement scoring, v4 telemetry + route gating, blind-review QA with a false-progress detector, real-geometry spatial validation; UI rebuilt as CT/T Combat Lab; last gate: the human test</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">heal ledger empty: last mine closed 09-08 (CI green first since 09-05, hermeticity fixed); next pick from Proposed — prom step 3 (ntfy alerting) or stage the Train proof run</span>
+                    <span class="term-desc">prom step 3a shipped 09-09: ntfy /metrics scraped on loopback :9091 (220/220 pytest, live up=1, one planned restart at 05:32); heal ledger empty since 09-08; next: step 3b alerting decision</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -298,7 +298,7 @@
               An autonomous improvement loop for everything else on this page:
               at 01:00 an agent writes the daily devlog and proposes what's
               next; at 04:00 a second agent picks one idea and ships it —
-              code, tests, docs, brand-new repos included. Thirteen ledger
+              code, tests, docs, brand-new repos included. Fifteen ledger
               entries in: a dead-man's switch, an ntfy notification
               backbone, borg backups with a weekly restore drill, an
               upstream release watcher, a service uptime scoreboard, an
@@ -327,6 +327,14 @@
               (<code>aa54bd4</code>), the first fully green CI
               run since 09-05 recorded, and a heal that fired
               five times since 09-05 with no job left. The
+              very next pick, Prom step 3a — the ntfy
+              <code>/metrics</code> scrape — shipped the
+              following morning with receipts: loopback :9091
+              joined prometheus.yml, the one planned ntfy
+              restart done at the quiet 05:32 hour, live
+              <code>up{job="ntfy"}=1</code>, 220/220 pytest,
+              leaving step 3b, the alerting-consumer decision,
+              as the open item. The
               idea ledger, every run and
               every failure are public.
             </p>
@@ -362,7 +370,13 @@
               features have started landing overnight: a redesigned,
               map-centric coach app, a routine generator that actually
               prescribes, an arena trainer with personal bests, and
-              practice bots with real reaction time. The last gate is
+              practice bots with real reaction time. Then the validity
+              pass went through the corpus: an audit engine over all 581
+              scenarios — honest labels, contracts everywhere — a
+              crosshair-placement scoring dimension, blind-review QA with
+              a false-progress detector, real-geometry spatial validation,
+              and a security pass that moved runtime data out of the repo.
+              The last gate is
               still a human in the seat. The
               game server spawns on a rented cloud box only while you
               train; Hetzner CPU boxes are the default now — a
