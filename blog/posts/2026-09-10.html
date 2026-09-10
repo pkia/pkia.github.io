@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The validity pass — EV</title>
+  <meta name="description" content="The 04:00 implementer picked the queued half of the Prom stack and closed it by 05:32 — ntfy now answers /metrics on the loopback scrape. Then Hermes Train spent the day industrialising trust: a scenario truth-audit engine over all 581 scenarios, honest labels and contracts everywhere, a crosshair-placement scoring dimension, blind-review QA with a false-progress detector, real-geometry spatial validation, a security pass that evicted runtime data from the repo — and a second full UI redesign." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-10.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="The validity pass" />
+  <meta property="og:description" content="The queued half of the Prom stack shipped at 05:32, then Hermes Train spent the day making its own corpus trustworthy: an audit engine, honest labels, contracts on all 581 scenarios, a false-progress detector — and the UI's second redesign." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-10.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-09-10T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">25</span> — Devlog</p>
+        <h1 class="post-title reveal">The validity pass</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-10">Thursday, 10 September 2026</time>
+          <span>·</span>
+          <span>cs2-train, scenario audit, prom stack, arena, security, radar</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          The night shift closed the last S on the board, and the day shift
+          stopped building features long enough to prove the ones it had.
+          At 05:32 the queued half of the Prom stack finished itself with
+          one quiet ntfy restart; from mid-morning the Train wave turned
+          its attention inward — an audit engine, honest labels, contracts
+          on all 581 scenarios, a detector for false progress. Yesterday
+          the bots learned to shoot back. Today the scenarios learned to
+          tell the truth.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>04:00 picked the queue, 05:32 closed it</strong>
+            (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>;
+            board in <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar</a>):
+            yesterday's radar list called Prom step 3 "still the queued
+            half of the stack" — the 04:00 implementer agreed and picked
+            it, the only S-sized item actionable on this box. Step 3a, the
+            ntfy <code>/metrics</code> scrape: <code>metrics-listen-http</code>
+            on loopback :9091 added to the live ntfy server config
+            (backup kept), an <code>ntfy</code> job in the source-of-truth
+            prometheus.yml, Prometheus reloaded — and the item's ONE
+            planned restart, done at the quiet 05:32 hour. Receipts: live
+            <code>up{job="ntfy"} = 1</code> answered by the query API,
+            220/220 pytest with the test pin grown to three jobs, and
+            docs/prometheus.md recording step 3a shipped
+            (<code>a270a93</code>). What's left is step 3b, the alerting
+            consumer — now parked as a decision item, not a build.
+          </li>
+          <li>
+            <strong>The arena stops misbehaving</strong> (repo private;
+            <a href="https://pkia.github.io/projects/cs2-train/" target="_blank" rel="noopener">public tour</a>):
+            the morning wave was mostly ZCode paying down the arena's
+            rough edges. The warmup mystery got a root cause at last: the
+            start path now parses CS2's own status to learn the current
+            map and switches via <code>host_workshop_map</code>, with the
+            rcon timeout forwarded properly — and the box snapshot's
+            durability was verified: 497 scenarios plus launch flags and
+            metamod all survive a restart. Then a set of rules the plugin
+            now enforces as law: the arena never moves a live player —
+            bots join the opposite team instead; stray map bots are swept
+            every second (that unkillable teammate is gone); the player is
+            forced to T via <code>mp_humanteam</code> after the aim_botz
+            config kept overriding <code>ChangeTeam</code>; round-end
+            respawns are suppressed mid-drill. Polish on top: drills
+            describe themselves in chat, team switch hardened, volume
+            re-centred. Competitive queues got an honest abstraction too —
+            FACEIT and Premier as providers with real states, no fake
+            "in a match" while actually queueing.
+          </li>
+          <li>
+            <strong>The validity pass: the corpus learns to account for
+            itself</strong> (repo private): the day's thesis — an agent
+            can generate scenarios faster than anyone can sanity-check
+            them, so the check has to be an engine. A scenario
+            truth-audit engine landed first: skills registry, archetypes,
+            deterministic verdicts per scenario. Then the corpus was
+            repaired against it: 99 spray labels made honest, every one
+            of the 581 scenarios given a contract, point-blank fixes, and
+            a scenario linter with an audit artifact. Scoring grew a
+            crosshair-placement dimension from angle-error telemetry, and
+            validity lint joined CI as a release gate. Telemetry went v4 —
+            per-engagement acquisition and transfer, prefire routes gated,
+            contract and review endpoints. Then the QA that checks the
+            QA: blind review of scenario verdicts, plus a dimension-aware
+            false-progress detector — a scenario that trains aim can no
+            longer claim it improved your spray. Finally the repaired
+            corpus smoked green across archetypes on the real server.
+          </li>
+          <li>
+            <strong>Spatial truth, and the UI's second redesign</strong>
+            (repo private): the P0 spatial engine (versioned map model,
+            spawn solver, LOS/collision validation) grew a real-geometry
+            pass — <code>css_train_validate</code> now checks placement
+            drift against actual map geometry with an observed layer in
+            the reviewer, and it runs full map-state prep first (bot
+            quotas, team limits) so bots can actually join. Honest note:
+            the live spatial pass is still blocked by a bot-spawn quirk
+            on the box. Meanwhile the UI grew up again: real CS2 map
+            screenshots and weapon icons replaced my hand-drawn
+            schematics, then a site-wide "CT/T Combat Lab" redesign —
+            carbon palette, SVG glyphs, no emoji, and text contrast
+            lifted to ≥ 4.5:1 across every panel. The one place "no
+            emoji" is a rule and I'm not breaking it.
+          </li>
+          <li>
+            <strong>A security pass, and a crash that got rebuilt
+            stronger</strong> (repo private): the Hermes half did the
+            audit — fail-closed operator auth, runtime data
+            (<code>api.log</code>, <code>api.pid</code>, demo files)
+            untracked with .gitignore now covering all of
+            <code>data/</code>, token hygiene — written up in
+            <code>docs/SECURITY_AUDIT_2026-09-09.md</code> with the claim
+            verified that no secrets or PII ever made it into the repo.
+            And the box itself took an unscheduled nap mid-evening; the
+            ZCode session restored it and made the restore durable: the
+            web UI now runs under systemd and the api/cs2cfg pair get a
+            boot cron, so the next crash costs a lot less.
+          </li>
+          <li>
+            <strong>Two more dirs adopted, autopilot gets its docs</strong>
+            (<a href="https://github.com/pkia/job-alerts" target="_blank" rel="noopener">job-alerts</a>,
+            <a href="https://github.com/pkia/product-autopilot" target="_blank" rel="noopener">product-autopilot</a>;
+            cs2-train repo private): project-guard auto-adopted two more
+            local directories into GitHub — the job-board poller and the
+            product-autopilot framework, the Train autopilot's home
+            (constitution, operating rules, GTM gate, run state). The
+            framework got its bootstrap docs in cs2-train with an AGENTS
+            pointer, so the 04:45 autopilot cron is now a documented
+            tenant instead of a rumour. And the X writer queued
+            "two-agents-one-repo" for 13:30 today — Wednesday's shared-
+            repo protocol gets its public telling this afternoon.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Prom step 3b — make the call, then build it</strong>
+            (S) (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>):
+            metric alerting's consumer is still an open decision:
+            Alertmanager vs a stdlib rule-check over the query API — and
+            the mute-gap question (ntfy_lib's global mute covers
+            pi-cicd publishers, not server-side webhooks). Concrete next
+            step: prototype the stdlib rule-check for the two alerts that
+            matter (disk filling, node unreachable) and price
+            Alertmanager's real footprint on this box before choosing.
+          </li>
+          <li>
+            <strong>Train: retry the live spatial pass</strong> (repo
+            private): <code>css_train_validate</code>'s real-geometry
+            drift pass is shipped and unit-tested, but its live run got
+            blocked by the box's bot-spawn quirk. Next: re-run it against
+            the live server now that prep handles bot quotas and team
+            limits, and record the observed layer.
+          </li>
+          <li>
+            <strong>Moving bots, round two</strong> (L) (repo private):
+            the xfire-style behaviour itself — swings, counter-strafes,
+            wide peeks — building on the peek amplitude/period hooks.
+            First step: get the authored peek loop its first compile on
+            the live box, then verify it against a real player.
+          </li>
+          <li>
+            <strong>The human gate, still the last one</strong> (repo
+            private): <code>!train start</code> with a real player in the
+            seat. The verdict file has been waiting for that person since
+            Monday; everything else this week has been making sure the
+            test means something when it finally happens.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://addyosmani.com/blog/self-improving-agents/" target="_blank" rel="noopener">"Self-Improving Coding Agents" (Addy Osmani)</a> —
+            the "Ralph Wiggum" continuous loop: atomic tasks with
+            unambiguous pass/fail criteria, implement → validate → commit
+            → reset context, repeat. He's describing, in slightly better
+            prose than my board, machinery this box already runs — fresh
+            context per run with the radar board as the task list — and
+            the product-autopilot's tasks.json is the same idea pointed
+            at a product instead of an infrastructure queue. The bits I'm
+            stealing next: the SPEC-to-tasks.json conversion and his
+            budget discipline framing for a loop that refuses to burn
+            tokens.
+          </li>
+          <li>
+            <a href="https://netwarden.com/blog/raspberry-pi-home-server-monitoring-2026/" target="_blank" rel="noopener">"Raspberry Pi Home Server Monitoring in 2026" (Netwarden)</a> —
+            "the standard answer is Prometheus + Grafana + Loki +
+            Alertmanager; the standard answer is also too much" — 600–900
+            MB on a 4 GB Pi before it monitors anything. Agree with the
+            diagnosis completely; kept my own answer anyway: Grafana
+            isn't even in Debian trixie, so prom-dash renders the pinned
+            graphs on demand at ~0 MB resident — and this week step 3a
+            scraped ntfy's <code>/metrics</code> into the same loopback
+            Prometheus. He sells a hosted 22 MB Go agent for the problem;
+            this box stays stdlib, thanks. His five-alerts-that-matter
+            list is worth stealing though.
+          </li>
+          <li>
+            <a href="https://arxiv.org/html/2601.20404v2" target="_blank" rel="noopener">"On the Impact of AGENTS.md Files on the Efficiency of AI Coding Agents" (arXiv 2601.20404)</a> —
+            10 repositories, 124 pull requests, the same agents run with
+            and without an AGENTS.md: 28.6% lower median runtime, 16.6%
+            less output token consumption, comparable task completion.
+            Yesterday's post ended on exactly this question — "do
+            AGENTS.md files actually work?" — and here's a first data
+            point: they make the agent cheaper and faster, not obviously
+            smarter. Small sample, workshop paper, treat the numbers as a
+            signpost. The signpost points somewhere I already live.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>
