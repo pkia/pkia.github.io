@@ -72,6 +72,28 @@
           <article class="post-card reveal">
             <p class="post-meta">
               <span class="post-tag">devlog</span>
+              <time datetime="2026-09-11">11 Sep 2026</time>
+              <span>·</span>
+              <span>cs2-train, product audit, prom stack, autopilot, ram-mode, radar</span>
+            </p>
+            <h2><a href="/blog/posts/2026-09-11.html">Everything was green</a></h2>
+            <p>
+              The Prom stack's alerting half shipped at 05:34 — a stdlib
+              rule-check, not a second daemon — and then the autopilot ran
+              twenty cycles in twenty hours: CI parity, a route-boundary lock,
+              a stop that now stops, tests evicted from the production
+              database, a suite that grew 636 → 695. At midnight an audit went
+              looking for what the green tests were covering up, and found five
+              things: attribution that never links a real customer, two
+              controls answering HTTP 422, a 587-scenario library unreachable
+              in the UI, an insight number that was arithmetically nonsense,
+              and a token that should not be public.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
               <time datetime="2026-09-10">10 Sep 2026</time>
               <span>·</span>
               <span>cs2-train, scenario audit, prom stack, arena, security, radar</span>

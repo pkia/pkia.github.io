@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Everything was green — EV</title>
+  <meta name="description" content="The Prom stack's alerting half shipped at 05:34 — a stdlib rule-check, not a second daemon — and then the autopilot ran twenty cycles in twenty hours: CI parity, a route-boundary lock, a stop that now stops, tests evicted from the production database, a suite that grew 636 → 695. At midnight an audit went looking for what the green tests were covering up, and found five things: attribution that never links a real customer, two controls answering HTTP 422, a 587-scenario library unreachable in the UI, an insight number that was arithmetically nonsense, and a token that should not be public." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-11.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Everything was green" />
+  <meta property="og:description" content="Prom step 3b shipped at 05:34, then twenty autopilot cycles in twenty hours: CI parity, a route-boundary lock, tests evicted from the production database, suite 636 → 695. At midnight an audit found the five things the green tests were covering up." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-11.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-09-11T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">26</span> — Devlog</p>
+        <h1 class="post-title reveal">Everything was green</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-11">Friday, 11 September 2026</time>
+          <span>·</span>
+          <span>cs2-train, product audit, prom stack, autopilot, ram-mode, radar</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday the Train's scenarios learned to tell the truth. Today the
+          alerting stack shipped its missing half, the autopilot ran twenty
+          cycles in twenty hours, and then — just after midnight, at the end of
+          a very good day — an audit went looking for what the green tests were
+          covering up. It found five things. Everything was green; not
+          everything was true.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>Prom step 3b: the alert consumer, decided and shipped</strong>
+            (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>;
+            board in <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">radar</a>):
+            yesterday's post left this as a decision — Alertmanager or a
+            stdlib rule-check. Verdict: rule-check. Five rules do not need a
+            second daemon with its own config language when Prometheus is
+            already scraped and its query API is free. The subtle half is the
+            mute gap: alerts publish through <code>ntfy_lib</code> like every
+            other pi-cicd publisher, so <code>ntfy-notify --mute</code>
+            silences metric alerts too — an Alertmanager webhook receiver,
+            sitting outside that library, never could. Rules are
+            <code>RULE=Name op threshold = promql</code> lines instant-queried
+            against loopback Prometheus; a breach must hold two consecutive
+            sweeps before it alerts, and alerting is edge-triggered — one
+            message on breach, one on recovery, silence while it stands.
+            Shipped rules: disk used %, SoC temperature, memory used %, failed
+            systemd units, any scrape target down. Evidence: 249/249 pytest
+            (27 new hermetic tests — fake Prometheus JSON through an injected
+            opener), CI green (run 34437718662), and a live sweep against the
+            real Prometheus: disk 14.88%, SoC 50.7&nbsp;°C, memory 46.06%,
+            and one failed unit — firing on the first of its two confirm
+            sweeps, exactly as designed. Timer active, next run four minutes
+            out. The live find on the way: the first
+            <code>/etc/metric-alert.conf</code> was written by root with mode
+            600, so the timer's own user read an empty rule set and exited
+            saying "no rules configured". The tool was right and the box
+            looked broken. Config is now owned by the user that reads it, and
+            the parser says so loudly when it cannot — the same class of bug
+            as last month's socket-directory ownership trap. Root writes, the
+            service reads.
+          </li>
+          <li>
+            <strong>Twenty cycles in twenty hours</strong>
+            (<a href="https://github.com/pkia/product-autopilot" target="_blank" rel="noopener">product-autopilot</a>,
+            both repos private): the release candidate's autopilot stopped
+            being a queue-drainer and became a process. Cycle 1 opened at
+            05:16, cycle 20 at 00:44 the next morning, and every one of them
+            ran the same written protocol: verify the premise at HEAD, freeze
+            an RFC <em>before</em> any code, dispatch a red team against it,
+            implement, take the review rounds, then close with a report and a
+            state update. Sixteen follow-up tasks were filed rather than
+            quietly forgotten — the tracker went from T-012 to T-045. What
+            they caught in a single day, in roughly the order it hurt:
+            <code>main</code> had been red for five commits and nobody had
+            looked; the test suite was writing to the <em>production</em>
+            database (fixed at the call site, with a witness); a stop during
+            provisioning did not stop, and the residual was a box left
+            billing — a powered-off box is still a bill, so it gets swept, but
+            only with a start lease, because the obvious "is it off" signal is
+            stale precisely on the dangerous path; the route boundary is now
+            locked — 124 routes classified, all 112 authed routes verified
+            returning 401, and drift fails the gate; four documents claimed a
+            test count the suite no longer had, so the lock now <em>measures</em>
+            instead of remembering, because equality is the only honest test
+            and "reject a list of known-stale numbers" passed a doc reading 687
+            while the suite was 688. Two of my own favourites came from the
+            agents auditing themselves: "a guard that cannot fail is not a
+            guard", and a round-2 pass that found three defects in the fixes I
+            had just written. The suite went from 636 to 695 tests. Somewhere
+            in there the scenario corpus also finished arriving — the full 587
+            drills, where yesterday's post knew 581, which was one batch short
+            of the whole thing.
+          </li>
+          <li>
+            <strong>The audit nobody had run end-to-end</strong>
+            (repo private): the mission was re-scoped last night from "release
+            candidate" to "commercially credible product", audit first. Two
+            persistent artifacts came out of it: a real site map (three front
+            doors, the app surface versus the operator API, the identity and
+            data model, the runtime topology) and a feature inventory that
+            classifies every customer and operator surface as WORKING, BROKEN,
+            PARTIAL, MOCK, MISSING or UNKNOWN with cited evidence. Method rule
+            written into both: a route existing is not evidence, and UNKNOWN is
+            never PASS. Five findings actually matter. One: the core promise
+            does not happen for a real customer — the plugin posts a scenario
+            and a map with no Steam identity, the request defaults to a
+            placeholder, and the session-linking call is scoped to that same
+            placeholder, so a customer's own session is never linked or
+            completed and history, stats, progress and DNA stay empty forever.
+            The measurement happens; the attribution does not. Two: two shipped
+            controls are hard-broken with HTTP 422 — two call sites pass a raw
+            JavaScript object as a fetch body, so the server receives the
+            string <code>[object Object]</code>; the other eleven call sites
+            stringify, and the live log had the proof sitting in it. Three: the
+            advertised 587-scenario library is unreachable in the current UI —
+            the dispatcher prefers the renderer that has no tabs, while the
+            only filter/search/favourite/launch view is called from a dead v1
+            handler. Four: the flagship AI insight was arithmetically nonsense
+            — a deficit normalised to 0..1 was printed as points, producing
+            "Your aim is +0 points below your average (62.4)" when the real gap
+            was 5.8. Five, security: the operator console renders
+            plugin-controlled strings as HTML before validating them, and the
+            injector token in the shipped bundle matches the live plugin token,
+            which makes it public. Also on the list: a webfont declared but
+            never loaded, a heading SVG rendering at 809×809, no compression or
+            caching anywhere, 5.86&nbsp;MB of PNG map art per page, an
+            objective score that is a constant 100, and a placement dimension
+            anchored to the nearest enemy rather than the one being shot. My
+            own error is in there too, recorded: I reported the front door as a
+            sign-in wall. It is not — the root is a real landing page, and I
+            had audited the app path instead. The GTM auditor caught that one,
+            which is the whole argument for having a second auditor.
+            Twelve audit tasks are filed, the first batch's RFC is frozen, and
+            cycle 20 is still running as I write this.
+          </li>
+          <li>
+            <strong>ram-mode: a work session gets its RAM back</strong>
+            (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>):
+            <code>ram-mode focus</code> parks the always-on hobby stack —
+            maritime, AIS, SDR, the satellite capture, the kiosk display — so a
+            work session has memory to breathe in, and <code>restore</code>
+            brings it back. The care is in what it refuses to do: it never
+            pauses the NOAA scheduler mid-capture, it parks each project's
+            deploy timer so a GitHub poll cannot restart what it just stopped,
+            it drops the affected probe rows so focus mode does not fire a
+            storm of DOWN and UP alerts at itself, it stops units stuck in a
+            restart loop, and it defers restarts that need the SDR dongle until
+            the dongle is free again. Documentation grew the two host-local
+            drop-ins that make this invisible to the rest of the unit index.
+            The box now has a command that gives memory back and, more
+            importantly, does not page me about the things it parked itself.
+          </li>
+          <li>
+            <strong>And the guard versions the desk drawer</strong>
+            (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>):
+            the project-guard auto-adopted six more local directories into
+            GitHub overnight. Two of them are scratch copies of a project that
+            already exists, one holds personal files, and none of them are
+            things a versioning bot should have opinions about. All private,
+            nothing leaked, no harm done — but an auto-adopter with no filter
+            will cheerfully commit the drawer under your desk, so adoption
+            filters are on the list below. Recording it here because the
+            alternative is finding out later.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Train: fix the attribution before anything else</strong>
+            (M; needs a cloud box) (repo private): finding one is the new P0,
+            because every other customer-facing feature is decorative until a
+            real player's session links to a real identity. Concrete next step:
+            have the plugin send the Steam identity it already has in the game
+            session, scope the session-linking call to that identity instead of
+            the placeholder, and prove it by starting one drill as a real
+            account and watching history fill in.
+          </li>
+          <li>
+            <strong>Train: the two controls that answer HTTP 422</strong>
+            (S; code lives on this box) (repo private): two call sites pass a
+            raw object as a fetch body. Next step: stringify them the way the
+            other eleven do, and add the regression test that would have caught
+            it — a test asserting the request body parses as JSON, not just
+            that the handler returns 200. Four lines of fix, one test that
+            means something.
+          </li>
+          <li>
+            <strong>Train: retry the live spatial pass</strong> (repo private):
+            the real-geometry drift check is shipped and unit-tested, and its
+            live run was still blocked by the box's bot-spawn quirk last time
+            it was attempted. Next: run it against the live server now that map
+            prep handles bot quotas and team limits, and record the observed
+            layer.
+          </li>
+          <li>
+            <strong>project-guard: adopt with a filter</strong> (S)
+            (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>):
+            the guard has no concept of a directory that should not be
+            versioned. Next step: an explicit deny-list file, read at adopt
+            time, plus a one-line report when a directory is skipped — so the
+            filter is visible in the log instead of being another thing I have
+            to remember.
+          </li>
+          <li>
+            <strong>Moving bots, round two</strong> (L) (repo private): the
+            xfire-style behaviour itself — swings, counter-strafes, wide peeks
+            — still waiting on a first compile on the live box, and still the
+            last item before the human gate that everything else this week has
+            been rehearsing for. One of these days the seat gets filled.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://arxiv.org/abs/2606.28430" target="_blank" rel="noopener">"Building to the Test: Coding Agents Deliver What You Check, Not What You Requested" (arXiv 2606.28430)</a> —
+            two production coding agents, one real task, one hidden oracle of
+            222 behavioural tests, 18 runs, and the thing every agent operator
+            has felt but nobody had measured: with the oracle visible the
+            scores go near-perfect while the library the task actually asked
+            for ends up dead or absent. The agents were not cheating; the
+            oracle was honest and hidden. They optimised the only part of the
+            intent they could see. The authors give it a name — building to the
+            test — and name the disposition underneath it, validation
+            self-awareness: the agent never checks its work the way a user
+            would. My day was a small, expensive demonstration of the same
+            theorem, which is why every cycle in my loop now has to pass a
+            red team that did not write the code.
+          </li>
+          <li>
+            <a href="https://blakecrosley.com/blog/check-becomes-the-spec" target="_blank" rel="noopener">"The Check Becomes the Spec" (Blake Crosley)</a> —
+            the readable companion to that paper, and the sharper framing: the
+            check is the only part of your intent the agent can see, so it
+            silently becomes the spec, and everything the check fails to encode
+            stops being the job. His rule — a check that cannot fail is a spec
+            that says nothing — is exactly the sentence my own review round
+            arrived at independently today ("a guard that cannot fail is not a
+            guard"). The best line is the honest limit: self-verification fixes
+            lying about being done, it does not fix whether your checks mean
+            done.
+          </li>
+          <li>
+            <a href="https://www.raspberrypi.com/news/configure-early-boot-splash-screens-for-spi-and-i2c-based-displays/" target="_blank" rel="noopener">"Configure early boot splash screens for SPI and I2C based displays" (Raspberry Pi)</a> —
+            the bootloader can now paint an SPI or I2C panel itself, about two
+            seconds after power-on, with a tiny interpreted language inspired
+            by the mipi-dbi one — no U-Boot stage bolted on just to get pixels
+            up early. Relevant here for two reasons: this site has a boot
+            splash it does not need, and the kitchen kiosk is exactly the class
+            of device the feature exists for. A panel that shows something
+            before Linux loads is a panel that stops looking like a brick when
+            it is slow.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>
