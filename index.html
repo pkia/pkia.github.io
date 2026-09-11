@@ -235,13 +235,19 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-control.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">validity pass: scenario truth-audit over all 581 (honest labels, contracts), crosshair-placement scoring, v4 telemetry + route gating, blind-review QA with a false-progress detector, real-geometry spatial validation; UI rebuilt as CT/T Combat Lab; last gate: the human test</span>
+                    <span class="term-desc">transformation audit: every customer and operator surface classified with cited evidence (a route existing is not evidence, unknown is never pass); twenty autopilot cycles in twenty hours, suite 636 → 695, sixteen follow-ups filed; top findings — a real customer's session never links to their Steam identity, two shipped controls answer HTTP 422, the 587-scenario library is unreachable in the current UI; twelve audit tasks filed, batch-1 RFC frozen; last gate still the human test</span>
+                  </li>
+                  <li>
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-unit">autopilot.timer</span>
+                    <span class="term-state waiting">active (waiting)</span>
+                    <span class="term-desc">one target per cycle, premise verified at HEAD first, RFC frozen before any code, red team dispatched before implementation — every close reports evidence and files its residual instead of forgetting it</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">prom step 3a shipped 09-09: ntfy /metrics scraped on loopback :9091 (220/220 pytest, live up=1, one planned restart at 05:32); heal ledger empty since 09-08; next: step 3b alerting decision</span>
+                    <span class="term-desc">prom step 3 closed 09-10: metric-alert is a stdlib rule-check, not a second daemon — five rules off the loopback Prometheus, edge-triggered, published through ntfy_lib so the one-flag mute covers it (249/249 pytest, live sweep, timer active); next: the 09:00 pick from the devlog list</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -298,7 +304,7 @@
               An autonomous improvement loop for everything else on this page:
               at 01:00 an agent writes the daily devlog and proposes what's
               next; at 04:00 a second agent picks one idea and ships it —
-              code, tests, docs, brand-new repos included. Fifteen ledger
+              code, tests, docs, brand-new repos included. Sixteen ledger
               entries in: a dead-man's switch, an ntfy notification
               backbone, borg backups with a weekly restore drill, an
               upstream release watcher, a service uptime scoreboard, an
@@ -306,9 +312,10 @@
               notification on the box — nightly chaos drills that break
               things on purpose and check the box notices, the
               architecture reference that maps every running unit, a heal
-              ledger that makes the self-healer show its work, and a
+              ledger that makes the self-healer show its work, a
               Prometheus + node_exporter scrape backbone that answers
-              the RAM question with ~102 MB — then a ledger dig that
+              the RAM question with ~102 MB, and an alert rule-check that
+              reads those metrics — then a ledger dig that
               corrected itself: the 09-03 "healers never deployed"
               verdict was wrong, they were Hermes-cron jobs, live and
               green all along; the empty heal ledger just means a
@@ -319,22 +326,27 @@
               (220/220 pytest, a live 24-hour render, docs matching the
               shipped code). Then the heal ledger, empty through
               August, stopped being empty: five ci-rerun entries since
-              09-05 all trace to one ruff F821 in the Train
+              09-05 all traced to one ruff F821 in the Train
               self-evaluation hook — not a flake — and the mine
               paid out on 09-07 with a one-line import fix
               (<code>9e78d03</code>) and closed itself on 09-08:
               the last two CI-only hermeticity tests fixed
-              (<code>aa54bd4</code>), the first fully green CI
-              run since 09-05 recorded, and a heal that fired
-              five times since 09-05 with no job left. The
-              very next pick, Prom step 3a — the ntfy
-              <code>/metrics</code> scrape — shipped the
-              following morning with receipts: loopback :9091
-              joined prometheus.yml, the one planned ntfy
-              restart done at the quiet 05:32 hour, live
-              <code>up{job="ntfy"}=1</code>, 220/220 pytest,
-              leaving step 3b, the alerting-consumer decision,
-              as the open item. The
+              (<code>aa54bd4</code>), the first fully green Train
+              CI run since 09-05 recorded, and a heal that fired
+              five times with no job left. The next two picks closed
+              Prom step 3 — the ingest half shipped 09-09 (loopback
+              :9091 into prometheus.yml, the one planned ntfy restart
+              done at the quiet 05:32 hour, live
+              <code>up{job="ntfy"}=1</code>), then the alerting half at
+              05:34 the next morning: a stdlib rule-check rather than a
+              second daemon, five rules against the loopback
+              Prometheus, edge-triggered so a breach sends one message
+              and its recovery sends another, and published through the
+              same notification library as everything else — which means
+              the one-flag alert-storm mute covers metrics alerts too.
+              249/249 tests, a live sweep on real metrics, and an
+              en-route lesson: the first config file was root-owned, so
+              the service read an empty rule set and said so. The
               idea ledger, every run and
               every failure are public.
             </p>
@@ -356,7 +368,7 @@
               A personal CS2 coach that measures real gameplay mechanics
               server-side — crosshair offset at fire, counter-strafe stop
               quality, burst discipline — via a CounterStrikeSharp
-              plugin, 497 scenarios across the Active Duty pool, and
+              plugin, 587 scenarios across the Active Duty pool, and
               a deliberate-practice engine that builds timed sessions
               around measured weaknesses. A coach brain on top — an
               intelligence ledger, Player DNA, adaptive sessions, demo
@@ -371,12 +383,22 @@
               map-centric coach app, a routine generator that actually
               prescribes, an arena trainer with personal bests, and
               practice bots with real reaction time. Then the validity
-              pass went through the corpus: an audit engine over all 581
+              pass went through the corpus: an audit engine over all 587
               scenarios — honest labels, contracts everywhere — a
               crosshair-placement scoring dimension, blind-review QA with
               a false-progress detector, real-geometry spatial validation,
               and a security pass that moved runtime data out of the repo.
-              The last gate is
+              Then the audit turned on the product itself, and the green tests
+              stopped being reassuring: every customer-facing surface is now
+              classified with cited evidence — a route existing is not
+              evidence, unknown is never pass — and the findings that matter
+              are that a real customer's session never links to their own
+              Steam identity, two shipped controls answer HTTP 422, the
+              587-scenario library is unreachable in the current UI, an
+              insight number is printed at a hundred times its real value,
+              and the plugin token in the shipped bundle is public. Twenty
+              autopilot cycles in twenty hours filed twelve audit tasks and
+              grew the suite from 636 tests to 695; the last gate is
               still a human in the seat. The
               game server spawns on a rented cloud box only while you
               train; Hetzner CPU boxes are the default now — a
@@ -476,7 +498,12 @@
               morning — and a prom-dash that answered the Grafana
               question with a stdlib script: the pinned CPU-vs-load and
               unit-state graphs as one self-contained HTML page, on
-              demand, ~0 MB resident.
+              demand, ~0 MB resident — and metric-alert turning those
+              metrics into five edge-triggered alerts that publish
+              through the same mute-able notification library — plus a
+              ram-mode switch that parks the hobby stack so a work
+              session gets its RAM back without firing a single alert
+              about the things it just parked.
               The architecture reference for how everything here ships.
             </p>
             <ul class="chips chips-sm">
