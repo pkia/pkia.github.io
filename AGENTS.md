@@ -81,6 +81,11 @@ is current. Rules:
   ais_analysis, hub, pi-cicd) before older highlights; past eight, fold the
   least significant into the "Also:" `.more-link` line instead. Badges must
   stay honest: "In progress" until the work is committed and green.
+  **Card body length cap (owner directive 2026-09-12 — cards had become
+  changelog walls): ONE paragraph, max ~90 words / ~550 characters. Lead
+  with what the project IS and its strongest honest proof point; no
+  play-by-play history, no dates, commit shas, CI-run ids, test-count
+  deltas, or "then… then… then" chains. History belongs in the devlog.**
 - **"Currently" panel** (`#currently`, in `#about`): a terminal-styled panel
   showing `systemctl status currently` output. Update the systemd-style lines
   to match what is actually being worked on right now (recent commits + the
@@ -89,7 +94,12 @@ is current. Rules:
   three work units plus the final `location.service … active (permanent)`
   the city line. Unit names are lowercase-hyphenated slugs (e.g.
   `radar-agent.service`; use `.timer` + `active (waiting)` for recurring
-  background work). Leave the command line, closing prompt line and window
+  background work).
+  **Hard length caps (owner directive 2026-09-12 — the panel had become
+  walls of text): each `term-desc` is ONE clause-style line, max ~160
+  characters, no semicolon chains, no dates/CI-run-ids/commit shas. If more
+  context matters, it belongs in that day's devlog post, not here.**
+  Leave the command line, closing prompt line and window
   chrome untouched; if you change the command text, update the `--term-ch`
   style hint on `.term-type` to its character count.
 - **Journey timeline** (`#journey`): only for genuinely notable milestones
@@ -136,12 +146,20 @@ Rules:
   shipped repos (including ones created by the radar implementer), keep the
   list at four to five bullets, retire or fold the least significant older
   ones into a short "More on GitHub" line. Never invent or oversell work.
+- **Length discipline (owner directive 2026-09-12 — the README had become
+  a wall of text): the "Right now" paragraph is max ~90 words; each repo
+  bullet is ONE line, max ~30 words. No semicolon chains, no dates, commit
+  shas, CI-run ids or test-count deltas. The profile is a shop window, not
+  a changelog — detail lives in the repo READMEs and the devlog.**
 - **"Right now" interest line**: refresh from the same sources as the
   homepage "Currently" panel (recent commits + the radar board at
   https://github.com/pkia/radar/IDEAS.md).
 - **Toolbox**: update only when genuinely stale.
 - Keep the intro bio and contact links untouched unless genuinely outdated;
   keep the markdown valid and the concise engineer voice; no emoji spam.
+- **Employer privacy on GitHub**: the site (pkia.github.io) may name
+  Cohesity (owner-approved 2026-09-12); this GitHub README does NOT name
+  an employer — keep it that way unless the owner says otherwise.
 - **No profile-views counter**: deliberately removed in Aug 2026 — the hosted
   counter services are either dead (komarev.com) or unprofessionally styled
   (getloli anime characters), and a vanity view count adds nothing to the
