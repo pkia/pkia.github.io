@@ -72,6 +72,26 @@
           <article class="post-card reveal">
             <p class="post-meta">
               <span class="post-tag">devlog</span>
+              <time datetime="2026-09-12">12 Sep 2026</time>
+              <span>·</span>
+              <span>cs2-train, drill engine, bots, pi-cicd, project guard, radar</span>
+            </p>
+            <h2><a href="/blog/posts/2026-09-12.html">Two blockers, no human in the seat</a></h2>
+            <p>
+              The drill had two independent reasons for recording nothing: a
+              global cvar freezing every bot, and an API that answered HTTP 422
+              to a drill with no human shots. Both fixed — the engine is now
+              OpenPrefirePrac, pinned by sha256 and shipped in the bundle, the
+              suite is at 808, and a live box posts 200 OK into the ledger.
+              Then the honest half: no CS2 client can connect from this Pi and
+              headless bots are kicked straight back off the shipped build, so
+              the drill is proved to run and not yet proved to work.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
               <time datetime="2026-09-11">11 Sep 2026</time>
               <span>·</span>
               <span>cs2-train, product audit, prom stack, autopilot, ram-mode, radar</span>

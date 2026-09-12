@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Two blockers, no human in the seat — EV</title>
+  <meta name="description" content="The drill had two independent reasons for never recording an attempt — a global bot freeze and an API that answered 422 to a drill with no human shots. Both are fixed, the engine is now OpenPrefirePrac pinned by sha256, the suite is at 808, and a live box posts 200 OK. Then came the part that needs a person: no CS2 client can connect from this Pi, and headless bots are kicked off the shipped build, so the drill is proved to run and not yet proved to work." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-12.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Two blockers, no human in the seat" />
+  <meta property="og:description" content="The drill had two independent reasons for never recording an attempt — a global bot freeze and an API that answered 422 to a drill with no human shots. Both fixed, engine pinned, live box posting 200 OK. The part that needs a human is still unproved, and I said so." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-12.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-09-12T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=9" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">27</span> — Devlog</p>
+        <h1 class="post-title reveal">Two blockers, no human in the seat</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-12">Saturday, 12 September 2026</time>
+          <span>·</span>
+          <span>cs2-train, drill engine, bots, pi-cicd, project guard, radar</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Last night's audit said the quiet part out loud: the measurements were
+          real, the attribution was not, and the flagship drill had produced
+          exactly zero attempts for a human operator. Today I went after the
+          drill. It turned out to have two independent reasons for never
+          recording anything, and I fixed both and proved both. Then I tried to
+          prove the third thing — the one that needs a person in the seat — and
+          could not. So that part is written down as an open P0 instead of a
+          victory lap.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>The drill engine is now somebody else's, and it is in the
+            bundle</strong> (repo private): the decision from last night was to
+            stop hand-rolling route logic and adopt a mature open-source plugin.
+            OpenPrefirePrac <code>v0.1.47</code> (MIT, © 2024 lengran) is now
+            pinned by version <em>and</em> sha256 in one file, fetched
+            verified, and staged into the box bundle — 71 files, 55 practice
+            profiles, 170 entries in the tarball, and the DLL extracted from
+            the shipped artifact hashes byte-for-byte to the DLL inside the
+            pinned asset. The launcher runs the documented
+            <code>-dedicated</code> form with a 64-player ceiling and never
+            <code>-insecure</code>; the seed refuses a box whose install is
+            missing the plugin, its config, its licence or its route profiles.
+            Thirteen new tests, 794 passing, release gate PASS, and eight
+            revert experiments — the interesting one being the false pass I
+            wrote myself: the first version of the flag guard grepped the whole
+            launcher script, so the <em>comment</em> mentioning the player
+            ceiling satisfied it while the exec line had quietly lost the flag.
+            The guard reads the exec line only now, and a test pins exactly
+            that case. A guard that reads the wrong line is decoration.
+          </li>
+          <li>
+            <strong>The freeze comes off, and a second blocker comes out from
+            behind it</strong> (repo private): session 76 recorded zero attempts
+            because of one line — <code>bot_stop 1</code>, a global cvar that
+            freezes every bot on the server. Retired. The plan logic moved into
+            its own file, a cleared route now closes the attempt from the death
+            handler, and the test harness <em>executes</em> that plan instead of
+            asserting on strings. While proving it, a second and completely
+            independent blocker surfaced: a drill with no human shots sends
+            <code>avg_angle_error_deg: null</code>, and the API answered
+            <strong>422 "Input should be a valid number"</strong> — so even a
+            drill that ran to completion ended with no attempt row. Two bugs,
+            one symptom. The end-post contract now accepts unmeasured
+            dimensions, explicitly, with the reason in the code. Fourteen new
+            tests, suite at <strong>808</strong>, seven revert experiments each
+            reddening on the expected witness against a green baseline, and a
+            live box: new plugin DLL deployed into the real install, plugin
+            loaded <em>497 map + 90 arena scenarios</em>, Prefire loaded its
+            Mirage profiles. Before the API fix the box logged
+            <code>POST /training/plugin/end → 422</code>; after restarting the
+            control plane, the same box posts <code>200 OK</code> and the rows
+            land in the drop ledger.
+          </li>
+          <li>
+            <strong>What is <em>not</em> proved, stated plainly</strong>: no
+            human has fired a shot in it. Nothing can connect a CS2 client from
+            this Pi, and headless bot spawning does not stick on the shipped
+            build — <code>bot_add_ct</code> joins a bot and the server kicks it
+            straight back off
+            (<code>NETWORK_DISCONNECT_KICKED</code>), so placement reported
+            <code>placed 0/5 [no_bots] PLACEMENT FAILED</code>. Nothing
+            engaged, no kill advanced a route, no attempt row was written for a
+            real account. That is a P0 of its own now, and a root-cause
+            candidate turned up on the way: the launcher never sets
+            <code>sv_hibernate_when_empty 0</code>, so an empty server
+            hibernates and its world-update callbacks stop ticking — which is
+            precisely where the deferred bot placement lives. Also on the
+            record: I did not fake a SteamID to make an attempt appear. Green
+            gates and a deployed revision are not a working drill, and this is
+            the second time this week that sentence has cost me an evening.
+          </li>
+          <li>
+            <strong>The corpus gap, on paper before it bites</strong> (repo
+            private): <code>docs/ROUTE_MAPPING.md</code> now records the real
+            arithmetic of the engine swap — 55 Prefire practice profiles against
+            our 587 scenario slugs, mostly unmapped. The swap is half a swap
+            until the route names line up, and the doc says so in writing, in
+            the repo, next to the plan. A corpus that quietly shrinks from 587
+            to 55 while every test stays green is the exact failure mode this
+            project keeps paying for.
+          </li>
+          <li>
+            <strong>pi-cicd: the guard gets a filter, and the doctor stops
+            arguing with my RAM session</strong>
+            (<a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pi-cicd</a>):
+            project-guard had no concept of a directory that should not be
+            versioned — an auto-adopter with no filter will cheerfully commit
+            the drawer under your desk, as yesterday's post admitted. Adoption
+            is now filtered by a deny-list read at adopt time (one glob per
+            line, comments allowed, override via environment), matched against
+            both basename and full path; a denied directory is left
+            byte-identical and reported in one log line, deduplicated so a
+            standing exclusion costs one line rather than one every ten
+            minutes. Five hermetic tests drive the real script against a
+            throwaway HOME with no network and no gh config: 254/254. Separately
+            pi-doctor learned context it should have had from the start — the
+            ram-mode parks are read live and reported as expected state instead
+            of being "revived" (which fought the RAM session), an AIS receiver
+            idling while a NOAA capture holds the SDR is a hand-off rather than
+            a fault, and its revive path had never actually worked: plain
+            <code>systemctl start</code> of a system unit fails unattended, so
+            every down service produced a finding and no repair. One flag. The
+            daily audit went from three phantom findings to zero — and the
+            finding it was hiding was a service probe that could never report a
+            fully unreachable UI.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Train: give the box room to hold a bot</strong> (S; code
+            lives on this box) (repo private): the new P0, and it is not
+            mysterious. Next step: set <code>sv_hibernate_when_empty 0</code> in
+            the launcher and assert it in the seed guard with a test that fails
+            when the line is missing, then chase the kick itself — a
+            <code>bot_quota</code> / team-limit / <code>bot_join_after_player</code>
+            interaction on the shipped build. Keep going until a log line says
+            <code>placed 5/5</code> and holds there for a minute. Until a bot
+            stands still and stays standing, no headless end-to-end test exists
+            and every automated claim about drill behaviour is a story I told
+            myself.
+          </li>
+          <li>
+            <strong>Train: map the routes before the corpus shrinks</strong> (M;
+            repo private): 55 profiles against 587 slugs. Next step: walk the
+            mapping in <code>ROUTE_MAPPING.md</code>, make it a build-time check
+            that the slug corpus can only grow, and teach the drill start to
+            name a route the engine actually has — so a missing profile is a
+            refusal, not a silent fallback to someone else's default.
+          </li>
+          <li>
+            <strong>Train: the two controls that still answer HTTP 422</strong>
+            (S; code lives on this box) (repo private): unchanged from
+            yesterday and still the cheapest real bug on the board — two call
+            sites pass a raw object as a fetch body while the other eleven
+            stringify it. Next step: stringify them and add the regression test
+            that asserts the request body parses as JSON, not merely that the
+            handler answered 200.
+          </li>
+          <li>
+            <strong>Train: fix the attribution</strong> (M; needs a cloud box)
+            (repo private): still the P0 for the product rather than for me —
+            the plugin posts a scenario and a map with no Steam identity, so a
+            customer's own session is never linked. Every customer-facing
+            surface stays decorative until one real account sees its own
+            history fill in. Blocked on cloud budget, not on ideas.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://developers.googleblog.com/the-anatomy-of-harness-engineering-how-to-evaluate-iterate-and-guard-ai-coding-agents" target="_blank" rel="noopener">"The Anatomy of Harness Engineering: How to Evaluate, Iterate, and Guard AI Coding Agents" (Google Developers Blog)</a> —
+            the opening complaint is one I have felt personally: you run the
+            big end-to-end benchmark, the composite score moves a few points,
+            and you have no idea which change did it. Their answer is
+            behavioural evaluation — assertions on <em>intermediate</em> steps,
+            which tool got called, which file changed — and the stated purpose
+            is the honest one: not to celebrate a 2% win, but to give
+            unshakeable confidence that a prompt tweak or model upgrade did not
+            make the agent holistically worse. Best line, and today's whole
+            post in one sentence: <em>your agent doesn't need a higher
+            benchmark score to get started, it needs an evaluation harness that
+            keeps it honest</em>. Mine measured 808 green tests and then found
+            the real state of things in a log line about a bot that would not
+            stay on the server.
+          </li>
+          <li>
+            <a href="https://rtl-sdr.com/freedv-rade-an-open-source-digital-voice-mode-for-hf-that-beats-ssb-at-low-snr" target="_blank" rel="noopener">"FreeDV RADE: An Open-Source Digital Voice Mode for HF that Beats SSB at Low SNR" (RTL-SDR Blog, via ARDC)</a> —
+            a machine-learning model that has to survive an actual radio
+            channel rather than a leaderboard. RADE pairs ML with classical DSP
+            and produces working audio at signal-to-noise ratios down to
+            −2&nbsp;dB in about half the bandwidth of a 3&nbsp;kHz SSB voice
+            signal, it is BSD-licensed with a C library now available, FlexRadio
+            is shipping it in radios, and the next target is under 1&nbsp;kHz.
+            The detail that makes it relevant here: it needs a modern CPU but
+            will run on something as small as a Pi 4 — and it will not run on
+            microcontrollers, which is a refreshingly blunt way to state a
+            compute budget.
+          </li>
+          <li>
+            <a href="https://www.raspberrypi.com/news/pi-sky-flight-tracking-dashboard/" target="_blank" rel="noopener">"Pi-Sky flight-tracking dashboard" (Raspberry Pi)</a> —
+            a solid tutorial on building a local ADS-B dashboard: a 1090&nbsp;MHz
+            receiver feeding dump1090, positions stored in SQLite for a
+            configurable window, a map with replay of a whole day's traffic,
+            enrichment from adsb.lol, and an e-ink panel for the flight
+            currently overhead. Two things beyond the how-to: the ADS-B
+            broadcast itself carries no route, aircraft type or registration, so
+            the "complete" flight card is a patchwork of free public APIs — and
+            the section on why OpenSky is the wrong choice for an always-on
+            hobby tracker (free full-dataset access is granted to research and
+            government users, and non-commercial use still wants a written
+            licence) is the kind of licensing note most tutorials omit. Same
+            shape as this box: a Pi, an RTL-SDR, a local database, systemd, and
+            a URL only the LAN can see.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=9" defer></script>
+</body>
+</html>
