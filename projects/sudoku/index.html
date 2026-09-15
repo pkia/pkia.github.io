@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Our Sudoku — a co-op Sudoku for two</title>
+<meta name="description" content="A two-player co-op Sudoku: one shared passcode, live-synced board over WebSockets, genuine generator with graded difficulty. FastAPI + SQLite, installable PWA.">
+<link rel="canonical" href="https://pkia.github.io/projects/sudoku/">
+<meta name="theme-color" content="#0b0e16">
+<meta property="og:title" content="Our Sudoku — a co-op Sudoku for two">
+<meta property="og:description" content="One passcode, live-synced board, genuine generator. A co-op Sudoku PWA for exactly two people.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://pkia.github.io/projects/sudoku/">
+<style>
+:root{
+  --bg:#0b0e16; --panel:#121828; --panel2:#171f33; --line:#233048;
+  --ink:#e9edf6; --dim:#94a0b8; --faint:#5d6a84;
+  --blue:#4f8cff; --lav:#9d8cff; --green:#3ecf8e; --red:#f2555a;
+  --gold:#ffc857;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,Segoe UI,sans-serif;line-height:1.6;overflow-x:hidden}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.hero{position:relative;padding:80px 0 52px;text-align:center;overflow:hidden;
+  background:
+    radial-gradient(600px 300px at 25% 0%,rgba(79,140,255,.08),transparent 60%),
+    radial-gradient(700px 350px at 78% 12%,rgba(157,140,255,.07),transparent 60%);}
+.hero .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;margin-bottom:16px}
+.hero h1{font-size:clamp(32px,5.2vw,54px);font-weight:800;letter-spacing:-.02em;line-height:1.08}
+.hero h1 .grad{background:linear-gradient(92deg,var(--blue) 0%,var(--lav) 80%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{max-width:620px;margin:20px auto 0;color:var(--dim);font-size:17.5px}
+.stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:34px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 22px;min-width:120px}
+.stat b{display:block;font-size:27px;font-weight:800;font-family:var(--mono);color:var(--gold)}
+.stat span{font-size:11.5px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+section{padding:60px 0;border-top:1px solid var(--line)}
+h2.sec{font-size:25px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px}
+p.sec-sub{color:var(--dim);margin-bottom:26px;max-width:640px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:820px){.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+.card h3{font-size:16.5px;font-weight:700;margin-bottom:7px}
+.card p{color:var(--dim);font-size:14px}
+
+/* ------- playable board ------- */
+.play{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px;margin-bottom:14px}
+.play-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.play-head .t{font-weight:700;font-size:18px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:12px;color:var(--dim);border:1px solid var(--line);border-radius:99px;padding:5px 14px;cursor:pointer;transition:.15s}
+.chip.on{color:#0b0e16;background:var(--gold);border-color:var(--gold);font-weight:700}
+.chip:hover:not(.on){border-color:var(--gold);color:var(--gold)}
+.board{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;max-width:440px;margin:0 auto;background:var(--panel2);border:2px solid var(--line);border-radius:12px;padding:8px;touch-action:manipulation;user-select:none}
+.cell{position:relative;aspect-ratio:1;background:var(--panel);border-radius:7px;display:grid;place-items:center;font-family:var(--mono);font-size:clamp(16px,3.4vw,23px);font-weight:600;cursor:pointer;transition:background .12s}
+.cell.b-r{margin-right:4px}.cell.b-b{margin-bottom:4px}
+.cell.given{color:var(--faint);cursor:default}
+.cell.user{color:var(--blue)}
+.cell.partner{color:var(--lav)}
+.cell.wrong{color:var(--red)}
+.cell.sel{outline:2px solid var(--gold);outline-offset:-2px}
+.cell.hint{background:#1c2a45}
+.pad{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;max-width:440px;margin:16px auto 0}
+.pad button{font-family:var(--mono);font-size:17px;font-weight:700;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:10px 0;cursor:pointer;transition:.12s}
+.pad button:hover{border-color:var(--gold);color:var(--gold)}
+.meta-row{display:flex;justify-content:center;gap:22px;margin-top:14px;font-family:var(--mono);font-size:13px;color:var(--dim)}
+.meta-row b{color:var(--gold)}
+.legend-line{font-size:12.5px;color:var(--faint);text-align:center;margin-top:12px}
+.legend-line i{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 4px 0 10px;vertical-align:-1px}
+
+/* ------- roster/feature rows ------- */
+.frow{display:flex;gap:14px;align-items:flex-start;padding:15px 4px;border-bottom:1px dashed var(--line)}
+.frow:last-child{border-bottom:0}
+.frow .ic{flex:0 0 38px;height:38px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;font-size:17px}
+.frow .tx b{display:block;font-size:14.5px}
+.frow .tx span{color:var(--dim);font-size:13.5px}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;border-radius:11px;padding:12px 22px;font-weight:700;font-size:15px;margin-top:6px}
+.cta:hover{filter:brightness(1.1);text-decoration:none}
+.cta.gh{background:var(--panel2);border:1px solid var(--line);color:var(--ink);margin-left:10px}
+footer{padding:44px 0 60px;border-top:1px solid var(--line);color:var(--faint);font-size:13.5px;text-align:center}
+footer a{color:var(--dim)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="kicker">Two-player · one passcode · no accounts</div>
+    <h1>Our <span class="grad">Sudoku</span></h1>
+    <p class="sub">A co-op Sudoku for exactly two people. Every placement, note and mistake
+    syncs live over WebSockets — solve together on two phones, or play solo with saved progress.</p>
+    <div class="stats">
+      <div class="stat"><b>2</b><span>players, one passcode</span></div>
+      <div class="stat"><b>4</b><span>difficulty tiers</span></div>
+      <div class="stat"><b>20</b><span>tests green</span></div>
+      <div class="stat"><b>0</b><span>accounts needed</span></div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec">Try a real puzzle.</h2>
+    <p class="sec-sub">This board was generated by the app's actual engine — the same generator/solver
+    that grades every puzzle valid with a unique solution. Tap a cell, pick a digit.
+    The blue/lavender split is what two players see live on a shared board.</p>
+
+    <div class="play">
+      <div class="play-head">
+        <div class="t">Play a round <span style="color:var(--faint);font-weight:400;font-size:13px">(solo preview)</span></div>
+        <div class="chips" id="diff">
+          <span class="chip on" data-d="easy">easy · 38 clues</span>
+          <span class="chip" data-d="medium">medium · 32</span>
+          <span class="chip" data-d="hard">hard · 28</span>
+        </div>
+      </div>
+      <div class="board" id="board"></div>
+      <div class="pad" id="pad"></div>
+      <div class="meta-row">
+        <div>filled <b id="m-fill">0</b>/81</div>
+        <div>wrong <b id="m-wrong">0</b></div>
+        <div>time <b id="m-time">0:00</b></div>
+      </div>
+      <div class="legend-line">What you're playing: <i style="background:var(--faint)"></i>given
+        <i style="background:var(--blue)"></i>you <i style="background:var(--lav)"></i>partner's placements (co-op)</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec">How co-op works.</h2>
+    <div class="grid3">
+      <div class="card"><h3>One shared passcode</h3><p>No accounts, no invites, no codes. Both players
+      enter the same 4-digit code, pick their name, and they're in. Rate-limited so it can't be brute-forced.</p></div>
+      <div class="card"><h3>Live board sync</h3><p>Values, pencil marks, mistakes and the timer all sync
+      over WebSockets. If your partner places a 7, you see it in under a second — with their colour.</p></div>
+      <div class="card"><h3>A genuine generator</h3><p>Every puzzle is generated on the server: solved
+      with constraint propagation, then checked to have exactly one solution before it's graded into
+      easy → expert tiers.</p></div>
+    </div>
+    <div style="margin-top:26px">
+      <div class="frow"><div class="ic">📱</div><div class="tx"><b>Installable PWA</b><span>Add to Home Screen on iOS/Android — full-screen, offline shell, feels native.</span></div></div>
+      <div class="frow"><div class="ic">🔒</div><div class="tx"><b>Private by design</b><span>Two names in a config line, one SQLite file, one port. The public repo ships neutral defaults — your roster stays yours.</span></div></div>
+      <div class="frow"><div class="ic">🧪</div><div class="tx"><b>Tested end to end</b><span>Engine correctness plus a full two-client WebSocket lifecycle: create, join, bidirectional sync, disconnect/reconnect resync, completion.</span></div></div>
+    </div>
+    <a class="cta" href="https://github.com/pkia/sudoku" target="_blank" rel="noopener">Source on GitHub</a>
+    <a class="cta gh" href="/" target="_self">← back to pkia.github.io</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Built with FastAPI + WebSockets + SQLite · runs 24/7 on a Raspberry Pi ·
+  <a href="https://github.com/pkia/sudoku" target="_blank" rel="noopener">pkia/sudoku</a></div>
+</footer>
+
+<script>
+/* Real puzzles generated by app/engine.py at build time */
+const PUZZLES = {
+  easy:   {p:"285394600170000800000180402009008160801240090436000280060013000040702300007460000", s:"285394671174625839693187452729538164851246793436971285562813947948752316317469528"},
+  medium: {p:"015800004000024506904010003050100002130250000248000100007081020000000060380600700", s:"615837294873924516924516873759148632136259487248763159467381925591472368382695741"},
+  hard:   {p:"000200950000003001000010047179400000005000000004507089020005094010000208040320000", s:"681274953497853621352916847179482536835691472264537189728165394513749268946328715"}
+};
+let diff="easy", cells=[], sel=null, t0=null, timer=null, wrong=0;
+const board=document.getElementById("board"), pad=document.getElementById("pad");
+
+function load(d){
+  diff=d; cells=[]; wrong=0; sel=null;
+  clearInterval(timer); t0=Date.now();
+  timer=setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);
+    document.getElementById("m-time").textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0");},500);
+  board.innerHTML="";
+  for(let i=0;i<81;i++){
+    const v=+PUZZLES[d].p[i];
+    const el=document.createElement("div");
+    el.className="cell"+(v?" given":"");
+    el.textContent=v||"";
+    if(i%3===2&&i%9!==8)el.classList.add("b-r");
+    if(Math.floor(i/9)%3===2&&i<72)el.classList.add("b-b");
+    el.addEventListener("click",()=>{ if(v)return; sel=i; render(); });
+    board.appendChild(el);
+    cells.push({el,v,sol:+PUZZLES[d].s[i],given:!!v});
+  }
+  // pad
+  pad.innerHTML="";
+  for(let n=1;n<=9;n++){
+    const b=document.createElement("button");
+    b.textContent=n;
+    b.addEventListener("click",()=>place(n));
+    pad.appendChild(b);
+  }
+  render();
+}
+function place(n){
+  if(sel==null)return;
+  const c=cells[sel];
+  if(c.given||c.v===n)return;
+  c.v=n;
+  if(n!==c.sol){wrong++;}
+  render();
+  // auto-advance to next empty
+  for(let j=1;j<81;j++){const k=(sel+j)%81; if(!cells[k].given&&!cells[k].v){sel=k;break;}}
+  if(cells.every(c=>c.v)){ setTimeout(()=>alert("Solved! "+Math.floor((Date.now()-t0)/1000)+"s, "+wrong+" wrong."),200); }
+}
+function render(){
+  let fill=0;
+  cells.forEach((c,i)=>{
+    c.el.textContent=c.v||"";
+    c.el.classList.toggle("sel",i===sel);
+    c.el.classList.toggle("user",!c.given&&!!c.v);
+    c.el.classList.toggle("partner",false);
+    c.el.classList.toggle("wrong",!c.given&&!!c.v&&c.v!==c.sol);
+    if(c.v)fill++;
+  });
+  document.getElementById("m-fill").textContent=fill;
+  document.getElementById("m-wrong").textContent=wrong;
+}
+document.getElementById("diff").addEventListener("click",e=>{
+  const c=e.target.closest(".chip"); if(!c)return;
+  document.querySelectorAll("#diff .chip").forEach(x=>x.classList.remove("on"));
+  c.classList.add("on"); load(c.dataset.d);
+});
+load("easy");
+</script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission Control — the agents' kanban dashboard</title>
+<meta name="description" content="A phone-friendly dashboard and HTTP API over an AI-agent kanban board: live SSE updates, an activity feed every agent drives, and an mc CLI. A view layer over the agents' own database — not another orchestrator.">
+<link rel="canonical" href="https://pkia.github.io/projects/mission-control/">
+<meta name="theme-color" content="#0a0d12">
+<style>
+:root{
+  --bg:#0a0d12; --panel:#11161f; --panel2:#161d29; --line:#222c3d;
+  --ink:#e8edf4; --dim:#8b98ab; --faint:#5c6a7e;
+  --acc:#7d97f7; --acc2:#4ec9b0; --gold:#e5a13d; --red:#f14c4c; --green:#3ecf8e;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,Segoe UI,sans-serif;line-height:1.6;overflow-x:hidden}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+a{color:var(--acc2);text-decoration:none}
+a:hover{text-decoration:underline}
+.hero{position:relative;padding:84px 0 56px;text-align:center;overflow:hidden;
+  background:
+    radial-gradient(600px 300px at 22% 0%,rgba(125,151,247,.08),transparent 60%),
+    radial-gradient(700px 350px at 80% 10%,rgba(78,201,176,.06),transparent 60%);}
+.hero .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:var(--acc);text-transform:uppercase;margin-bottom:16px}
+.hero h1{font-size:clamp(30px,4.8vw,50px);font-weight:800;letter-spacing:-.02em;line-height:1.08}
+.hero h1 .grad{background:linear-gradient(92deg,var(--acc) 0%,var(--acc2) 75%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{max-width:640px;margin:20px auto 0;color:var(--dim);font-size:17.5px}
+.stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:34px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 20px;min-width:120px}
+.stat b{display:block;font-size:26px;font-weight:800;font-family:var(--mono);color:var(--acc)}
+.stat span{font-size:11.5px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+section{padding:60px 0;border-top:1px solid var(--line)}
+h2.sec{font-size:25px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px}
+p.sec-sub{color:var(--dim);margin-bottom:26px;max-width:660px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:820px){.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+.card h3{font-size:16.5px;font-weight:700;margin-bottom:7px}
+.card p{color:var(--dim);font-size:14px}
+
+/* board demo */
+.demo{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:14px}
+.demo .cap{font-family:var(--mono);font-size:12px;color:var(--acc);letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+.cols{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:820px){.cols{grid-template-columns:repeat(2,1fr)}}
+.col{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;min-height:180px}
+.col h4{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;display:flex;justify-content:space-between}
+.kcard{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--faint);border-radius:8px;padding:9px 10px;font-size:12.5px;margin-bottom:8px;cursor:pointer;transition:.15s}
+.kcard:hover{border-color:var(--acc)}
+.kcard .who{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:3px}
+.kcard.ready{border-left-color:var(--acc)}
+.kcard.progress{border-left-color:var(--gold)}
+.kcard.review{border-left-color:#c792ea}
+.kcard.done{border-left-color:var(--green);opacity:.75}
+.demo-hint{font-size:12.5px;color:var(--faint);margin-top:14px;text-align:center}
+
+/* feed */
+.feed{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px;font-family:var(--mono);font-size:12px;max-height:180px;overflow:hidden;position:relative}
+.feed .ln{display:flex;gap:10px;padding:3px 0;color:var(--dim);animation:slidein .3s ease}
+.feed .ln .t{color:var(--faint);flex:0 0 44px}
+.feed .ln .a{color:var(--acc);flex:0 0 92px;overflow:hidden;text-overflow:ellipsis}
+@keyframes slidein{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px;animation:pu 1.6s infinite}
+@keyframes pu{0%,100%{box-shadow:0 0 0 0 rgba(62,207,142,.5)}55%{box-shadow:0 0 0 7px rgba(62,207,142,0)}}
+
+/* lifecycle */
+.life{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:18px 0 8px}
+.lstep{font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:7px 13px;color:var(--dim)}
+.lstep.hl{border-color:var(--acc);color:var(--acc)}
+.arrow{color:var(--faint);font-size:13px}
+.frow{display:flex;gap:14px;align-items:flex-start;padding:15px 4px;border-bottom:1px dashed var(--line)}
+.frow:last-child{border-bottom:0}
+.frow .ic{flex:0 0 38px;height:38px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;font-size:17px}
+.frow .tx b{display:block;font-size:14.5px}
+.frow .tx span{color:var(--dim);font-size:13.5px}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--acc);color:#0a0d12;border-radius:11px;padding:12px 22px;font-weight:700;font-size:15px;margin-top:26px}
+.cta:hover{filter:brightness(1.08);text-decoration:none}
+.cta.gh{background:var(--panel2);border:1px solid var(--line);color:var(--ink);margin-left:10px}
+footer{padding:44px 0 60px;border-top:1px solid var(--line);color:var(--faint);font-size:13.5px;text-align:center}
+footer a{color:var(--dim)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="kicker">SSE · SQLite · zero framework</div>
+    <h1>the agents' <span class="grad">mission control</span></h1>
+    <p class="sub">When AI agents pick up work, cards move on a board — start, activity, review, done.
+    This is the phone dashboard over that board: a live view of what every agent is doing, fed by the
+    agents themselves through an HTTP API and CLI.</p>
+    <div class="stats">
+      <div class="stat"><b>1</b><span>file stdlib server</span></div>
+      <div class="stat"><b>SSE</b><span>live board stream</span></div>
+      <div class="stat"><b>21</b><span>lifecycle events/card</span></div>
+      <div class="stat"><b>0</b><span>re-implemented logic</span></div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec">Watch the board work.</h2>
+    <p class="sec-sub">A simulation of the real thing: agents pick up cards, log activity, and finish
+    work — every movement below is the same state machine the live board runs.</p>
+    <div class="demo">
+      <div class="cap"><span class="pulse"></span>board · live simulation</div>
+      <div class="cols">
+        <div class="col" id="c-ready"><h4>ready <span id="n-ready"></span></h4></div>
+        <div class="col" id="c-progress"><h4>in progress <span id="n-progress"></span></h4></div>
+        <div class="col" id="c-review"><h4>review <span id="n-review"></span></h4></div>
+        <div class="col" id="c-done"><h4>done <span id="n-done"></span></h4></div>
+      </div>
+      <div class="feed" id="feed"></div>
+      <div class="demo-hint">illustrative simulation — real cards come from the agents' own API calls</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec">Built the right way round.</h2>
+    <div class="life">
+      <span class="lstep">backlog</span><span class="arrow">→</span>
+      <span class="lstep">ready</span><span class="arrow">→</span>
+      <span class="lstep hl">in progress</span><span class="arrow">→</span>
+      <span class="lstep hl">review</span><span class="arrow">→</span>
+      <span class="lstep">done</span>
+      <span class="arrow">·</span>
+      <span class="lstep">blocked</span>
+    </div>
+    <p class="sec-sub" style="margin-bottom:22px">Agents drive the lifecycle: <b>mc start</b> when work
+    begins, <b>mc activity</b> on sub-task switches, <b>mc review</b> when done, <b>mc block</b> when stuck.
+    Promotions are idempotent; you can't review straight from backlog.</p>
+    <div class="grid3">
+      <div class="card"><h3>A view, not an orchestrator</h3><p>The board of record is the agents' own kanban database. Mission Control reads it and writes through the same API — it never re-implements scheduling or claims.</p></div>
+      <div class="card"><h3>Live by SSE</h3><p>The dashboard subscribes to /events and repaints the instant any card changes — no polling, no refresh. Same stream the phone dashboard uses.</p></div>
+      <div class="card"><h3>Agent-native writes</h3><p>Every write needs a bearer token. The mc CLI wraps the whole API so an agent — or a human — can drive the board from a shell in one line.</p></div>
+    </div>
+    <div style="margin-top:26px">
+      <div class="frow"><div class="ic">📱</div><div class="tx"><b>Built for the phone</b><span>Check the board from anywhere on the tailnet — one thumb-scroll, live dots for active agents, tap a card for its full event history.</span></div></div>
+      <div class="frow"><div class="ic">🧾</div><div class="tx"><b>Every card tells its story</b><span>Task detail carries comments and the complete event log — who created, claimed, heartbeated, reviewed, completed.</span></div></div>
+      <div class="frow"><div class="ic">🪶</div><div class="tx"><b>One file, stdlib only</b><span>A ~800-line single-file server, WAL-mode SQLite, systemd unit. No framework, no build step, nothing to rot.</span></div></div>
+    </div>
+    <a class="cta" href="https://github.com/pkia/mission-control" target="_blank" rel="noopener">Source on GitHub</a>
+    <a class="cta gh" href="/" target="_self">← back to pkia.github.io</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Runs on the same Raspberry Pi as the agents it watches ·
+  <a href="https://github.com/pkia/mission-control" target="_blank" rel="noopener">pkia/mission-control</a></div>
+</footer>
+
+<script>
+const AGENTS=["researcher","implementer","reviewer","qa-bot"];
+const TASKS=["Scrape fixtures","Patch GSI parser","Ship sudoku page","Audit funnel","Rotate certs","Write e2e test","Tune passband","Index devlog"];
+let cards=[], idc=0, feedEl=document.getElementById("feed");
+const cols={ready:document.getElementById("c-ready"),progress:document.getElementById("c-progress"),review:document.getElementById("c-review"),done:document.getElementById("c-done")};
+
+function mk(title){return {id:++idc,title,who:AGENTS[idc%AGENTS.length],st:"ready"};}
+function log(agent,what){
+  const d=new Date();
+  const ln=document.createElement("div");ln.className="ln";
+  ln.innerHTML=`<span class="t">${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}</span><span class="a">${agent}</span><span>${what}</span>`;
+  feedEl.prepend(ln);
+  while(feedEl.children.length>8)feedEl.lastChild.remove();
+}
+function render(){
+  for(const st of ["ready","progress","review","done"]){
+    const c=cols[st].querySelectorAll(".kcard");c.forEach(x=>x.remove());
+    document.getElementById("n-"+st).textContent="· "+cards.filter(x=>x.st===st).length;
+  }
+  cards.forEach(x=>{
+    const el=document.createElement("div");
+    el.className="kcard "+x.st;
+    el.innerHTML=`${x.title}<div class="who">${x.who}</div>`;
+    cols[x.st].appendChild(el);
+  });
+}
+function step(){
+  // spawn new work sometimes
+  if(cards.filter(c=>c.st!=="done").length<4||Math.random()<.25){
+    const t=TASKS[Math.floor(Math.random()*TASKS.length)];
+    cards.push(mk(t));log("dispatcher","created "+t);
+  }
+  const movers=cards.filter(c=>c.st!=="done");
+  if(movers.length&&Math.random()<.8){
+    const c=movers[Math.floor(Math.random()*movers.length)];
+    if(c.st==="ready"){c.st="progress";log(c.who,"mc start — "+c.title);}
+    else if(c.st==="progress"){
+      if(Math.random()<.3){c.st="blocked";log(c.who,"mc block — waiting on upstream");setTimeout(()=>{if(c.st==="blocked"){c.st="progress";log(c.who,"unblocked, resuming");render();}},3000);}
+      else if(Math.random()<.5){log(c.who,"activity — "+["reading sources","writing tests","mid-build","verifying"][Math.floor(Math.random()*4)]);}
+      else{c.st="review";log(c.who,"mc review — "+c.title);}
+    }
+    else if(c.st==="blocked"&&Math.random()<.4){c.st="progress";log(c.who,"unblocked");}
+    else if(c.st==="review"){c.st="done";log("reviewer","complete — "+c.title);}
+  }
+  render();
+  if(cards.filter(c=>c.st==="done").length>6)cards=cards.filter(c=>c.st!=="done"||Math.random()<.7);
+}
+for(let i=0;i<3;i++)cards.push(mk(TASKS[i%TASKS.length]));
+render();log("system","board loaded");
+setInterval(step,1900);
+</script>
+</body>
+</html>

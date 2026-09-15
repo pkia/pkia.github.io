@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS2 Tracker — FACEIT + Premier, one dashboard</title>
+<base target="_blank">
+<meta name="description" content="A personal CS2 match tracker: FACEIT history and elo from the official Data API, plus Valve Premier matches captured live via Game State Integration — because Valve publishes no match-history API.">
+<link rel="canonical" href="https://pkia.github.io/projects/cs2-tracker/">
+<meta name="theme-color" content="#0c0f14">
+<style>
+:root{
+  --bg:#0c0f14; --panel:#131820; --panel2:#181f2a; --line:#242e3d;
+  --ink:#e8edf4; --dim:#8b98ab; --faint:#5c6a7e;
+  --acc:#f5a623; --acc2:#4ec9b0; --red:#f14c4c; --green:#3ecf8e; --blue:#569cd6;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,Segoe UI,sans-serif;line-height:1.6;overflow-x:hidden}
+.wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+a{color:var(--acc2);text-decoration:none}
+a:hover{text-decoration:underline}
+.hero{position:relative;padding:84px 0 56px;text-align:center;overflow:hidden;
+  background:
+    radial-gradient(600px 300px at 22% 0%,rgba(245,166,35,.07),transparent 60%),
+    radial-gradient(700px 350px at 80% 10%,rgba(78,201,176,.06),transparent 60%);}
+.hero .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:var(--acc);text-transform:uppercase;margin-bottom:16px}
+.hero h1{font-size:clamp(32px,5.2vw,54px);font-weight:800;letter-spacing:-.02em;line-height:1.08}
+.hero h1 .grad{background:linear-gradient(92deg,var(--acc) 0%,var(--acc2) 75%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{max-width:640px;margin:20px auto 0;color:var(--dim);font-size:17.5px}
+.stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:34px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 20px;min-width:118px}
+.stat b{display:block;font-size:26px;font-weight:800;font-family:var(--mono);color:var(--acc)}
+.stat span{font-size:11.5px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+section{padding:60px 0;border-top:1px solid var(--line)}
+h2.sec{font-size:25px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px}
+p.sec-sub{color:var(--dim);margin-bottom:26px;max-width:660px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+.card h3{font-size:16.5px;font-weight:700;margin-bottom:7px}
+.card p{color:var(--dim);font-size:14px}
+
+/* real stats strip */
+.strip{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:16px}
+.strip .cap{font-family:var(--mono);font-size:12px;color:var(--acc);letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+.bigrow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:700px){.bigrow{grid-template-columns:repeat(2,1fr)}}
+.big{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+.big b{display:block;font-size:30px;font-family:var(--mono);font-weight:800;color:var(--acc)}
+.big span{font-size:11.5px;color:var(--dim);letter-spacing:.05em;text-transform:uppercase}
+/* match pills */
+.pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.pill{font-family:var(--mono);font-size:12px;border-radius:8px;padding:6px 11px;border:1px solid var(--line);background:var(--panel2);color:var(--dim)}
+.pill.w{border-color:rgba(62,207,142,.4);color:var(--green)}
+.pill.l{border-color:rgba(241,76,76,.35);color:#e57373}
+.pill b{color:var(--ink)}
+
+/* two paths */
+.path{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+.path .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;border-radius:6px;padding:3px 9px;margin-bottom:10px}
+.path .tag.f{color:var(--acc2);border:1px solid rgba(78,201,176,.4)}
+.path .tag.p{color:var(--acc);border:1px solid rgba(245,166,35,.4)}
+.path h3{font-size:17px;margin-bottom:6px}
+.path p{color:var(--dim);font-size:14px}
+.frow{display:flex;gap:14px;align-items:flex-start;padding:15px 4px;border-bottom:1px dashed var(--line)}
+.frow:last-child{border-bottom:0}
+.frow .ic{flex:0 0 38px;height:38px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;font-size:17px}
+.frow .tx b{display:block;font-size:14.5px}
+.frow .tx span{color:var(--dim);font-size:13.5px}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--acc);color:#141005;border-radius:11px;padding:12px 22px;font-weight:700;font-size:15px;margin-top:26px}
+.cta:hover{filter:brightness(1.08);text-decoration:none}
+.cta.gh{background:var(--panel2);border:1px solid var(--line);color:var(--ink);margin-left:10px}
+footer{padding:44px 0 60px;border-top:1px solid var(--line);color:var(--faint);font-size:13.5px;text-align:center}
+footer a{color:var(--dim)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="kicker">FACEIT Data API · CS2 Game State Integration</div>
+    <h1>every match, <span class="grad">one dashboard</span></h1>
+    <p class="sub">Valve publishes no Premier match-history API — so this tracker builds history the
+    only way left: a Game State Integration listener that captures each match live as it's played,
+    next to full FACEIT history from the official API.</p>
+    <div class="stats">
+      <div class="stat"><b>2</b><span>data paths, one feed</span></div>
+      <div class="stat"><b>50</b><span>matches unified</span></div>
+      <div class="stat"><b>5 min</b><span>deploy cadence</span></div>
+      <div class="stat"><b>0</b><span>cloud services</span></div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec">Real numbers from the live tracker.</h2>
+    <p class="sec-sub">Pulled from the running instance's own API — the same dashboard served from
+    the Pi, not mock data.</p>
+    <div class="strip">
+      <div class="cap">FACEIT · live API snapshot</div>
+      <div class="bigrow">
+        <div class="big"><b>1721</b><span>elo</span></div>
+        <div class="big"><b>67</b><span>games tracked</span></div>
+        <div class="big"><b>46.3%</b><span>win rate</span></div>
+        <div class="big"><b>37%</b><span>headshot</span></div>
+      </div>
+      <div class="pills">
+        <span class="pill" style="border-color:rgba(245,166,35,.4);color:var(--acc)">last 20 →</span>
+        <span class="pill l">L anubis 21–18</span><span class="pill l">L cache 7–15</span>
+        <span class="pill w">W cache 7–8</span><span class="pill l">L ancient 9–20</span>
+        <span class="pill w">W ancient 14–17</span><span class="pill l">L mirage 24–30</span>
+        <span class="pill w">W anubis 20–22</span><span class="pill w">W nuke 16–12</span>
+        <span class="pill w">W inferno 10–11</span><span class="pill w">W anubis 23–19</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec">Why two data paths.</h2>
+    <div class="grid2">
+      <div class="path">
+        <span class="tag f">Official API</span>
+        <h3>FACEIT — ask for it</h3>
+        <p>The Data API v4 gives full match history, per-match K/D/A, headshot %, and elo per game.
+        The tracker backfills automatically and records one elo sample per change at every hourly
+        refresh — so the elo-over-time chart is built from real snapshots since install day.</p>
+      </div>
+      <div class="path">
+        <span class="tag p">Capture it yourself</span>
+        <h3>Premier — build it live</h3>
+        <p>Valve refuses Web API keys on the lifetime-stats endpoint and community stat pages are
+        sign-in gated. So a GSI listener on the game server POSTs each live match — map, score,
+        result — as it happens. History grows from cfg-install day forward, one match at a time.</p>
+      </div>
+    </div>
+    <div style="margin-top:26px">
+      <div class="frow"><div class="ic">🧩</div><div class="tx"><b>Unified feed</b><span>/api/matches merges both sources into one timeline; /api/summary splits the stat cards by source.</span></div></div>
+      <div class="frow"><div class="ic">🍪</div><div class="tx"><b>Session-rotation aware</b><span>Steam rotates login cookies; the tracker persists rotations when Steam sends them so lifetime stats keep working unattended.</span></div></div>
+      <div class="frow"><div class="ic">🩺</div><div class="tx"><b>Self-healing deploy</b><span>Pull-based CD every 5 minutes with health checks and automatic rollback to the last good commit.</span></div></div>
+    </div>
+    <a class="cta" href="https://github.com/pkia/cs2-tracker" >Source on GitHub</a>
+    <a class="cta gh" href="/" target="_self">← back to pkia.github.io</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Python · served from a Raspberry Pi over the tailnet ·
+  <a href="https://github.com/pkia/cs2-tracker">pkia/cs2-tracker</a></div>
+</footer>
+</body>
+</html>
