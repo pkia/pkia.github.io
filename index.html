@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=9" />
+  <link rel="stylesheet" href="styles.css?v=10" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -157,7 +157,7 @@
             <span class="stat-label">years building &amp; shipping</span>
           </div>
           <div class="stat reveal">
-            <span class="stat-num"><span data-count="17">0</span></span>
+            <span class="stat-num"><span data-count="15">0</span></span>
             <span class="stat-label">live services on the home-lab Pi</span>
           </div>
           <div class="stat reveal">
@@ -231,7 +231,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-control.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Hermes Train — autopilot cycle 29: DB migration and launcher flags landed</span>
+                    <span class="term-desc">Autopilot cycle 30: aim drills capped at five live bots, poses staged as the gallery clears</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -243,7 +243,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.service</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Daily improvement picks from the idea ledger, run log appended</span>
+                    <span class="term-desc">Board pick in progress: map the train's scenario routes before the corpus shrinks</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -343,7 +343,7 @@ while you train; the control plane lives on the Pi.
 
           <article class="project-card reveal">
             <div class="project-top">
-              <span class="project-badge">Just shipped</span>
+              <span class="project-badge subtle">Book recs</span>
               <span class="project-year">2026</span>
             </div>
             <h3>ShelfMate</h3>
@@ -358,26 +358,6 @@ while you train; the control plane lives on the Pi.
               <li>Python&nbsp;stdlib</li><li>Open&nbsp;Library</li><li>Recommender</li><li>pytest&nbsp;CI</li>
             </ul>
             <a class="project-link" href="https://github.com/pkia/shelfmate" target="_blank" rel="noopener">View on GitHub
-              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-          </article>
-
-          <article class="project-card reveal">
-            <div class="project-top">
-              <span class="project-badge subtle">Touchscreen kiosk</span>
-              <span class="project-year">2026</span>
-            </div>
-            <h3>CS2 Dashboard</h3>
-            <p>
-              Pro Counter-Strike tracker for the kitchen touchscreen: live series
-              and near-live round scores, a week of upcoming matches with
-              countdowns, and results — fed by Liquipedia's parse API, with a
-              Camoufox headless-browser scraper filling in match details.
-            </p>
-            <ul class="chips chips-sm">
-              <li>Flask</li><li>Liquipedia API</li><li>Camoufox</li><li>Kiosk</li>
-            </ul>
-            <a class="project-link" href="https://github.com/pkia/cs2-dashboard" target="_blank" rel="noopener">View on GitHub
               <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
           </article>
@@ -428,26 +408,6 @@ everything here ships.
 
           <article class="project-card reveal">
             <div class="project-top">
-              <span class="project-badge subtle">Personal stats</span>
-              <span class="project-year">2026</span>
-            </div>
-            <h3>CS2 Tracker</h3>
-            <p>
-              My own CS2 match tracker: FACEIT history and elo over time from the
-              official Data API, plus Valve Premier matches captured live by a Game
-              State Integration listener — because Valve publishes no match-history
-              API at all. One dashboard, two data paths, served from the Pi.
-            </p>
-            <ul class="chips chips-sm">
-              <li>FACEIT&nbsp;API</li><li>CS2&nbsp;GSI</li><li>Python</li><li>Pi-hosted</li>
-            </ul>
-            <a class="project-link" href="/projects/cs2-tracker/" target="_blank" rel="noopener">View the tour
-              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-          </article>
-
-          <article class="project-card reveal">
-            <div class="project-top">
               <span class="project-badge subtle">Two-player</span>
               <span class="project-year">2026</span>
             </div>
@@ -486,26 +446,6 @@ everything here ships.
             </a>
           </article>
 
-          <article class="project-card reveal">
-            <div class="project-top">
-              <span class="project-badge subtle">Paused</span>
-              <span class="project-year">2026</span>
-            </div>
-            <h3>ais_analysis</h3>
-            <p>
-              A from-scratch AIS decoder for the signal pile the rooftop antenna
-              collected: GMSK demodulation, bit-timing recovery, HDLC framing
-              and message parsing in pure Python — built test-first. The
-              synthetic round trip works end to end; decoding the real capture
-              is parked on a branch until I circle back.
-            </p>
-            <ul class="chips chips-sm">
-              <li>DSP</li><li>Python</li><li>pytest</li><li>RTL-SDR</li>
-            </ul>
-            <a class="project-link" href="https://github.com/pkia/ais_analysis" target="_blank" rel="noopener">View on GitHub
-              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-          </article>
         </div>
 
         <p class="more-link reveal">
@@ -513,7 +453,10 @@ everything here ships.
           <a href="https://github.com/pkia/Twitter_Threat_Scanner" target="_blank" rel="noopener">Tweet Guard</a> (NLP timeline scanning from a team-of-five hack build),
           the <a href="https://github.com/pkia/kiosk-home" target="_blank" rel="noopener">kiosk chooser</a> that flips the touchscreen between dashboards,
           a live <a href="/projects/sat-audio/" target="_self">satellite-audio tap (with real audio)</a>,
+          the <a href="/projects/cs2-tracker/">CS2 match tracker tour</a> whose service I retired this week (code stays public),
+          the <a href="https://github.com/pkia/cs2-dashboard" target="_blank" rel="noopener">pro-match kiosk ticker</a> it replaced,
           a <a href="https://github.com/pkia/CoinMarketCap_Scraper" target="_blank" rel="noopener">CoinMarketCap dataset scraper</a>,
+          the AIS decoder experiments (repo private for now),
           and a graveyard of experiments, archived with honour.
           <a href="https://github.com/pkia?tab=repositories" target="_blank" rel="noopener">Browse everything →</a>
         </p>
@@ -528,10 +471,10 @@ everything here ships.
         <p class="arch-intro reveal">
           Almost everything on this page runs 24/7 on a single Raspberry Pi 5 in
           the city — a ship-tracking RF station and weather-satellite receiver,
-          the DNS for the whole house, pro and personal CS2 trackers,
+          the DNS for the whole house, a self-hosted ops portal,
           pull-based deploys with auto-rollback, and a pair of AI agents that
           write the devlog and ship improvements while I sleep — watched by a
-          dead-man\'s switch, probed every five minutes, and backed up nightly.
+          dead-man's switch, probed every five minutes, and backed up nightly.
         </p>
 
         <div class="arch-stage reveal">
@@ -655,23 +598,21 @@ everything here ships.
                 <span class="arch-name">MARITIME DASHBOARD</span>
                 <span class="arch-sub">:8000 · AIS + NOAA + fleet</span>
               </div>
-              <div class="arch-card" data-node="cs2" style="--x:51.03%;--y:8.23%;--w:46.9%;--h:29.11%">
+              <div class="arch-card" data-node="missioncontrol" style="--x:51.03%;--y:8.23%;--w:46.9%;--h:29.11%">
                 <div class="arch-card-top">
-                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.8v3.4M12 17.8v3.4M2.8 12h3.4M17.8 12h3.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.6" y="4.6" width="4.8" height="10.4" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="9.6" y="4.6" width="4.8" height="14.8" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="15.6" y="4.6" width="4.8" height="7.4" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
                   <span class="arch-led"></span>
                 </div>
-                <span class="arch-name">CS2 DASHBOARD</span>
-                <span class="arch-sub">:8001 · matches + live scores</span>
-                <span class="arch-src">☁ hltv.org</span>
+                <span class="arch-name">MISSION CONTROL</span>
+                <span class="arch-sub">:8788 · agent board + feed</span>
               </div>
-              <div class="arch-card" data-node="cs2tracker" style="--x:2.07%;--y:39.87%;--w:30.97%;--h:29.11%">
+              <div class="arch-card" data-node="webui" style="--x:2.07%;--y:39.87%;--w:30.97%;--h:29.11%">
                 <div class="arch-card-top">
-                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.8v3.4M12 17.8v3.4M2.8 12h3.4M17.8 12h3.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+                  <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.8" width="18" height="14.4" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3 9.4h18" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="6.3" cy="7.1" r=".9" fill="currentColor"/><circle cx="9" cy="7.1" r=".9" fill="currentColor"/></svg>
                   <span class="arch-led"></span>
                 </div>
-                <span class="arch-name">CS2 TRACKER</span>
-                <span class="arch-sub">:8092 · FACEIT + Premier</span>
-                <span class="arch-src">☁ Steam · GSI</span>
+                <span class="arch-name">HERMES WEBUI</span>
+                <span class="arch-sub">:8787 · agent front-end</span>
               </div>
               <div class="arch-card" data-node="hub" style="--x:34.48%;--y:39.87%;--w:30.97%;--h:29.11%">
                 <div class="arch-card-top">
@@ -941,6 +882,6 @@ everything here ships.
     </div>
   </footer>
 
-  <script src="script.js?v=9" defer></script>
+  <script src="script.js?v=10" defer></script>
 </body>
 </html>
