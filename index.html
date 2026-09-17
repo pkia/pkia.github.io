@@ -231,19 +231,19 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-control.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Autopilot cycle 30: aim drills capped at five live bots, poses staged as the gallery clears</span>
+                    <span class="term-desc">CS2 coach: the scenario corpus mapped route by route, bot poses staged, stops measured server-side</span>
+                  </li>
+                  <li>
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-unit">pi-doctor.timer</span>
+                    <span class="term-state waiting">active (waiting)</span>
+                    <span class="term-desc">Morning audits that now leave owner-retired services retired and prune their probes</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">autopilot.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Evidence-first autopilot cycles, one target per run</span>
-                  </li>
-                  <li>
-                    <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">radar-agent.service</span>
-                    <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Board pick in progress: map the train's scenario routes before the corpus shrinks</span>
+                    <span class="term-desc">Evidence-first autopilot cycles, one shipped target per run</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -300,10 +300,10 @@
               An autonomous improvement loop for everything else on this page: at 01:00 an
 agent writes the daily devlog and proposes what's next; at 04:00 a second
 agent picks one idea and ships it — code, tests, docs, brand-new repos
-included. Seventeen ledger entries in, from a dead-man's switch and an
-alert-storm kill switch to a Prometheus backbone with edge-triggered
-alerting and a self-healing CI audit. The idea ledger, every run and every
-failure are public.
+included. Its ledger runs from a dead-man's switch and an alert-storm kill
+switch to a Prometheus backbone with edge-triggered alerting, a self-healing
+CI audit and a corpus-wide route map for the CS2 coach. The idea ledger,
+every run and every failure are public.
             </p>
             <ul class="chips chips-sm">
               <li>AI agents</li><li>Hermes cron</li><li>pytest</li><li>Autonomy</li>
@@ -321,17 +321,12 @@ failure are public.
             <h3>Hermes Train</h3>
             <p>
               A personal CS2 coach that measures real gameplay mechanics server-side —
-crosshair offset at fire, counter-strafe stop quality, burst discipline —
-and builds deliberate-practice sessions around measured weaknesses: 587
-scenarios across the Active Duty pool, a coach brain that decides what to
-train next, and a customer side with accounts and progress history. It
-reached release candidate with receipts — 54/54 live scenario runs on a
-real server, fourteen release gates green — then an honest audit turned
-it into a rebuild: OpenPrefirePrac (MIT, pinned by sha256) is now the
-drill engine, the suite grew from 636 to 808 tests, and a live box logs
-drills end to end. Proved to run, not yet proved to work — the last gate
-is a human in the seat. Game servers spawn on a rented cloud box only
-while you train; the control plane lives on the Pi.
+crosshair offset at fire, counter-strafe stop quality, burst discipline — and
+builds deliberate-practice sessions around the weaknesses it finds. The drill
+engine is OpenPrefirePrac (MIT, pinned by hash); a control plane decides what
+to train next and a live box logs real drills end to end. Proved to run, not
+yet proved to work: the last gate is a human in the seat. Game servers spawn
+on a rented cloud box only while you train; the control plane lives on the Pi.
             </p>
             <ul class="chips chips-sm">
               <li>CS2</li><li>CounterStrikeSharp</li><li>Deliberate&nbsp;practice</li><li>Hetzner&nbsp;/&nbsp;RunPod</li>
