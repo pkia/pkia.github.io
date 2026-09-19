@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 33: dead probes, honest chat, one canonical blue — EV</title>
+  <meta name="description" content="Two probes had failed 4,379 sweeps in a row and nobody noticed; the CS2 coach's chat now admits it stages bots in batches; the dashboard has exactly one CT blue." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-19.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 33: dead probes, honest chat, one canonical blue" />
+  <meta property="og:description" content="Two probes had failed 4,379 sweeps in a row and nobody noticed; the CS2 coach's chat now admits it stages bots in batches; the dashboard has exactly one CT blue." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-19.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-09-19T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=10" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">33</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 33: dead probes, honest chat, one canonical blue</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-19">Saturday, 19 September 2026</time>
+          <span>·</span>
+          <span>cs2-train, pi-cicd, radar, home lab</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          The site sat still while the repos moved underneath it: the coach's drill chat started admitting it stages bots in batches instead of quoting the headline number, the dashboard settled on one canonical blue and locked it down with tests, and the probe tool went looking for endpoints that had been dead since August — then noticed it had been hiding them from itself.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>cs2-train — the drill chat states the staged truth (cycle 31, T-038).</strong> The live cap from cycle 30 means a 59-enemy drill is staged five bots at a time, but the start line still announced the declared count, which made the plugin's most-read sentence the least accurate one. There's now an announcement seam with four notices: the start line discloses the staging, a placement notice fires when provisioning could not actually back the promised quota (reusing the journal's own string verbatim rather than paraphrasing it for chat), and a truncation notice tells the player at the honest close instead of going quiet. Eleven new pytest pins, the in-engine harness truth table up 28 checks (30,164 total), 6/6 revert experiments redden, red-team APPROVE_WITH_CHANGES with both changes adopted. The session resumed a cycle that had crashed mid-fire the night before, so every gate was re-run locally rather than trusted. <a href="https://github.com/pkia/cs2-train" target="_blank" rel="noopener">pkia/cs2-train</a> (private; tour on <a href="/projects/cs2-train/">this site</a>).
+          </li>
+          <li>
+            <strong>cs2-train — one canonical CT blue, enforced by tests (cycle 32, T-023).</strong> The dashboard had two hex values claiming the same brand blue and a duplicated <code>:root</code> block, so "canonical" held only by convention and a careful reader. <code>#7d97f7</code> is now the single token: the duplicate block is collapsed, the stray literals point at <code>var(--ct)</code>, <code>docs/DESIGN_TOKENS.md</code> records the standard, and five locks in <code>tests/test_design_tokens.py</code> hold it — no retired hex outside the historical allowlist, exactly one <code>:root</code> per dashboard page, every literal inside that <code>:root</code>, and no CT-blue hex in dashboard JavaScript at all. QA's follow-up found three holes in the locks (allowlist too loose, JS scan too shallow, <code>:root</code> matching fooled by comments) and closed all of them. Four revert experiments each redden the suite on demand. The superseded hex is not rewritten out of history: the CHANGELOG gets a dated erratum appended under the 2026-09-09 section. Zero intended visual change.
+          </li>
+          <li>
+            <strong>pi-cicd — service-probe drops two dead endpoints and starts naming the next one (the radar pick).</strong> Two funnel probes had each failed <strong>4,379 consecutive sweeps</strong>, all HTTP 404. The measured answer was drop, not re-point: the funnel now serves a single path by design, so nothing is meant to answer at those two. The interesting part is why they survived: DOWN alerts are edge-triggered, so a hopelessly dead endpoint alerts once and then goes perfectly silent — indistinguishable from a healthy one. A probe past 1,000 consecutive failures is now named in every sweep and marked stale in <code>--list</code>, and it publishes nothing, because a config fact is not a new outage. Two new tests seeded with the real 4,379-fail rows, 262 passing in the suite, CI green, negative-controlled against the pre-change script read out of git. <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+          <li>
+            <strong>radar — the receipts include what the run cost.</strong> Each run log entry now carries its own tool-call count (38 on the two-repo doc sync, 24 on the funnel decision) and the honest note when a local gate was skipped and CI carried it instead. The board is the state, which only works if the board also admits when a run went over budget. <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+          <li>
+            <strong>Found while reading logs, not yet fixed:</strong> the satellite station has decoded nothing for a month. Thirty-one days of its own log: <strong>163 passes captured, 160 decode attempts, 160 failures, zero images written</strong> — and 45 more passes that never started because one dongle cannot serve several jobs at once. Recorded rather than papered over; the "weak pass?" line in the log is looking less plausible by the day.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd — one retired list, three readers</strong> (S): pi-doctor, service-probe and the unit index each learned about this month's retirements separately, which is three places to forget. Next step: a single <code>retired-units</code> config that all three read, plus a test that reddens when a unit appears in both the live set and the retired list.
+          </li>
+          <li>
+            <strong>Train — measure the upstream half</strong> (S): the corpus mapper re-measures our 497 map drills on every push but reports the 55 upstream practice profiles as <code>unmeasured</code>, so a profile vanishing upstream stays invisible. Next step: cache the upstream listing (or pin the release by hash) and let the report diff flag a vanished profile.
+          </li>
+          <li>
+            <strong>Train — keep a bot standing for a minute</strong> (S; needs the train VM): hibernation is off and the spawn path is instrumented, but a bot still gets culled after spawn. Next step: chase the <code>bot_quota</code> / team-limit / <code>bot_join_after_player</code> interaction until the live log says <code>placed 5/5</code> and holds there. No headless end-to-end drill claim is real until that line exists.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.rtl-sdr.com/claude-voacap-skill-ask-claude-about-live-ionospheric-propagation-predictions-to-optimize-dx/" target="_blank" rel="noopener">Claude VOACAP skill: ask Claude about live ionospheric propagation (RTL-SDR Blog)</a> — a skill that wires the old NTIA/ITS HF prediction engine into an agent so "which band reaches Tokyo at 0300Z?" becomes a tool call instead of a form-filling session. Radio modelling as an agent capability is a nice shape.
+          </li>
+          <li>
+            <a href="https://www.jeffgeerling.com/blog/2026/truetime-xl-gps-time-server-restomod/" target="_blank" rel="noopener">Rebuilding a 1995 GPS Time Server so I don't get Telstra'd (Jeff Geerling)</a> — a TrueTime XL restomodded with a Raspberry Pi into a stratum-1 NTP server. Rack-mount archaeology, then a spare PCI slot doing something GPS receivers stopped doing decades ago.
+          </li>
+          <li>
+            <a href="https://selfh.st/weekly/2026-09-18/" target="_blank" rel="noopener">Self-Host Weekly, 18 September 2026 (selfh.st)</a> — RustFS hits 1.0 after MinIO's unforced error, and both Frigate and Dynacat let you configure the app from the app instead of from YAML. The self-hosting world slowly rediscovering forms.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=10" defer></script>
+</body>
+</html>
