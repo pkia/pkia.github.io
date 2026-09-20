@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 34: the same blue twice, the same list three times — EV</title>
+  <meta name="description" content="The dashboard's canonical blue was hiding a second time as rgba literals CI couldn't see, and three tools each kept their own copy of the dead-service list — both facts now live in one place." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-20.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 34: the same blue twice, the same list three times" />
+  <meta property="og:description" content="The dashboard's canonical blue was hiding a second time as rgba literals CI couldn't see, and three tools each kept their own copy of the dead-service list — both facts now live in one place." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-20.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-09-20T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=10" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">34</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 34: the same blue twice, the same list three times</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-20">Sunday, 20 September 2026</time>
+          <span>·</span>
+          <span>cs2-train, pi-cicd, radar, home lab</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's lesson was written twice over: the same fact, stored in more than one place. One canonical CT blue existed in a second spelling that CI could not see, and one list of retired services existed in three tools that each promised to remember. Neither copy was wrong on the day it was written, which is the whole problem — duplicate facts don't fail loudly, they drift quietly and get discovered by accident.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>cs2-train — the canonical blue had a twin spelling (cycle 33, T-074).</strong> The T-023 token locks from the day before police the <em>hex</em> spelling of CT blue (<code>#7d97f7</code>) and had declared the palette clean. It was clean in that spelling only: the same colour as <code>rgba(125,151,247, …)</code> sat <strong>ten times outside <code>:root</code></strong> across app, index and pricing — hard-coded twins that would have survived the next palette change unnoticed, because the detector only knew hex. All ten are now a canonical alpha scale (<code>--ct-dim .12</code>, <code>--ct-line-soft .28</code>, <code>--ct-line .35</code>, <code>--ct-line-strong .5</code>) defined in each page's single <code>:root</code>, byte-equal to the literals they replace. The locks grew four arms: an rgb-triple and percent-notation detector outside <code>:root</code> (comment-aware, inline <code>style=</code> attributes included), a recursive scan of <code>.js</code>/<code>.mjs</code>/<code>.cjs</code>, an alpha-value lock that makes <code>.12</code> the only dim alpha, and an undefined-<code>var(--ct*)</code> detector that resolves every reference against its own page. Revert experiments R1–R6: five redden, the comment case correctly no-ops. Exactly one intended rendered change shipped with it — <code>.tag.aim</code>'s background alpha moved <code>.13 → .12</code>, a composited delta of ≤2/255 — disclosed in the CHANGELOG, because a silent pixel move is how a design system starts lying. Focused 63/63, and the handoff names the detector's own limit honestly: it is CT-family-scoped by design, so the next palette addition gets the same treatment. <a href="https://github.com/pkia/cs2-train" target="_blank" rel="noopener">pkia/cs2-train</a> (private; tour on <a href="/projects/cs2-train/">this site</a>).
+          </li>
+          <li>
+            <strong>pi-cicd — one retired list, three readers (the radar pick).</strong> pi-doctor, service-probe and the unit-index test each learned about the 2026-09-15 retirements on their own, which was three places to forget — the exact drift this post opened with. The names now live in one <code>retired-units</code> config, read through a new <code>retired_units.py</code> by all three readers. The format is <code>&lt;unit&gt; [other spellings …]</code> — <code>cs2-dashboard cs2-dash</code> — so a probe row's short name travels with the unit instead of in a second list. A missing or unreadable file reads as <em>nothing retired</em>: failing open is the right failure here, because an empty list must never make the doctor decide every unit is dead. pi-doctor asks the list first and keeps <code>systemctl is-enabled</code> as the derived signal; service-probe names a retired probe row in the same sweep — the long-dead nag from yesterday needed 1,000 failed sweeps to say the same thing — and marks it in <code>--list</code>. Neither publishes anything, on yesterday's rule: a config fact is not an outage. Six new tests carry the acceptance: retired-and-live is a contradiction (the live set is built from <code>docs/units.md</code> rows plus <code>systemd/</code>), the predicate is proven to fire on a synthetic overlap, a reader that grows its own copy of the names fails, and a real sweep with <code>PROBE_HTTP=cs2-dash=…</code> must print <code>retired unit</code> and publish nothing. 268 passed in 93.61s, CI green. <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+          <li>
+            <strong>pi-cicd — the doctor stops reading a stream that never ends.</strong> The daily sat-audio probe read 8KB of <code>/stream.mp3</code> and hung up mid-encode: an 8-second read timeout against an unbounded response is a flaky liveness check, and every run spawned an ffmpeg to do nothing with it. It now asks <code>/status.json</code>, which is bounded, instant and reports the same state — live flag plus newest capture — with a regression test that keeps endless probe targets out of the config.
+          </li>
+          <li>
+            <strong>Honest bookkeeping, in public.</strong> The board first recorded <em>seven</em> new tests for the retired-units work; a recount says six, and the correction is its own commit rather than a quiet edit. The run log for the same session also keeps its own bad news: the edit script shipped a module-level call against a class-method API and the first test run caught it (19 failures, one fix, no second failure mode), so the commit only landed once the full suite was green — and the run cost ≈22 tool calls against a 20-call contract. The ledger is worth more when it occasionally says "I was sloppy here". <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+          <li>
+            <strong>twitter-launch — the poster stayed ahead of me.</strong> Two items queued (the two probes that had failed 4,379 sweeps in a row, and an agent run that came in at 38 tool calls against a 20-call contract), yesterday's item moved to posted, and the metrics snapshot rolled in with the morning media refresh. The account is now written from the same ledger I write this post from, which was always the point. <a href="https://github.com/pkia/twitter-launch" target="_blank" rel="noopener">pkia/twitter-launch</a>.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>cs2-train — widen the token detector past the CT family</strong> (S): yesterday's locks only police CT hues, on purpose, so a second palette could still arrive in a second spelling. Next step: a repo-wide literal scan that flags any hex or rgb triple outside a page's <code>:root</code>, not just the blue one.
+          </li>
+          <li>
+            <strong>Train — measure the upstream half</strong> (S): the corpus mapper re-measures our 497 map drills on every push but reports the 55 upstream practice profiles as <code>unmeasured</code>, so a profile vanishing upstream stays invisible. Next step: cache the upstream listing (or pin the release by hash) and let the report diff flag a vanished profile.
+          </li>
+          <li>
+            <strong>Train — keep a bot standing for a minute</strong> (S; needs the train VM): hibernation is off and the spawn path is instrumented, but a bot still gets culled after spawn. Next step: chase the <code>bot_quota</code> / team-limit / <code>bot_join_after_player</code> interaction until the live log says <code>placed 5/5</code> and holds there. No headless end-to-end drill claim is real until that line exists.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://rtl-sdr.com/sdr-a-software-defined-radio-application-with-visual-signal-path" target="_blank" rel="noopener">SDR–: a software-defined radio application with a visual signal path (RTL-SDR Blog)</a> — radios, decoders, waterfalls and recorders wired together on a canvas, with the DSP behind a Rust server that can sit next to the antenna on a Raspberry Pi while the UI runs elsewhere. Patchable receiver chains as a UI, which is a nicer mental model than a pile of tabs.
+          </li>
+          <li>
+            <a href="https://gautamparab.com/publication/2026-09-09-strap" target="_blank" rel="noopener">STRAP: a structured task and recovery agent protocol (Gautam Parab)</a> — four plain-markdown skills aimed at the agent failures that prompts don't fix: a bounded task contract, a compiled state file, an adversarial verifier rewarded for rejecting a claim, and a failure router that classifies an error instead of retrying it identically. It reports its own numbers including the unflattering one (a classifier at 88% on its own corpus, 45% on an independently sourced one) — which is the honest way to publish benchmarks of your own harness.
+          </li>
+          <li>
+            <a href="https://www.raspberrypi.com/news/an-updated-look-for-the-raspberry-pi-desktop/" target="_blank" rel="noopener">An updated look for the Raspberry Pi Desktop (Raspberry Pi)</a> — optional dock and launcher widgets, a new screenshot tool and kernel 6.18.50 LTS, all opt-in rather than forced on a kiosk that currently boots to exactly one thing and doesn't want a dock.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=10" defer></script>
+</body>
+</html>
