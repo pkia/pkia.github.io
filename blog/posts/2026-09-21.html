@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 35: a ledger that fails both ways — EV</title>
+  <meta name="description" content="The colour detector went palette-agnostic and now fails in both directions — a new literal, or a baselined one that quietly leaves — while the operator console lost its last raw sinks and gained a CSP." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-21.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 35: a ledger that fails both ways" />
+  <meta property="og:description" content="The colour detector went palette-agnostic and now fails in both directions — a new literal, or a baselined one that quietly leaves — while the operator console lost its last raw sinks and gained a CSP." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-21.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-09-21T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=10" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">35</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 35: a ledger that fails both ways</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-21">Monday, 21 September 2026</time>
+          <span>·</span>
+          <span>cs2-train, radar, twitter-launch, home lab</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Two days of the same lesson, worn down one layer further. A duplicate fact drifts quietly; an <em>exemption list</em> is a duplicate fact with paperwork, so today's detector was built to fail in both directions — a colour literal that shows up undeclared, and a declared one that quietly leaves. The same suspicion applies to escaping: an HTML escaper used inside a JavaScript string literal is two languages pretending to be one, and it fails exactly when a token contains a quote.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>cs2-train — the token detector went palette-agnostic (T-075, the radar pick).</strong> Yesterday's locks police CT-blue, on purpose, which means a second palette could still arrive in a second spelling and stay invisible. The new <code>scripts/token_audit.py</code> scans every shipped dashboard asset — the four pages, nested JS in all three dialects, and CSS — for hex and <code>rgb()</code>/<code>rgba()</code> literals, ignores <code>:root</code> token definitions and commented-out CSS, and gates on a declared ledger, <code>docs/color_literals.json</code>. Two ways to go red: a literal that appears but is not declared, and a declared literal that no longer appears, which fails as <code>STALE</code> — so the ledger cannot rot into an exemption list nobody reads. The baseline is measured, not assumed: <strong>84</strong> outside-<code>:root</code> spellings sit in the tree today, and the honest framing is that they are now <em>visible</em>, not tokenised. Six new tests in <code>tests/test_design_token_audit.py</code> drive the real CLI against throwaway trees (inject a literal → red; tokenise a baselined one away → stale; fresh baseline → green) plus <code>:root</code>/comment/entity awareness and file discovery. <code>--check</code> green on the shipped tree, 15 passed (6 new + the 9 existing design-token locks), ruff clean. <a href="https://github.com/pkia/cs2-train" target="_blank" rel="noopener">pkia/cs2-train</a> (private; tour on <a href="/projects/cs2-train/">this site</a>).
+          </li>
+          <li>
+            <strong>cs2-train — the operator console lost its last raw sinks (T-063, autopilot cycle 34).</strong> Five renderers escaped one field and interpolated a sibling straight into <code>innerHTML</code> — the intel label, the intelligence <code>confidence_method</code>, the timeline <code>type</code>, the evaluation <code>verdict</code>, the learned-feed <code>verdict</code>. Those values are engine-derived today and nothing enforced that at the sink, which is the definition of a latent problem. All five now go through the audited five-character <code>esc()</code>, locked per line. Then the better bug: <code>/dashboard</code> injected the operator token into an inline <code>&lt;script&gt;</code> with <code>html.escape()</code>, an HTML escaper inside a JS string-literal context. Entities are not decoded inside <code>&lt;script&gt;</code>, so any token holding a quote or ampersand quietly corrupted the literal, a trailing backslash or newline broke it outright, and U+2028/U+2029 would end the line. It is now <code>_js_string_literal()</code> — <code>json.dumps(ensure_ascii=True)</code> with <code>&lt;/</code> rewritten to <code>&lt;\/</code> — pinned by a hostile-token matrix including U+2028 and a node round-trip. On top of that: a Content-Security-Policy on the four HTML routes (<code>default-src 'self'</code>, <code>object-src</code>/<code>base-uri</code>/<code>frame-ancestors 'none'</code>, <code>data:</code> images for the favicon), and <code>X-Content-Type-Options: nosniff</code> on every response via a pure-ASGI wrapper — never <code>BaseHTTPMiddleware</code>, because that rule exists for a reason, and SSE streaming through the wrapper is proven by execution rather than by hope. 23 new locks, revert experiments R1–R4 all redden, and the red team came back <em>approve with changes</em>; all three required changes were adopted. Disclosed residual, in the RFC rather than in a hidden allowance: inline scripts keep <code>'unsafe-inline'</code> until the shells are externalised or nonced. Also honest housekeeping — T-007 was closed as <em>stale premise</em>: test collection now takes 0.90–1.94s for 1,124 tests, not the &gt;180s its note recorded.
+          </li>
+          <li>
+            <strong>cs2-train — parked telemetry is now impossible to miss.</strong> <code>/server/status</code> reports the same drop-ledger count <code>/system/health</code> does, including the honest <code>-1</code> that means <em>unreadable</em>, and the operator console renders a persistent banner for it (<code>textContent</code> only, naturally). Yesterday's principle was that a parked event must be visible; today it is visible on the surface the operator actually stares at.
+          </li>
+          <li>
+            <strong>radar — I got a number wrong and fixed it in public.</strong> The board first recorded <em>seven</em> new tests for the audit work; a recount says six, and the correction is its own commit rather than a quiet edit. The run log keeps its own bad news too: the edit script shipped a module-level call against a class-method API and the first test run caught it (19 failures, one fix, no second failure mode), the commit only landed once the suite was green, and the run cost ≈26 tool calls against a 20-call contract. It also declines to claim CI: the cited evidence is local green test output. <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+          <li>
+            <strong>twitter-launch — ahead of me again.</strong> The 09-19 items moved to <code>posted/</code>, the media set refreshed, and this morning's window is queued with the probe that read 8KB of an endless audio stream, cut the read at 8 seconds and left an ffmpeg stranded at 756MB — now asking a bounded status endpoint instead. <a href="https://github.com/pkia/twitter-launch" target="_blank" rel="noopener">pkia/twitter-launch</a>.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>cs2-train — retire the <code>'unsafe-inline'</code> allowance</strong> (S): the CSP shipped with a documented carve-out for inline scripts and styles. Next step: externalise those shells or hand them a nonce, then tighten the header and let the two-ended marker lock prove the new shape.
+          </li>
+          <li>
+            <strong>cs2-train — tokenise the 84, page by page</strong> (M): the audit makes the drift visible but does not remove it. Next step: fold the baselined spellings into each page's <code>:root</code>, re-baseline deliberately after each page with <code>token_audit.py --write</code>, and let <code>STALE</code> confirm the literal actually left rather than merely moved.
+          </li>
+          <li>
+            <strong>Train — cache the upstream listing</strong> (S): the corpus mapper re-measures our 497 map drills on every push but reports the 55 upstream practice profiles as <code>unmeasured</code>, so a profile vanishing upstream stays invisible. Next step: cache the upstream release listing, or pin it by hash, and let the report diff flag the disappearance.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://claude.com/blog/agentic-coding-is-straining-ci-heres-how-we-scaled-test-impact-analysis-at-anthropic" target="_blank" rel="noopener">Agentic coding is straining CI — scaling test impact analysis at Anthropic (Claude blog)</a> — CI job volume up 25x in six months because Claude authors 80% of the code, and the test-selection service needed three patches that bought 70 days, 29 days, then less than a day before a full redesign. The memorable part is the shape, not the numbers: each cheap fix bought a fraction of the time it would have a year ago, which is the argument for planning for 25x load instead of another bigger machine.
+          </li>
+          <li>
+            <a href="https://www.jeffgeerling.com/blog/2026/vcf-midwest-21-ntp-time/" target="_blank" rel="noopener">NTP, an atomic clock, and the world's largest VCF (Jeff Geerling)</a> — a table at the vintage computer festival demonstrating NTP strata 0 through 3 across three generations of Macs, with a rebuilt 1995 GPS time server on a Pi inside it. Time discipline as a party trick, which is roughly how all of my monitoring started too.
+          </li>
+          <li>
+            <a href="https://rtl-sdr.com/using-a-fruit-fly-brain-to-tune-an-rtl-sdr-fm-radio" target="_blank" rel="noopener">Using a fruit fly brain to tune an RTL-SDR FM radio (RTL-SDR Blog)</a> — 165,122 traced neurons fed an egocentric view of the 87.5–108 MHz band; the connectome-driven controller found the hidden station at 95.2 MHz in 33 actions, and the author is careful to call it one preliminary observation with control conditions. A signal path where the detector is a nervous system and the limitation is honestly stated is a good day at the office.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=10" defer></script>
+</body>
+</html>
