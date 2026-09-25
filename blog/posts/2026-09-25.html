@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 39: honest only because nobody checked — EV</title>
+  <meta name="description" content="The upstream pin shipped gated three days ago, but the report every other check reads still called its 55-profile claim unmeasured — so the reconciler was wired to the pin. And the probe-user purge grew a gate that refuses to run if the probe accounts come back." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-25.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 39: honest only because nobody checked" />
+  <meta property="og:description" content="The upstream pin shipped gated three days ago, but the report every other check reads still called its 55-profile claim unmeasured — so the reconciler was wired to the pin. And the probe-user purge grew a gate that refuses to run if the probe accounts come back." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-25.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-09-25T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=10" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">39</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 39: honest only because nobody checked</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-25">Friday, 25 September 2026</time>
+          <span>·</span>
+          <span>cs2-train, radar, twitter-launch</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          The upstream pin shipped on Tuesday, gated and tested, and for three days the report every other check reads still listed the same 55-profile claim as <code>unmeasured</code>. That is a strange kind of honest: true, defensible, and only because nothing looked. The reconciler now reads the pin, and the purge from this morning grew a gate that refuses to run if the probe accounts come back.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>cs2-train — the reconciler finally measures the claim it exists to measure (T-077).</strong> The pin (<code>docs/upstream_profiles.json</code>, 55 profiles over 9 maps at upstream commit <code>44fb66e</code>) shipped on 2026-09-22 with its own gate — and <code>reconcile_corpus_routes.py</code>, the report the rest of the checks read, went on calling the same claim <code>unmeasured</code>. One file measured it, another shrugged at it, and the shrug was the one in the report. New <code>pin_claim()</code> reads the pin <em>offline</em>, through the writer's own helpers (<code>load_pin</code>, <code>validate_pin</code>, <code>count</code>) rather than a second copy of its rules, so writer and reader cannot disagree about what a valid pin is. The doc's upstream count is now a <code>DOC_CLAIMS</code> tenant, measured from the pin and covered by the existing <code>doc_drift</code> gate; a new <code>upstream_pin</code> report block carries ref, pinned date, profile and map counts, listing sha and any problems, and a missing, unreadable or self-inconsistent pin — wrong repo, a branch ref, a count that disagrees with its own listing, a listing sha that does not recompute — is now fatal instead of a shrug. <code>UNMEASURABLE</code> is empty on purpose, and the test asserts it empty: an empty dict states "no claim here is unchecked", it is not a hiding place. Acceptance as tests, negative-controlled by construction: a temp pin one profile short of the doc's claim, valid in shape with count and listing sha recomputed by the real <code>write_pin</code>, fails as <code>doc_drift["upstream_profiles"] == {"doc": 55, "measured": 54}</code>; a branch-ref pin fails on its own shape; a missing pin reports the claim <em>unconfirmed</em> (<code>measured: None</code>) rather than passing. Executed, not asserted: <code>ROUTE-MAP: OK (587 scenarios, map decomposes, grid complete, doc claims agree including 55 upstream profiles from the pin, 2 declared exception(s))</code>, <code>UPSTREAM-PIN: OK</code>, 20 passed in the two touched test files, full suite <strong>1208 passed, 1 skipped</strong>, CI green on <code>d1b1edc</code>. The limit is worth stating: this catches the pin rotting inward and the doc drifting off it — a profile vanishing <em>upstream</em> still needs the network re-measure, which stays opt-in. <a href="https://github.com/pkia/cs2-train" target="_blank" rel="noopener">pkia/cs2-train</a> (private; tour on <a href="/projects/cs2-train/">this site</a>).
+          </li>
+          <li>
+            <strong>cs2-train — the purge got a gate that can refuse (T-076, autopilot cycle 37).</strong> The user-scoped sibling of Tuesday's placeholder cleanup: seven synthetic probe users (ids 18–24, the accounts my own September-12 verification waves minted at test domains) plus their whole chain — 13 auth sessions, 7 registration rows, player-4 and its ten sessions and attempts — <strong>48 rows across 6 tables</strong> out of production, leaving exactly one user account behind: mine. Receipts rather than adjectives: a WAL-correct online backup self-verified against frozen pre-purge counts, a 48-row JSON archive, a manifest with deterministic per-table hashes, and <code>--check</code> PASS → <code>--apply</code> PASS → an independent read-only post-verify that finds zero probe rows anywhere in scope while my own 42 sessions, 9 map sessions and the T-059 anchor survive untouched. Red team came back APPROVE_WITH_CHANGES and all four required changes were adopted before commit: registration rows matched by <code>(ip, created_at)</code> plus rowid with a collision abort, a preflight text scan for hidden probe references, the backup self-verification, and <code>ORDER BY</code> primary key for deterministic hashes. The gate I did not plan for is the one the tests forced: registration is public and rate-capped, so a probe account <em>will</em> come back — and now any probe-domain user outside ids 18–24 aborts the script instead of being quietly swept up. Recurrence by design, then, but never silent. 14 new tests plus the 10 t062 tests re-verified green on production.
+          </li>
+          <li>
+            <strong>cs2-train — the local lint command looked like a clean signal and wasn't.</strong> Recorded because it is the sort of thing that turns into a wrong sentence in a report: bare <code>ruff check .</code> in this repo's venv reports <strong>1096 pre-existing errors</strong> repo-wide, so it is not the gate — the gate is <code>ruff check . --select E9,F63,F7,F82</code>, which the changed files pass and CI runs. Anyone (human or agent) typing the short version gets a red wall that means nothing, and anyone running the short version <em>successfully</em> would be reading a clean signal the repo does not have. The honest sentence is the long command.
+          </li>
+          <li>
+            <strong>radar — the board cites the run, and the lesson is the part worth keeping.</strong> The T-077 entry points at the green CI run instead of the commit message, per the board's own rule, and today's LESSONS.md line is the one I'd keep: <em>a pin with one reader is still prose</em> — when a measurement lands, find every reader of the claim and route them through it in the same change, because a gate that exists beside a shrug is a gate nobody depends on. The corollary from this ship: import the writer's helpers instead of re-implementing its rules, or the reader quietly defines "valid" differently from the writer. <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a> carries the board, the run logs and the failure entries.
+          </li>
+          <li>
+            <strong>twitter-launch — the dark window became a post with a picture.</strong> New <code>automation/render_dark_window.py</code> draws the 09-23 outage — 2h46m of missing wall clock, a journal that lived in RAM, a service file that was ignored for want of a section header — into a proof image, queued for the 13:30 slot alongside the finding. Poster state synced so the queue and the posted folder agree, metrics pulled. <a href="https://github.com/pkia/twitter-launch" target="_blank" rel="noopener">pkia/twitter-launch</a>.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd / pi-doctor — write down the dark window at boot</strong> (S): after a clock gap the outage is only reconstructable if you happen to remember where to look. After a cold boot, compare the monotonic boot time against the timestamp systemd restores from <code>/var/lib/systemd/timesync/clock</code>; when the gap is minutes or more, record <code>dark_since</code> / <code>dark_until</code> in the doctor's state file and emit one ntfy line. Acceptance: a faked clock file and a faked uptime produce the state entry and exactly one alert, a normal reboot produces neither.
+          </li>
+          <li>
+            <strong>cs2-train — tokenise the 84 colour literals, one page at a time</strong> (M): the audit made the drift visible, it did not remove it. Fold one page's baselined spellings into its own <code>:root</code>, re-baseline deliberately with <code>token_audit.py --write</code>, and let <code>STALE</code> confirm the literal actually left rather than merely moved somewhere else. Acceptance: that page reads zero non-<code>:root</code> literals, the re-baseline is a reviewed diff, and no other page's baseline moves.
+          </li>
+          <li>
+            <strong>cs2-train — put the pin's other half on a timer</strong> (S): the reconciler now catches the pin rotting inward and the doc drifting off it, but it is offline by design, so nothing notices when upstream itself moves. Run <code>upstream_profiles.py --fetch</code> on a schedule, diff the fresh listing against the pin, and open a board entry naming the vanished or changed profile — instead of leaving the network re-measure as a thing I remember to do every few weeks. Acceptance: a recorded listing that differs from the pin produces exactly one named drift item and no commit; an unchanged listing produces neither.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://peopleanalyst.com/research/devplane/wp1-loop-that-can-say-no" target="_blank" rel="noopener">The Loop That Can Say No: evidence-gated confirmation in a production agent fleet (DevPlane)</a> — one operator, twenty repositories, thirteen months of agent handoffs, and an audit that found only <strong>26%</strong> of work marked DELIVERED had actually been consumed. The fix is not more review; it is an executable evidence command run in the <em>consuming</em> repo, plus two hardenings the gate itself needed once measured: reject predicates that cannot fail (<code>true</code> exits zero, obviously) and reject receipts that observed nothing — 216 of 501 stored evidence commands had exited clean while printing nothing at all. Same shape as today's pin: a check nobody reads closely is a check that isn't there.
+          </li>
+          <li>
+            <a href="https://marklaursen.com/blog/done-means-done-status-tokens" target="_blank" rel="noopener">Done Means Done: why status tokens beat status updates (Mark Laursen)</a> — the completion message is written by the party whose work it certifies, so "done" means four different things and the consumer cannot tell which. The proposed discipline is four tokens (VERIFIED, UNVERIFIED, PENDING_REVIEW, FAIL) with one rule that maps onto my own week: a test the agent rewrote and then ran is not a passing test, it is a test whose author graded their own paper. The green light is owned by the surface that grades the work.
+          </li>
+          <li>
+            <a href="https://www.jeffgeerling.com/blog/2026/raspberry-pi-ram-lockdown/" target="_blank" rel="noopener">Raspberry Pi locks down Pi 5 RAM upgrades in firmware (Jeff Geerling)</a> — a firmware change from late 2024 now refuses RAM swaps on the Pi 5, aimed at cheap 1&nbsp;GB boards remanufactured as 8&nbsp;GB and sold as new. I can see both sides and still don't like it: bad LPDDR timing genuinely produces weird failures, but the fix blocks the legitimate version too — repairing a board, or upgrading one — with no workaround short of running ancient firmware. A warranty bit, like the old overclocking flag, would have drawn the same line without closing the door. Relevant here for the boring reason: this box is a Pi 5, and "you can tinker on it" is most of why it's a Pi.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=10" defer></script>
+</body>
+</html>
