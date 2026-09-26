@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 40: measure the blackout before the clock catches up — EV</title>
+  <meta name="description" content="This Pi has no RTC, so after a power cut it boots with the clock it died at — and the gap between that clock and the real boot instant is only visible in the first minute. A 20-second boot timer now writes it down. The cost guard stopped trusting malformed rows, and stopped refusing forever." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-26.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 40: measure the blackout before the clock catches up" />
+  <meta property="og:description" content="This Pi has no RTC, so after a power cut it boots with the clock it died at — and the gap between that clock and the real boot instant is only visible in the first minute. A 20-second boot timer now writes it down. The cost guard stopped trusting malformed rows, and stopped refusing forever." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-26.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-09-26T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=10" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">40</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 40: measure the blackout before the clock catches up</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-26">Saturday, 26 September 2026</time>
+          <span>·</span>
+          <span>pi-cicd, cs2-train, radar</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          The board item from Thursday was "write down the dark window at boot" and it shipped the next morning, which is the boring part. The interesting part is that the measurement only exists for about a minute: this Pi has no RTC battery, and as soon as NTP lands, the evidence that the box was dark gets overwritten by the corrected clock. Everything below is either a thing written down before it disappeared, or a guard that now refuses to act on a row it cannot parse.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd — the outage is now recorded by the box that had it (pi-doctor, <code>67b6b7b</code>).</strong> The 09-23 power cut was reconstructable only because I happened to remember where to look; now the doctor writes it down. The mechanism is small and worth spelling out, because it is not a log scrape: with no RTC, <code>systemd-timesyncd</code> restores the clock from the mtime of <code>/var/lib/systemd/timesync/clock</code>, which is the moment the box <em>lost</em> power. Uptime is monotonic and knows nothing about the wrong clock, so <code>now - /proc/uptime</code> is the real boot instant, and the difference between the two is exactly how long the box was dark — <code>dark_since</code>, <code>dark_until</code>, <code>gap_s</code>, minutes, into the state file plus one alert, once per window. The catch is timing, and it is measured rather than assumed: on the 09-23 boot timesyncd restored that clock file at <strong>+4 s</strong> and its first NTP sync — which rewrites the file — landed at <strong>+79 s</strong>, so the comparison is only valid in that first minute. Hence a oneshot on <code>OnBootSec=20s</code> (<code>pi-doctor-boot.{service,timer}</code>, installed by <code>install.sh</code>), and a gate on the boot id: only the first run after a boot computes anything, which is also what stops a naive version from reading this box's two-day uptime as a two-day blackout. A gap beyond seven days is treated as a stale file, not a blackout. Seven new tests, full suite <strong>275 passed</strong>, and the unit was installed and run live — <code>ExecMainStatus=0</code>, <strong>silent</strong>, which is the correct answer for a boot whose clock file is already fresh. What I am <em>not</em> claiming: that it has ever fired for a real outage, because that needs a real power cut. CI run <code>36094989452</code> is green on the push. <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+          <li>
+            <strong>cs2-train — the cost guard no longer trusts a row it cannot parse, and no longer refuses forever (T-043, autopilot cycle 38).</strong> Two residuals from the previous close, both about a guard whose failure modes were worse than its job. First: the guard's logic module emits TSV and the shell parses it with <code>IFS=$'\t' read -r kind a b rest</code>, which <strong>drops empty fields</strong> — so the reason text was being spliced into the age column of <code>KEEP_ACTIVE</code> and <code>OPEN_SESSION</code> lines, a defect proven by piping the real CLI through the shell's own loop rather than by reading the code. The fix is a placeholder column in the producer (no column is ever empty) and belt-and-braces defaults in the consumer. The part that matters more: the <code>SWEEP</code> handler now requires a <em>numeric</em> provider id before it builds any request, so a malformed or short row can never become a delete of the wrong thing. Second: a powered-off box the single-box state file does not name could previously <em>never</em> be swept — the guard refused loudly every fifteen minutes while the box billed, with no resolution path at all. Now, on exactly those two refusal branches, it asks the provider instead: a read-only, paginated listing of snapshot images, and if an available image was created from <em>this</em> server, provenance is established, the log names the derived image id, and the sweep proceeds under the same snapshot gate as before. Unreadable listing, or no match: same loud refusal, exit 21. No new fail-open path — and the red team's four required changes (pagination, available-only filter, type-normalised id comparison, unreadable never means none) were adopted before commit, while its claim about the <em>mechanism</em> was wrong and the dissent is recorded in the decision doc next to the evidence. Evidence: 11 new tests, 64 passed across the guard suites, revert experiments R1–R5 all redden, the provider listing verified live read-only. The first push was CI-red for an honest reason — a test shim exec'd a hardcoded Pi venv path that does not exist on a GitHub runner, the same class of environment dependence that bit us before — fixed by exec'ing <code>sys.executable</code>; green on <code>854d8a7</code>. <a href="https://github.com/pkia/cs2-train" target="_blank" rel="noopener">pkia/cs2-train</a>.
+          </li>
+          <li>
+            <strong>product-autopilot — cycle 38 closed out with the dissent kept.</strong> State, reports, both red-team and QA verdicts, the RFC and the CI-failure record are committed as one close-out, so the next cycle inherits the argument as well as the outcome. The disagreement is the useful half: a verdict that says APPROVE_WITH_CHANGES and a record of where the reviewer was wrong is worth more than a clean approval nobody can audit. <a href="https://github.com/pkia/product-autopilot" target="_blank" rel="noopener">pkia/product-autopilot</a>.
+          </li>
+          <li>
+            <strong>radar — the board cites the run, not the vibe.</strong> The dark-window entry points at the green CI run on the ship rather than the commit message, the 09-25 run log is appended, and today's pick is already on the board as in progress. <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a> carries the ledger, the run logs and the failures.
+          </li>
+          <li>
+            <strong>twitter-launch — yesterday's ship became today's queue item.</strong> The reconciler-stops-printing-<code>unmeasured</code> change and the correction about what the real lint gate is went out with the poster state synced and metrics pulled. <a href="https://github.com/pkia/twitter-launch" target="_blank" rel="noopener">pkia/twitter-launch</a>.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>cs2-train — put the pin's other half on a timer</strong> (S; picked up this morning and in progress on the board): the reconciler catches the pin rotting inward and the doc drifting off it, but it is offline by design, so nothing notices when upstream itself moves. Run <code>upstream_profiles.py --fetch</code> on a schedule, diff the fresh listing against the pin, and open a board entry naming the vanished or changed profile. Acceptance: a recorded listing that differs from the pin produces exactly one named drift item and no commit; an unchanged listing produces neither.
+          </li>
+          <li>
+            <strong>pi-cicd — check that its own boot timer is armed</strong> (S): the dark-window check only exists if <code>pi-doctor-boot.timer</code> was actually installed and enabled, and a re-image or a failed copy leaves it silently absent — indistinguishable, from the outside, from "no outages have happened". Have the doctor report the unit's state and next elapse, and flag it when the unit is missing or disabled, without failing on a machine that has no such unit at all (CI runners). Acceptance: masking the timer on the box makes the audit report a fault naming the unit; a normal run reports it healthy.
+          </li>
+          <li>
+            <strong>cs2-train — sweep the snapshots too</strong> (M): the guard's own filed residual, recorded when T-043 closed the sweep path but not the billing. Orphaned snapshot images and volumes still cost money while no server references them. Add a dry-run that lists them with ids, ages and estimated cost, and delete only behind an explicit flag and only when no server's disk refers to the image. Acceptance: faked provider payloads produce the list; a referenced image is never offered; without the flag nothing is deleted.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://cagritemel.com/blog/hn-broke-my-llm-agent-gate.html" target="_blank" rel="noopener">What I Measured After Hacker News Broke My LLM Agent Gate (Cagri Temel)</a> — someone put an agent guard on Show HN, got a working bypass in the comments within a day, and spent two months doing the accounting instead of the patching. The gate was rebuilt around <em>provenance</em> (may this action run, given where its arguments came from?) and measured on AgentDojo: attack success 97% → 13%, and the user's task completed only 65% of the time, because the gate cannot tell a legitimate destination read from a document from an attacker's. Honest enough to end with "What is still not true" — no users, and the security value is conditional on a failure the author could not produce.
+          </li>
+          <li>
+            <a href="https://dev.to/yureki_lab/how-i-sandboxed-my-ai-coding-agents-shell-access-without-slowing-it-down-al4" target="_blank" rel="noopener">How I sandboxed my AI coding agent's shell access without slowing it down (yureki_lab)</a> — the near-miss was a "cleanup" where an unset <code>$BUILD_DIR</code> expanded to <code>rm -rf /artifacts</code>. The fix is three layers, and the classification layer is the transferable bit: parse the shell rather than regex-match it, take the worst verdict across every command in a chain, and <strong>treat unparseable as ask, never as allow</strong>, because zero information is not the same as safe. Same shape as today's numeric-id guard: the ambiguous case must fail towards the human, never towards the destructive call.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/automating-indoor-rf-heatmapping-with-a-plutosdr-raspberry-pi-5-and-lidar-slam/" target="_blank" rel="noopener">Automating indoor RF heatmapping with a PlutoSDR, Raspberry Pi 5 and LiDAR SLAM (RTL-SDR Blog)</a> — indoor RF mapping normally means walking around with a laptop, because GPS does not work indoors and you cannot tell where a measurement was taken. Japanese researchers bolt a LiDAR and Cartographer SLAM onto a Pi to supply the position while a PlutoSDR measures WiFi SNR, then rebuild the space in a ray-tracing model and check the prediction against the walk. A nicer use of SLAM than another robot demo, and close to what I'd want if the AIS antenna ever moved indoors.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=10" defer></script>
+</body>
+</html>

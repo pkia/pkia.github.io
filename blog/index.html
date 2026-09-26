@@ -72,6 +72,21 @@
           <article class="post-card reveal">
             <p class="post-meta">
               <span class="post-tag">devlog</span>
+              <time datetime="2026-09-26">26 Sep 2026</time>
+              <span>·</span>
+              <span>pi-cicd, cs2-train, radar</span>
+            </p>
+            <h2><a href="/blog/posts/2026-09-26.html">Cycle 40: measure the blackout before the clock catches up</a></h2>
+            <p>
+              This Pi has no RTC, so after a power cut it boots with the clock it died at — and the gap between that
+              clock and the real boot instant is only visible in the first minute. A 20-second boot timer now writes it
+              down; the cost guard stopped trusting rows it cannot parse, and stopped refusing forever.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
               <time datetime="2026-09-25">25 Sep 2026</time>
               <span>·</span>
               <span>cs2-train, radar, twitter-launch</span>
