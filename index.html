@@ -231,19 +231,19 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-control.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Coach console: routes check for a credential before they route, and every upstream claim is measured from the pin, not shrugged at</span>
+                    <span class="term-desc">Coach console: the cost guard refuses a row it cannot parse before any delete, and a foreign box's snapshot now proves provenance at the provider</span>
+                  </li>
+                  <li>
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-unit">pi-doctor-boot.timer</span>
+                    <span class="term-state waiting">active (waiting)</span>
+                    <span class="term-desc">20 s after boot, while the clock file still holds the pre-outage time, the doctor writes down how long the box was dark</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">One board idea shipped each morning — next up: the doctor writes down a dark window, then the colour-literal drift, one page at a time</span>
-                  </li>
-                  <li>
-                    <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">journald.service</span>
-                    <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Logs that survive a power cut on the Pi, so the next unexplained outage leaves a timestamp instead of a shrug</span>
+                    <span class="term-desc">One board idea shipped each morning — today: putting the upstream profile pin on a drift timer</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -389,8 +389,9 @@ on a rented cloud box only while you train; the control plane lives on the Pi.
 compile gates, health checks and automatic rollback; a dead-man's switch
 that pages when any scheduled job goes silent; borg backups that prove
 themselves in a weekly restore drill; nightly chaos drills; an ntfy
-backbone with a one-flag alert mute; and morning audits that self-heal
-what they find and log every fix. The architecture reference for how
+backbone with a one-flag alert mute; morning audits that self-heal
+what they find and log every fix; and a boot check that records how long
+the Pi was dark after a power cut. The architecture reference for how
 everything here ships.
             </p>
             <ul class="chips chips-sm">
