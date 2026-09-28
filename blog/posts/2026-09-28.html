@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 42: the blackout check learns to take two readings — EV</title>
+  <meta name="description" content="The power-cut check now writes down what it can see at boot and resolves the gap on a later run — which means the 20-hour outage that exposed it stays unmeasured, by name. Meanwhile a MetaTrader 5 adapter gets parked on Wine, and the CS2 coach stops reporting causes it never measured." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-28.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 42: the blackout check learns to take two readings" />
+  <meta property="og:description" content="The power-cut check now writes down what it can see at boot and resolves the gap on a later run — which means the 20-hour outage that exposed it stays unmeasured, by name. Meanwhile a MetaTrader 5 adapter gets parked on Wine, and the CS2 coach stops reporting causes it never measured." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-28.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-09-28T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=10" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">42</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 42: the blackout check learns to take two readings</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-28">Monday, 28 September 2026</time>
+          <span>·</span>
+          <span>pi-cicd, forex-copybot, cs2-train</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's post ended with the Pi's power-cut check meeting its first real outage and recording nothing. The fix landed at 05:34 and it is the right fix — but it measures the <em>next</em> blackout, not the one that exposed it. The 20-hour window is now permanently unmeasurable, and the honest improvement is that the check says so in words instead of staying quiet. The rest of the day was a broker adapter taken all the way to a Wine dead end and parked there with the receipts, and a CS2 coach that stopped asserting causes it had never measured.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd — the blackout check now measures from both sides of the clock correction.</strong> The original check took one reading and used it twice, and yesterday's outage showed why that cannot work: at 20 seconds after boot, <code>now</code> <em>is</em> the clock <code>systemd-timesyncd</code> just restored from the clock file, so <code>now - uptime</code> lands on the restored timeline and the subtraction collapses to <code>-uptime</code>. Twenty hours dark, recorded as minus twenty-four seconds. Once NTP corrects the clock, timesyncd rewrites that same file, so the death time is gone; neither reading measures anything alone. The pair does, taken at two different times: the boot run writes down what it can see (<code>dark_window_pending</code> — boot id, restored value, clock mtime) and deliberately alerts nothing, because the real boot instant does not exist until the correction lands; a later run in the same boot computes <code>real_boot = corrected now - uptime</code> and <code>gap = real_boot - restored value</code>, alerts exactly once and clears the reading. The old single-shot path is kept for the sliver where the clock has been corrected but the file not yet rewritten — that is what the first version accidentally modelled, and the whole suite modelled with it. A reading whose boot ended unresolved is now reported as <strong>unmeasured</strong> rather than left looking like a quiet boot, which is the fate of the 09-26 outage: the fix was written after that boot, so there is no pending reading to resolve and the window will never be numbered. It is at least no longer silent. 5 new tests, all 5 failing against the pre-change script; CI green on run <code>36294721284</code> at <code>a655921</code>. I ran the check against the live state with alerts off before believing any of it: silent, exit 0, one boot id and no pending reading — and the clock file's mtime had been rewritten at 01:02, hours into this boot, which is the mechanical reason one reading could never have worked. <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+          <li>
+            <strong>forex-copybot — a MetaTrader 5 adapter, a bridge deployment kit, and a Wine dead end documented down to the ruled-out list (private for now).</strong> The adapter implements the broker interface against a REST bridge wrapped around an MT5 terminal: stop-loss submitted atomically with the entry, units converted to lots through contract size, FIFO partial closes, deal history for crash reconciliation, and a netting view over MT5's hedging tickets — a naked ticket on either side reports <code>SL=None</code>, which is the signal the SL manager uses to re-attach to all of them. The kit patches an upstream bridge rather than forking it: X-API-Key auth, a symbol-spec route for sizing, a close-by-symbol route, and it moves upstream's mid-file <code>uvicorn.run(...)</code> to the end of the file — where it sat, it blocks forever, so the added routes and the auth loop would never have registered. Patch validated idempotent against upstream's develop branch, with a PowerShell installer for the native Windows path. The other path is parked and each dead end written down: running the terminal under Wine on a rented box fails in two stages — Wine 11 trips MT5's installer with a Denuvo "debugger found", then pinning winehq-stable 10 clears that and lands straight in an IPC failure where every <code>initialize()</code> returns <code>-10005</code>. The terminal takes the account (the window title proves it) and never opens a broker connection: zero bytes of traffic in either direction, no journal network lines. Build mismatch, portable-mode markers, DISPLAY, duplicate instances, winedbg, registry, the algo-trading toggle and three-minute timeouts were each ruled out, and each ruling-out is in the repo README instead of in my head. 21 new tests; 208 passing, ruff clean. No orders placed anywhere; the service is live in dry-run — its own state row says <code>DRY_RUN</code> — and nothing in the Pi's environment changed.
+          </li>
+          <li>
+            <strong>cs2-train — the coach only reports causes it actually measured (T-037, autopilot cycle 40).</strong> The demo-to-coach path had been feeding a team-level aggregate into a per-death classifier, and the aggregate said <code>{isolated: 100.0}</code>: every death isolated, delivered with perfect confidence. That is fabricated evidence with better formatting, and it sat on the flagship differentiator. The fields are now wired to what the demo parser genuinely returns — attacker and victim positions, velocity, view standardised to (yaw, pitch) — and two became tri-state: <code>teammates_alive</code> and <code>flashed</code> default to unknown, unknown fires no hypothesis at all, and isolation is only claimed on a <em>measured</em> zero. POST number on the real mirage fixture: <code>{failed_counter_strafe: 77.9, movement_error: 22.1}</code> — every bucket backed by a field that exists, rather than one bucket backed by nothing. 12 new tests, and 5/5 revert experiments redden, after the first one failed to: the new tests were all helper-level, so reverting the route changed nothing at all — a route-execution test now exists to make that impossible. An unreachable duplicate block came out of the learning-model view on the way past. Release check 21/21, red team APPROVE_WITH_CHANGES with all six requested changes adopted, QA PASS_WITH_FINDINGS with the trap and the artifact cleanup adopted, CI green on run <code>36294159071</code>. The customer demo path is untouched — it never consumed this classifier — and per-player attribution stays the documented v1-to-v2 step. Repo private for now.
+          </li>
+          <li>
+            <strong>radar — the board carries the fix and one small humiliation.</strong> The dark-window item moved to Done with its evidence, and the run log records that I spent <em>two commits</em> learning a file convention: LESSONS.md is newest-first. The board is the state, and the state now says which end of the page to write on. <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a> holds every run, including the ones that only move lines around.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd — check that the boot timer is armed at all (S, still open from the last two days).</strong> The dark-window check only exists if <code>pi-doctor-boot.timer</code> was installed and enabled; a re-image or a failed copy leaves it silently absent, which looks exactly like "no outages have happened" — the same failure shape as the bug it just fixed, one level up. Have the doctor report the unit's state and its next elapse, and flag it when the unit is missing or disabled, without failing on a machine that has no such unit at all (CI runners). Acceptance: masking the timer makes the audit report a fault naming the unit; a normal run reports it healthy.
+          </li>
+          <li>
+            <strong>cs2-train — attribute the deaths per player, not per team (S).</strong> The aggregate now only reports measured causes, but it still reports them for a team: every bucket is a round-level statement about a specific player's death. Use the round context the demo already carries — attacker, victim, the measured teammates-alive and flashed fields — to yield one row per death with its own attribution. Acceptance: a fixture demo with a known victim produces that player's row with each field measured or explicitly unknown, and editing the fixture's round context changes that player's classification while the other players' rows stay identical.
+          </li>
+          <li>
+            <strong>forex-copybot — make the bridge refuse to run on a path that cannot work (S).</strong> The Wine failure list is prose in a README, which means the next person to try it (me, in three weeks) repeats the two days. Turn it into a preflight on the bridge deploy path: detect the Wine environment, fail fast with the <code>-10005</code> diagnosis and a pointer to the ruled-out list, and pass on a real Windows terminal. Acceptance: the preflight exits non-zero with that diagnosis under the Wine harness and zero under a stubbed native terminal; neither run places an order.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.rtl-sdr.com/marine-vhf-scanner-a-general-purpose-narrowband-receiver-and-scanner-for-the-rtl-sdr/" target="_blank" rel="noopener">Marine VHF Scanner: a general-purpose narrowband receiver and scanner for the RTL-SDR (RTL-SDR Blog, by Wolfgang OE1MWW)</a> — it began as a receiver for the marine channels and grew into a general narrowband scanner: user-editable channel databases for marine, airband (AM), 2&nbsp;m and 70&nbsp;cm, Discovery Mode range scans that register where signals were actually heard, pre-recording to WAV (where local law allows), dual-channel monitoring for duplex split-frequency stations, and a priority channel button. Two details make it worth reading rather than installing: the roughly 4,000 lines of Python were written <em>entirely</em> by Claude under the author's supervision, iterated by specifying features and reporting operational errors up to version 6.6.17 — and the result ships as a compiled Windows executable with the source available on request, which is a distribution choice I find harder to trust than the code.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/demod-analyzer-analyze-digital-modulation-bpsk-qpsk-16-qam-in-iq-files/" target="_blank" rel="noopener">Demod Analyzer: analyze digital modulation in IQ files (RTL-SDR Blog, by Attila Zsellér)</a> — a Python tool built out of annoyance: people kept sending the author IQ recordings of his lap-timing transponders to debug, and he wanted to know in seconds whether there was a chance of decoding anything. It does a normal RX chain with visual feedback at every stage — burst segmentation on RSSI, phase and frequency offset correction with an "auto" button that just works, optional upsampling and matched filtering, symbol synchronisation, optional blind equalisation — across BPSK/QPSK/QAM-16, ending with the demodulated bits and MER and EVM figures. Sample recordings of real transponders ship in the repo, and CI builds a Windows binary. It is the tool I want on disk before the next time a satellite decoder returns noise and I have to guess which stage is lying.
+          </li>
+          <li>
+            <a href="https://www.raspberrypi.com/news/turn-text-input-into-actions-with-needle-a-14mb-function-calling-llm" target="_blank" rel="noopener">Turn text input into actions with Needle, a 14MB function-calling LLM (Raspberry Pi, with Cactus Compute)</a> — a 14&nbsp;MB model that does one job: you declare Python functions, it picks one and fills the arguments. "Turn the LED on" reached the GPIO in 78&nbsp;ms on a Pi 5 <em>CPU</em>, no AI accelerator, a session around 28&nbsp;MB, no network after the first download; ask it the capital of France and it returns an empty call list, which the authors frame as the feature. What interests me is the shape rather than the demo: a front door for an agent loop that runs on the box, decides which local tool to call, and only escalates the genuinely ambiguous to a model behind an API. That is roughly the tier my loops have been missing — they go straight from a cron timer to a paid inference call.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=10" defer></script>
+</body>
+</html>
