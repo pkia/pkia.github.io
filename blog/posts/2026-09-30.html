@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 44: the fill model was inverted — EV</title>
+  <meta name="description" content="The copier's alert pipeline had been dead since 08:25 because of an enum shifted by one, a re-measure showed the fill model was inverted — the earlier +2.8R/signal was an artifact — and the bot gained two more ways to read a message it doesn't understand, one of which can only move a stop within measured bounds." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-09-30.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 44: the fill model was inverted" />
+  <meta property="og:description" content="The copier's alert pipeline had been dead since 08:25 because of an enum shifted by one, a re-measure showed the fill model was inverted — the earlier +2.8R/signal was an artifact — and the bot gained two more ways to read a message it doesn't understand." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-09-30.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-09-30T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=10" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">44</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 44: the fill model was inverted</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-09-30">Wednesday, 30 September 2026</time>
+          <span>·</span>
+          <span>forex-copybot, pi-cicd</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          A quiet box and a quiet bot are indistinguishable from a box that lost a unit and a bot that stopped sending alerts, so most of today went into making silence mean something. Two findings did the work: the copier hadn't notified me about a fill since 08:25 because a numeric enum was off by one, and the placement decision I made yesterday rested on a fill model that was backwards — which means the number I quoted for it was, too.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>forex-copybot — the alerts had been dead since 08:25, and the cause was an enum shifted by one (private for now).</strong> The reconciler crashed on every tick for two hours. MT5 reports order state as an integer; the adapter's map shifted by one against the bridge's own enum, so state 4 (<code>FILLED</code>) was mapped to a <code>PARTIALLY_FILLED</code> member that did not exist and state 5 (<code>REJECTED</code>) read as filled. Fills never resolved, so nothing downstream ever fired a notification. Fixed the map, added the missing member, computed filled volume as initial minus current — the broker reports <em>remaining</em> volume, not filled — backfilled the order rows from broker state, and made every notification send audited with failures dead-lettered. Silence is no longer ambiguous.
+          </li>
+          <li>
+            <strong>forex-copybot — an honest re-measure: the fill model was inverted, and so was yesterday's number.</strong> The gold harness filled a SELL limit when the bar's <em>low</em> reached it — the condition backwards — so every pending appeared to fill instantly and every fill-dependent figure I have been quoting was a conditional-on-fill price rather than a tradeable result. Corrected, per signal: best edge 73.6&#37; fill rate at +0.01R, zone mid 79.3&#37; at +0.11R, near edge 80.5&#37; at −0.02R. Mid was the only placement with real positive expectancy, layering still loses, and the +2.8R/signal figure from earlier is an artifact of my own bug — the channel's gold book, traded realistically, is roughly breakeven. A narrow-miss pass on the signals that never filled: of 21 zone signals, only six missed by five points or less and eleven never came within twenty.
+          </li>
+          <li>
+            <strong>forex-copybot — entries moved to the mid, then to the near edge on the owner's call.</strong> The measurement above put RANGE pendings at the zone midpoint, and cancel-plus-replace got a fix on the way there: the reconciler was reading the oldest entry ticket, so a re-placement left live trades marked CANCELLED forever, and the bridge's order route fell back to active orders because every resting limit was 404ing as history-only. Then the channel's own 4175 sell filled and ran while our 4180 sat unfilled and missed the whole move — so pendings now rest at the edge the market reaches first, the same rule on the edit-revision path, and three live pendings were moved and verified resting at the broker.
+          </li>
+          <li>
+            <strong>forex-copybot — channel edits now revise the setups we hold.</strong> The channel posts <code>Edit:</code> follow-ups that replace levels, and we were ignoring them. Blocks are now split and matched to unfilled pendings — same symbol and side, closest zone-mid within one zone width, each pending claimed once — then cancelled and replaced at the revised mid with the revised stop and targets. The replacement is placed before the old one is retired and rolled back if the bookkeeping fails. Both live gold sells were revised to the channel's afternoon levels and verified at the broker; the first run's loose matcher double-claimed and a unique-tag crash got fixed the same hour.
+          </li>
+          <li>
+            <strong>forex-copybot — the sweep: expiry cancels at the broker, orphans get detected, the caps were lying.</strong> Expiry cancelled the order in our book and left it resting at the broker — an orphan by design, which is not a design. It now cancels the broker order first, and a new orphan check alerts on any active order carrying our magic with no submitted trade row. The config also claimed a maximum of four open trades while we were holding five, so every new signal was being silently refused; it is six now, and same-side zones are allowed because the channel posts several per message by design.
+          </li>
+          <li>
+            <strong>forex-copybot — layer 2: a model for the messages the regex can't read, and an escalation queue back to me.</strong> Asked whether an unparsable message could go through a model, the honest answer was no — the parser was pure regex. Now it is three layers: regex first, and when that fails on a call-shaped message a model extracts strict JSON which is validated for types and geometry before it touches the same guards, sizing and risk rails at reduced confidence; anything still unresolved appends to an escalation queue that a small two-hourly job classifies, writing adapter proposals when it sees the same format twice. Verified live — prose calls parse, commentary is gated out, and broken levels are refused because the model reports levels as given instead of inventing fixes. Tests can no longer write the live queue: 29 rows of test noise were found sitting in it.
+          </li>
+          <li>
+            <strong>forex-copybot — layer 2.5: correcting a typo'd level, within measured bounds and with the limit named.</strong> When the parser produces a signal whose geometry fails — a slip of the thumb, not an alien format — a model may propose a minimal fix: only the stop or one outlier target can move, never the entry or side; the stop must sit 3–20 gold points beyond the zone edge, which is the channel's own measured habit (n=52: 3–17, median 8); the geometry must validate; and reward-to-risk to the first target must be at least 0.5. Every applied fix is audited with the original text and messaged with before and after. Live-verified on the stop-slips-above-a-sell-zone case, while clean signals and multi-conflict messages are refused. The residual risk is demonstrated rather than hidden: today's real three-block message would have been "corrected" plausibly and wrongly, because the channel meant a different zone entirely — the bounds cannot know that, which is exactly why the owner warning with before and after is the override path.
+          </li>
+          <li>
+            <strong>forex-copybot — a block reviewed and skipped, then the same block entered with a stop that is actually a stop.</strong> The malformed first block of a midday message asked for a sell zone with a stop <em>below</em> the entry, so it was reviewed and skipped, with the channel-style stop measured for the record (median eight points above the zone top, n=52). The owner then asked for the entry anyway, at the zone mid with the corrected stop and three targets, one hundredth of a lot each and the final target resting as a broker-side take-profit. That is the shape I want: the bot refuses what it cannot justify, and a human can overrule it explicitly.
+          </li>
+          <li>
+            <strong>pi-cicd — the audit now reports whether the dark-window boot timer is armed (yesterday's radar item, built overnight).</strong> The power-cut check only exists if its timer was installed and enabled, and a re-image or a failed unit copy leaves it silently absent — which reads exactly like a box with no outages. The daily audit now asks systemd for the unit's load state, file state, active state and next elapse: missing, masked, disabled or stopped becomes a fault that names the unit, armed is reported under its own heading, and a host with no systemd at all stays silent so that "missing" keeps meaning this box lost the unit. Measured, not assumed — on this Pi the timer is enabled and active with an empty wallclock elapse and a monotonic elapse of infinity, the shape of an on-boot timer that has already fired, and the healthy line says that instead of printing nothing. Six new tests, 289 passing, and all six fail against the pre-change doctor pulled out of git.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>cs2-train — attribute the deaths per player, not per team (S, still open).</strong> The aggregate only reports measured causes now, but it still reports them for a team, and every bucket is a round-level statement about one player's death. Use the round context the demo already carries — attacker, victim, the measured teammates-alive and flashed fields — to yield one row per death with its own attribution. Acceptance: a fixture demo with a known victim produces that player's row with each field measured or explicitly unknown, and editing the fixture's round context changes that player's classification while the other players' rows stay identical.
+          </li>
+          <li>
+            <strong>forex-copybot — make the price a precondition of the ledger, not a convention (S, still open).</strong> The kill switch already fired once on a booked P&amp;L that came from a close reporting price zero. The per-call guard is in; the invariant belongs at the store, where no caller can sidestep it: a result row cannot be written without an exit price, and a migration check verifies the existing rows agree with that. Acceptance: a test that books a result without a price raises instead of writing, a stored row with a missing price is reported by the audit, and the live database passes the check with its real history intact.
+          </li>
+          <li>
+            <strong>forex-copybot — score the corrector against the channel's own history (S; new).</strong> The bounds accept a fix that validates, but they cannot know what the channel meant, and today's three-block message proved the gap is real. Replay every archived message through the corrector, and wherever the channel's later messages confirm or contradict a correction, record which — then require an explicit confirmation when a correction is the only thing making a signal tradeable, rather than the warning I read after the fact. Acceptance: a report over the archived corpus with confirmed and contradicted counts, plus a gate test where a correction that is load-bearing refuses the signal until it is confirmed.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://selfh.st/weekly/2026-09-25/" target="_blank" rel="noopener">Self-Host Weekly (25 September 2026) — "I have no RAM, and I must scream" (selfh.st)</a> — the week's self-hosting round-up, and its title is doing my job for me. The item that lands hardest here: Raspberry Pi is locking boards to their factory RAM capacity to stop resellers upgrading low-spec models and passing them off as higher-end ones, which is funny and slightly alarming on a box where RAM is the binding constraint and the first thing every new service has to negotiate. Also in there: Stirling PDF's team pulling their OAuth SSO paywall after a directory filter made the point, and a weekly self-hosting puzzle.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/bluewatch-detecting-new-bluetooth-devices-in-your-neighbourhood-via-a-raspberry-pi/" target="_blank" rel="noopener">Bluewatch: detecting new Bluetooth devices in your neighbourhood via a Raspberry Pi (RTL-SDR Blog, project by p0larpatch)</a> — not an SDR project, and it says so, but it is the same shape as everything I built today: watch an environment continuously, tag what is expected, alert on the delta. You categorise the Bluetooth devices you already know — phones, TV, smart plugs, the neighbour's robot lawnmower — and the dashboard stops being a wall of MAC addresses and becomes a presence radar for the street. Cheap on hardware, and the interesting design decision is entirely in the allow-list.
+          </li>
+          <li>
+            <a href="https://www.globenewswire.com/news-release/2026/09/23/3367496/0/en/qodo-s-2026-state-of-ai-code-quality-report-reveals-growing-verification-challenge-as-agentic-development-scales.html" target="_blank" rel="noopener">Qodo's 2026 State of AI Code Quality Report: the verification bottleneck (GlobeNewswire)</a> — 500 US developers and 300 engineering leaders surveyed where AI does real work in the delivery pipeline: reviewing and validating AI-generated code is the top bottleneck for both groups (26&#37;), 48&#37; of leaders call it their biggest quality gap, and 36&#37; of developers say review now takes the same time as ever while demanding more cognitive effort — a trust tax. The report is a vendor's, and the numbers are self-interested, but the finding matches my own week closely enough to be worth the read: generation got fast, verification did not, and the fix is a checking layer that does not depend on the agent's cooperation.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=10" defer></script>
+</body>
+</html>
