@@ -231,19 +231,19 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">copybot.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Live-risk gate acknowledged — trading a small real account at one hundredth of a lot per target</span>
+                    <span class="term-desc">Live on a small real account — regex first, a model for the calls regex can't read, and typo'd levels corrected only within measured bounds</span>
+                  </li>
+                  <li>
+                    <span class="term-dot" aria-hidden="true"></span>
+                    <span class="term-unit">pi-doctor.timer</span>
+                    <span class="term-state waiting">active (waiting)</span>
+                    <span class="term-desc">The daily audit names pi-doctor-boot.timer when the dark-window guard is missing, masked or stopped, instead of reading it as no outages</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-control.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Coach reports only measured causes, and the plugin's validation flags now survive into the stored review report</span>
-                  </li>
-                  <li>
-                    <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">chaos-drill.timer</span>
-                    <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Treats a sweep in flight as proof of life — a busy probe is no longer misread as a timer that never ran</span>
+                    <span class="term-desc">Next on the board: attribution per death, one row per player with its own measured cause rather than a team bucket</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -386,14 +386,13 @@ on a rented cloud box only while you train; the control plane lives on the Pi.
             <h3>pi-cicd</h3>
             <p>
               The CI/CD machinery that runs the Pi itself: pull-based deploys with
-compile gates, health checks and automatic rollback; a dead-man's switch
-that pages when any scheduled job goes silent; borg backups that prove
-themselves in a weekly restore drill; an ntfy backbone with a one-flag
-alert mute; morning audits that self-heal what they find and log every
-fix; and a boot check that measures a power-cut blackout from both sides
-of the clock correction, after the first real one exposed the
-single-reading version. The architecture reference for how
-everything here ships.
+              compile gates, health checks and automatic rollback, a dead-man's switch
+              that pages when a scheduled job goes silent, borg backups that prove
+              themselves in a weekly restore drill, and morning audits that self-heal
+              what they find. Its boot check measures a power-cut blackout from both
+              sides of the clock correction, and now reports when the dark-window timer
+              behind it is missing or disabled — the failure that reads exactly like
+              no outages have happened.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
@@ -453,7 +452,7 @@ everything here ships.
           the <a href="/projects/cs2-tracker/">CS2 match tracker tour</a> whose service I retired in September (code stays public),
           the <a href="https://github.com/pkia/cs2-dashboard" target="_blank" rel="noopener">pro-match kiosk ticker</a> it replaced,
           a <a href="https://github.com/pkia/CoinMarketCap_Scraper" target="_blank" rel="noopener">CoinMarketCap dataset scraper</a>,
-          a private Telegram-signal copier now trading a small live account under hard caps (329 tests, one hundredth of a lot per target, and a backtest that disagrees with its source),
+          a private Telegram-signal copier now trading a small live account under hard caps — regex first, a model for the messages regex can't read, and typo'd levels corrected only inside measured bounds,
           the AIS decoder experiments (repo private for now),
           and a graveyard of experiments, archived with honour.
           <a href="https://github.com/pkia?tab=repositories" target="_blank" rel="noopener">Browse everything →</a>
