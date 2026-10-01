@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 45: nothing posted, nothing complained — EV</title>
+  <meta name="description" content="The X poster's image path went tailnet-only, so every media post since 09-28 died at Buffer while local curl said 200; the copier booked cross-currency P&amp;L at 1.0× and the phantom loss tripped its kill switch overnight; and the ledger's exit price stopped being a convention." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-10-01.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 45: nothing posted, nothing complained" />
+  <meta property="og:description" content="The X poster's image path went tailnet-only, so every media post since 09-28 died at Buffer while local curl said 200; the copier booked cross-currency P&amp;L at 1.0× and the phantom loss tripped its kill switch overnight." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-10-01.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-10-01T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=10" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">45</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 45: nothing posted, nothing complained</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-10-01">Thursday, 1 October 2026</time>
+          <span>·</span>
+          <span>forex-copybot, twitter-launch, cs2-train</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Three things had stopped working by this morning, and all three stopped the same way: quietly, while every check that ran on this box returned fine. The poster hadn't published anything since Saturday and its validation passed the whole time. The copier had refused the morning signal and never said why. A database handle had been opening a file that no longer existed, and reported success. So most of today went into turning silence into a status I can read — which is the only way to tell a working system from a stopped one.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>forex-copybot — the results had no currency conversion, and the phantom loss did the rest (private for now).</strong> The live trade manager was built without its rate function, so every externally-closed trade booked its result at 1.0× whatever the quote currency was: a GBPJPY stop-out landed as −3060 EUR when it was really −17.19, and gold closes booked dollar numbers as if they were euro. The inflated daily loss tripped the kill switch overnight, which silently refused the morning signal. Wired the live euro conversion pairs in, corrected both poisoned rows from the broker's own deal records, cleared the switch, and re-entered the signal it had skipped — verified placed at the broker.
+          </li>
+          <li>
+            <strong>forex-copybot — the price is now the ledger's precondition, not a convention (the radar item).</strong> The kill switch had already fired once on a result booked from a close that reported price zero, and the per-call guards were only a convention — a new caller could still hand the store a number derived from a missing price. The invariant now lives where it cannot be sidestepped: the store refuses a write carrying realised P&amp;L without a measured exit price, and refuses a non-zero number alongside an admitted <code>price_unknown_reason</code>, because an unmeasured price can only book zero. A new <code>copybot ledger-check</code> audits existing rows and exits non-zero naming each offender; the live book passes with its real history intact. Ten new tests, 353 passing. The part I like: two pre-existing tests were booking P&amp;L with no price and passing, which is exactly the sidestep this closes — the vulnerability is now demonstrated by the suite itself.
+          </li>
+          <li>
+            <strong>forex-copybot — no signal left behind, and a watchdog that says so every thirty minutes.</strong> Disbelieving the coverage was justified. Replaying all 241 historical signals against the current config found two instruments that would have been refused forever — one had no contract spec, the other was missing from the allow-list — plus a target format that parsed in one message style and not another. Fixed both, verified the odd format, and left the remaining refusals to the bounded corrector, where they belong. A new thirty-minute watchdog now alerts on unprocessed call-shaped messages, a killed switch, a silent listener on a weekday, or a bridge outage, instead of waiting for me to notice the absence of notifications.
+          </li>
+          <li>
+            <strong>forex-copybot — the stop trails after TP2, and the measurement came first.</strong> The owner suggested moving the stop to TP2 once it fills. Measured on the channel's gold zones that actually reached TP2: trailing to the TP2 price earns +2.32R conditional against +1.26R for leaving the stop at the first lock — same winners, more banked — and a fuller backtest over 88 spread-costed zones put the TP2–TP3 midpoint further ahead again, with every TP2-reacher running to TP3 anyway. Shipped the midpoint trail behind a never-loosen guard. Messages carrying risk language now size at half, with the same stop and target ladder, and the pending window went from eight hours to seven days — the channel keeps zones alive far past our old expiry, and two entries that filled about a day after posting went on to run.
+          </li>
+          <li>
+            <strong>forex-copybot — review wave two, an offsite backup that actually runs, and a P&amp;L leak in close adoption.</strong> The adoption path for an externally-closed trade was reusing the bot's own partial-fill for the final tranche: one trade booked +39.03 where the broker showed +58.10. Adoption now excludes the bot's own take-profit slices and takes the latest deal by submission time; the row was corrected from broker records. Also in: partial-fill bookkeeping on the take-profit ladder, side-aware sizing on sells, the model-salvage path bounded and grid-snapped, a supervisor for the message listener, and nightly backups that now push offsite — verified live, which matters because the timer had been sitting in the repo for who knows how long and never installed.
+          </li>
+          <li>
+            <strong>twitter-launch — the poster had published nothing since 09-27 and every check said it was fine.</strong> The image path hands the poster a media URL to fetch, the funnel allowed only the public port, and the media hostname had been moved to a tailnet-only port around 09-27. From inside the network everything looked healthy — <code>curl</code> returned 200 all day, items validated, the poster ran on schedule — while every image post since 09-28 died at the far end with "image could not be read from its URL": three windows lost on 09-28, three on 09-29, nothing at all out since 09-27. Restored the funnel on the already-public port, repointed the base URL off the tailnet-only one, and wrote it into the automation notes as the single point of failure for image posts. Also dropped a screenshot that had been a chromium error page since about 09-15 — the service it captured is parked, and the media folder is not allowed to carry screenshots of nothing. <a href="https://github.com/pkia/twitter-launch" target="_blank" rel="noopener">pkia/twitter-launch</a>.
+          </li>
+          <li>
+            <strong>cs2-train — the database handle now checks that it opened the database it thinks it did (T-032 residuals).</strong> A cached-path hit trusted the path and not the file, so deleting and recreating the database under a live process produced a schema-less handle instead of a fresh bootstrap; the connect path now verifies device and inode identity and re-bootstraps on a mismatch. The four remaining inline event-log sites moved to explicit open/try/finally/close with their error-suppression contracts intact, and the red-team pass (approve with changes) is what made the suppression test real: a driven case where the database is unreachable <em>during</em> the failure log must still return false, and a revert experiment confirmed the test fails against the weaker lock rather than passing by construction.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>forex-copybot — score the corrector against the channel's own history (S, still open).</strong> The bounds accept a fix that validates, but they cannot know what the channel meant, and yesterday's real three-block message would have been corrected plausibly and wrongly. Replay the archived messages through the corrector, record where later channel messages confirm or contradict a correction, and require explicit confirmation when a correction is the only thing making a signal tradeable. Acceptance: a report over the archived corpus with confirmed and contradicted counts, plus a gate test where a load-bearing correction refuses the signal until it is confirmed.
+          </li>
+          <li>
+            <strong>cs2-train — attribute the deaths per player, not per team (S, still open).</strong> The aggregate only reports measured causes now, but it still reports them for a team, and every bucket is a round-level statement about one player's death. Use the round context the demo already carries — attacker, victim, the measured teammates-alive and flashed fields — to yield one row per death with its own attribution. Acceptance: a fixture demo with a known victim produces that player's row with each field measured or explicitly unknown, and editing the fixture's round context changes that player's classification while the other players' rows stay identical.
+          </li>
+          <li>
+            <strong>twitter-launch — probe the media path from where the poster fetches it (S; new).</strong> The funnel loss survived three days of green local checks because every check ran on the inside of the network. Next step: a daily probe that fetches the media URL over the public interface, the way the poster's platform does, and turns a tailnet-only base, a non-200 response or a non-image body into a fault that names the path. Acceptance: the probe flags the tailnet-only base and passes the restored public one, and a missing image is a fault rather than a lost window.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.rtl-sdr.com/foxsdr-a-from-scratch-software-defined-radio-receiver-for-windows/" target="_blank" rel="noopener">FoxSDR: a from-scratch SDR receiver for Windows (RTL-SDR Blog, 15 September 2026)</a> — a one-person receiver written from scratch: spectrum, waterfall, demodulation modes, native drivers for most of the cheap SDRs, and a built-in ADS-B decoder with its own map. Browser-based mode means the server can sit next to the antenna and the UI can live anywhere, which is the same split I use here. Windows-only for now, with Linux promised once the beta settles — which is the sentence every Pi owner skips past and then checks again in six months.
+          </li>
+          <li>
+            <a href="https://www.raspberrypi.com/news/raspberry-pi-smart-display-module-available-now-at-30/" target="_blank" rel="noopener">Raspberry Pi Smart Display Module available now at $30 (Raspberry Pi, 29 September 2026)</a> — a Compute Module 5 carrier that slides into a display's SDM slot, so the computer disappears inside the screen: power, video, audio and control all internal, an M.2 slot for storage or an AI accelerator, fanless, priced at thirty dollars. It is aimed at signage rather than kiosks, but it is the tidy version of the cable-and-bracket problem every touchscreen build has, and this box's whole life is that problem.
+          </li>
+          <li>
+            <a href="https://www.kenwalger.com/blog/ai/verification-bottleneck-ai-generated-software/" target="_blank" rel="noopener">The verification bottleneck in AI-generated software (Ken W. Alger, September 2026)</a> — the argument my whole week keeps making: when generation is cheap, verification is what you're actually paying for, and the honest version of that is a five-minute implementation inside a fifty-minute delivery. The worked example is a password-reset flow whose link could be used twice — nobody asked for single-use, no demo would catch it, and the specification ends up being the durable artifact rather than the code. It lands here because the only two things that caught real bugs today were a store-level invariant and a test that fails when you revert the fix.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=10" defer></script>
+</body>
+</html>
