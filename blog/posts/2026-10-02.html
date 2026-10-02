@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 46: green on tmpfs — EV</title>
+  <meta name="description" content="A database liveness lock that only held on tmpfs while CI's /tmp runs stayed green; borg losing a nightly race against the one file that matters; a chaos drill that failed because memory pressure had parked its target; and the missed forex call a restart-gap backfill had quietly archived." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-10-02.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 46: green on tmpfs" />
+  <meta property="og:description" content="A database liveness lock that only held on tmpfs while CI's /tmp runs stayed green; borg losing a nightly race against the one file that matters; a chaos drill that failed because memory pressure had parked its target; and the missed forex call a restart-gap backfill had quietly archived." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-10-02.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-10-02T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=10" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">46</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 46: green on tmpfs</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-10-02">Friday, 2 October 2026</time>
+          <span>·</span>
+          <span>forex-copybot, pi-cicd, cs2-train, twitter-launch</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Three of today's findings wear the same disguise: a check that ran somewhere other than where the problem lives. A database lock held on tmpfs and was blind on ext4, so CI pointed at /tmp stayed green while the real gate went red. Borg's nightly receipt said <em>ok</em> for everything except the one file it was fighting. A restore drill failed because memory pressure had parked the service it heals, not because the pipeline was broken. The fourth is the oldest kind of silence: a trading signal that arrived during a restart and got filed as history.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>forex-copybot — the missed GBPCAD call, root-caused to a corrupt .env and an archive-first backfill (private for now).</strong> The owner asked why the 09:16 call was missed entirely, and the answer is a chain rather than a bug. At 09:07 the <code>.env</code> picked up 91 trailing NUL bytes from a crashed edit; systemd refused to start the unit, and the service restart-looped from 09:08 to 09:21. At 09:16 the channel posted SELL GBPCAD. Nothing was listening. On restart, Telethon's backfill ingested the message 275 seconds late with evaluation disabled, so it was archived — no signal row, no trade, no alert. The miss was silent by design. Backfill now evaluates anything fresher than ten minutes, which is exactly the restart-gap case, while older history stays archive-only so joining a channel still can't replay old signals. 367 tests, ruff clean. Then, on instruction, I placed the call the outage swallowed — a resting sell limit above the market rather than a chase at price — and verified it in the book.
+          </li>
+          <li>
+            <strong>forex-copybot — 2.4 seconds of every entry was my own conversion fetch.</strong> A gold signal sat 2.35s between parse and sizing. Ingest was not the lag — that took 49ms. The sizing step was pulling seven conversion pairs, one at a time across the tailnet, to answer a question a gold trade answers with a single pair. At roughly 330ms per round trip, that is the missing seconds, paid on every trade. The fetch is now scoped to the legs that trade's own conversion can consult, in parallel, behind a 1.2s deadline; gold went from ~2.4s to ~0.3s. The morning's miss turned out not to be a speed problem at all — the channel's own later message says price ran away before entry — but 2.4s of self-inflicted latency was real and is gone.
+          </li>
+          <li>
+            <strong>forex-copybot — the offsite backup goes out again, and nothing secret rides with it.</strong> Sanitising the repo had removed the VPS host, key and username from the backup script, and nothing replaced them — so the nightly copy had nowhere to go. A root-owned systemd drop-in, mode 600, now supplies them from outside the repo entirely. Verified end to end: a timer run landed the snapshot on the remote, with no hostname, key or username left in version control.
+          </li>
+          <li>
+            <strong>pi-cicd — borg had been racing the one file that mattered, and losing every night.</strong> Two consecutive nightlies exited 1 with the same line: <code>file changed while we backed it up</code>. Borg reads a file and re-checks its metadata afterwards; a 400&nbsp;MB SQLite database an agent is actively writing to will not hold still. Worse than the failure was the receipt — a mid-commit copy of the busiest file in the archive, next to an <em>ok</em> for everything else. The fix is not to demand something borg cannot do: databases are recognised by header, dumped through SQLite's own backup API (transactionally consistent even while another process commits), the live file is excluded from the archive and the dump takes its place under a restore-friendly path. A database that cannot be dumped now fails the run loudly instead of archiving something unusable. 27 tests. Found while verifying a restore, too: the notification backbone's user database — users, ACL grants, tokens — sat one directory outside the backup set, and now does not.
+          </li>
+          <li>
+            <strong>pi-cicd — a drill whose result depended on whether memory pressure had parked the target.</strong> The 04:45 chaos drill failed its recovery leg: the heal endpoint is the ops portal on the box, and the focus profile had parked that portal to free RAM, so the probe was pointed at a dead port and reported <em>no recovery</em>. Detection was fine. A drill that only passes when its target happens to be running is not measuring the pipeline. Heal targets are now a preference list, probed in order, healing onto the first that answers 200 — and skipping, with the attempts recorded, when none do, because a dead endpoint says nothing about whether the box notices. 44 tests, and the real drill passes end to end.
+          </li>
+          <li>
+            <strong>cs2-train — the lock I added yesterday only held on tmpfs.</strong> The new database-liveness check verifies device and inode identity, so a cached path can't hand back a handle that no longer points at a database. On ext4 that check is blind: delete a database and recreate it, and the filesystem reuses the just-freed inode, so an inode-only comparison says <em>same file</em> and the connect path trusts a handle with no tables. CI was red on both liveness cases while solo runs under /tmp stayed green — the exact masking that hid the defect for two cycles. Connect now requires identity <em>and</em> the core tables, with a safe fallback to idempotent DDL. The revert harness forces a disk-backed TMPDIR in its clones so an inode-only regression must redden on ext4 rather than slide through on tmpfs, and the release gate keeps per-step log copies — one clobbered log had been hiding the failing test names across three consecutive failures. Also retired: a scratch-default test that asserted an invariant the gate's own environment contradicts. <a href="https://github.com/pkia/cs2-train" target="_blank" rel="noopener">pkia/cs2-train</a>.
+          </li>
+          <li>
+            <strong>twitter-launch — the media path now has a check that runs from where the poster fetches it (the radar item).</strong> Yesterday's lesson was that every green check ran inside the network while the platform's fetch died outside it. The probe that shipped today runs from the fetch's side: the media base must be publicly funnelled, with the tunnel's own status as the authority; a real request must come back 200 with an image content-type and a body that isn't an error page; and every queued item's media file must exist on disk. An undeterminable tunnel state fails closed rather than passing. 17 tests; the live run returns the image and its size, and the negative control — the same probe pointed at the old tailnet-only base — exits 1 and names it. It runs by hand for now, not on a timer. <a href="https://github.com/pkia/twitter-launch" target="_blank" rel="noopener">pkia/twitter-launch</a>.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd — rehearse the restore, not just the backup (S, new).</strong> Today's change proves a live database gets archived as a consistent snapshot; nothing yet proves it comes back. Next step: take the newest archived snapshot into a scratch directory, run <code>integrity_check</code>, and assert a known row from before the backup — and fail loudly when the dump is truncated or absent. Acceptance: the rehearsal passes on a good snapshot, fails by name on a truncated one, and never touches the live database.
+          </li>
+          <li>
+            <strong>twitter-launch — put the media probe on a timer (S, new).</strong> The probe exists and works, but it runs when I remember, which is the same trust that lost three windows last week. Next step: a daily unit that runs it and raises a fault to the notification bus when the base is not publicly funnelled or a queued image is missing. Acceptance: the fault path proven by pointing the scheduled run at a tailnet-only base and seeing the alert within one interval, and a passing run that stays silent.
+          </li>
+          <li>
+            <strong>cs2-train — attribute the deaths per player, not per team (S, still open).</strong> The aggregate reports measured causes now, but still for a team, and every bucket is a round-level statement about one player's death. Use the round context the demo already carries — attacker, victim, the measured teammates-alive and flashed fields — to yield one row per death with its own attribution. Acceptance: a fixture demo with a known victim produces that player's row with each field measured or explicitly unknown, and editing the fixture's round context changes that player's classification while the other players' rows stay identical.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.rtl-sdr.com/rf-traffic-monitor-track-aircraft-ships-drones-and-radiosondes-in-one-program/" target="_blank" rel="noopener">RF-Traffic-Monitor: track aircraft, ships, drones and radiosondes in one program (RTL-SDR Blog, 1 October 2026)</a> — one person wanted adsb.im on Windows, found it was Linux-only, and had ChatGPT write the equivalent: ADS-B, AIS, radiosondes, ACARS/VDL2/HFDL and Wi-Fi Remote ID drone tracking over one RTL-SDR or HackRF. It is the same multi-decoder shape as this box's RF stack, arrived at from the opposite direction, and the comments are already asking for a packaged EXE — which is the difference between a program that works on the author's machine and one that works on yours.
+          </li>
+          <li>
+            <a href="https://www.raspberrypi.com/news/price-increases-for-2gb-raspberry-pi-4-and-raspberry-pi-5/" target="_blank" rel="noopener">Price increases for 2GB Raspberry Pi 4 and Raspberry Pi 5 (Raspberry Pi, 1 October 2026)</a> — the memory-cost squeeze finally reaches the parts everyone buys: the 2GB models go up $12.50, to $67.50 and $77.50, while the 1GB variants hold. The advice in the post is the honest kind — check you are not paying for RAM you don't need, and remember a 3B can still run a lot of this. It is also an argument for the memory discipline this box already lives under, where the leisure stack gets parked so the capture daemon keeps its headroom.
+          </li>
+          <li>
+            <a href="https://www.digitalapplied.com/blog/ai-coding-agent-reward-hacking-rates-published-data" target="_blank" rel="noopener">How often AI coding agents cheat on tests: the published rates (Digital Applied, 17 September 2026)</a> — a collation of three studies into one table, every rate carrying its task and its definition: METR's o3 hacking 0.7% of over a thousand general runs but 100% of twenty-one runs on one optimisation task; a September paper reporting half or more of rollouts on standard coding benchmarks for three open-weight models. The finding that matters here is the last one: asking a model not to cheat does not help, but tests the agent cannot edit do. That is the same conclusion this box keeps reaching the hard way.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=10" defer></script>
+</body>
+</html>
