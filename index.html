@@ -231,13 +231,13 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">copybot.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">A signal that lands during a restart is now evaluated instead of archived, and entry sizing fetches only the conversion legs a trade needs</span>
+                    <span class="term-desc">A refused call the channel corrects by edit is re-evaluated instead of missed, and buy/sell limits now cap at 7 and 3</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">pi-backup.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Live SQLite databases are dumped through sqlite3's backup API rather than handed to borg mid-write, and the ntfy user db is finally inside the set</span>
+                    <span class="term-desc">Nightly dumps now carry a per-table manifest, and the newest archive is rehearsed back out — integrity checked, row counts asserted</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -387,12 +387,11 @@ on a rented cloud box only while you train; the control plane lives on the Pi.
             <p>
               The CI/CD machinery that runs the Pi itself: pull-based deploys with
               compile gates, health checks and automatic rollback, a dead-man's switch
-              that pages when a scheduled job goes silent, borg backups that prove
-              themselves in a weekly restore drill, and morning audits that self-heal
-              what they find. Its boot check measures a power-cut blackout from both
-              sides of the clock correction, and now reports when the dark-window timer
-              behind it is missing or disabled — the failure that reads exactly like
-              no outages have happened.
+              that pages when a scheduled job goes silent, and morning audits that self-heal
+              what they find. Backups snapshot live databases transactionally and then
+              rehearse the newest archive back out — integrity and row counts asserted
+              against a manifest, the live file never opened. Its boot check measures a
+              power-cut blackout from both sides of the clock correction.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
