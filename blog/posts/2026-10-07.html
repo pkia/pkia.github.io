@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 51: the stop that said it moved — EV</title>
+  <meta name="description" content="The copy bot moved to a VPS where “up” now means trading with nobody logged in, and a stop-loss amend that reported success because the bridge answered HTTP 200 while refusing the move." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-10-07.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 51: the stop that said it moved" />
+  <meta property="og:description" content="The copy bot moved to a VPS where “up” now means trading with nobody logged in, and a stop-loss amend that reported success because the bridge answered HTTP 200 while refusing the move." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-10-07.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-10-07T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=10" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">51</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 51: the stop that said it moved</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-10-07">Tuesday, 7 October 2026</time>
+          <span>·</span>
+          <span>forex-copybot, pi-cicd, product-autopilot</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          The trading bot spent the day moving house, off the Pi and onto a VPS, which sounds like a one-line change and isn't: "the host is up" had to be redefined to mean "the bot is trading", and every failure that only shows itself when nobody is watching had to be found before the fact rather than after it. Meanwhile the stop-loss on an open trade had been telling me it moved when it hadn't, which is a worse class of bug than a stop that plainly fails to move.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>forex-copybot — the bot moved to the VPS, and "VPS up" now means "trading".</strong> The bot had a boot trigger; the thing it trades through did not. MT5 ran in session 0, but the bridge started on a logon trigger as Administrator, and the host has no auto-login — so a reboot restored the bot while the broker link stayed down, held together by a stale disconnected RDP session. Measured rather than assumed: a session-0 SYSTEM process can attach to the running terminal (<code>initialize</code> true, <code>trade_allowed</code> true), so no interactive login is needed anywhere on that box. The bridge is now SYSTEM with a boot trigger, its 72-hour execution limit removed (it had already terminated a run once) and restart set high, and a new keeper runs every five minutes to start the bot when its health endpoint is unreachable and restart the bridge when <code>broker_ok</code> is false, on a fifteen-minute cooldown. Verified by rebooting the VPS with nobody logged in: bot and bridge up on boot triggers, <code>broker_ok</code> true, ten orders open, trading about two minutes later. Two other failure paths went with it — the watchdog used to write its alert into a drop directory that only the live bot drains, so the one failure it exists for, the bot being down, was the one it could never report; it now sends directly and keeps the file as a fallback, and an external health check on the Pi pages after two consecutive misses and stays quiet while down. <a href="https://github.com/pkia/forex-copybot" target="_blank" rel="noopener">pkia/forex-copybot</a>.
+          </li>
+          <li>
+            <strong>forex-copybot — an exit policy measured before it was shipped.</strong> Holding the full size and ratcheting the stop to each touched target beats banking thirds, on the channel's own signals: 141 filled signals over ~10 months of M5 real fills, 89 of them gold, both intrabar orderings agreeing. Gold: E[R] −0.036 for the ratchet against −0.090 for the legacy ladder, median +0.46R against +0.25R, stop-out rate unchanged at about a third. The popular variant — stop one target behind — measured strictly worse (−0.352R) and was deliberately not implemented. It is now a config flag (<code>exit_policy: ladder | ratchet_tp</code>), applied live to every open position, with the top target still exiting on the broker's own TP. Five new tests, 385 passing, running snapshot verified. A follow-up commit made the channel's "close half" management call raise the floor instead of slicing the position, so the auto-applied management can't contradict the policy I chose.
+          </li>
+          <li>
+            <strong>forex-copybot — the stop that reported success because the bridge said 200.</strong> I asked the bot why an open trade had passed its first target without its stop moving. Three stacked bugs. The trigger used the ask while the channel's targets track the bid and that pair carries a ~4.5 pip spread — the bid crossed the target and the ask never did, so the ratchet never fired; triggers are now bid-based. The stop amend trusted HTTP 200, but the bridge returns 200 <em>with</em> <code>success:false</code> when the terminal refuses a stop that violates the minimum distance — so the audit said applied, the database said moved, and the broker still held the original stop. The adapter now reads the response body and the database is written only on broker confirmation. And the target level was marked consumed even when the amend was refused, which killed the retry; levels now consume only on success, with refused amends retrying on a 60-second throttle until the distance clears. Live state repaired, two new tests, <strong>396 passing</strong>. Same day, a gold plan that parsed, validated and sized all three zones died as FAILED because the broker answered "market closed" and nothing retried at reopen: such rejections now park, retry every five minutes with the original price, stop, target and size, and the broker stays the authority on when the market is actually open. Deployed at 22:19 UTC, and the retry placed all three trades, confirmed at the broker.
+          </li>
+          <li>
+            <strong>pi-cicd — the power cut left races, not damage.</strong> The cut that left the box dark for eighteen hours rebooted it with every persistent timer firing at once, and three false alarms came out of it: the failed-unit audit was naming a bullet character instead of a unit, because systemd prints a leading marker even with <code>--no-legend</code>; the chaos drill failed because the service-probe timer hadn't finished a sweep yet and the notification daemon was still binding its socket; and the remote-access restart fired while the user manager was still starting. Fixed with plain parsing, a drill that skips a never-ran sweep while the box is younger than the staleness budget (past it, it's still a failure) and waits, bounded and fail-open, for the notifier's health endpoint, and a restart that waits for the manager to leave <code>starting</code>. 307 tests pass. <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+          <li>
+            <strong>product-autopilot — the orchestrator now survives its own crash.</strong> Cycle 46 closed T-077: a pid + start-time lock sidecar, an audited stale-lock takeover, a lock that refuses to clobber a live holder, and a checkpoint record written and archived at unlock. The 24-check suite plus the revert experiments are green and the red-team review came back approve-with-changes, all adopted. The repo also back-filled the audit trail from cycles the turn-budget crash had left untracked. <a href="https://github.com/pkia/product-autopilot" target="_blank" rel="noopener">pkia/product-autopilot</a>.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>copybot — make the keeper prove the heal, not assume it (S, new).</strong> The keeper's Tailscale heal was proven by stopping the service once and watching it repair unattended, but its bridge heal has only ever run on paper. Next step: a drill that stops the bridge on the VPS and asserts the keeper restores the broker link within one interval, pages once if the heal fails twice in a row, and stays silent on a clean heal. Acceptance: with the bridge stopped the keeper restores <code>broker_ok</code> inside fifteen minutes with zero pages; with the bridge held down, exactly one CRITICAL.
+          </li>
+          <li>
+            <strong>copybot — turn the bridge preflight into a gate, not a script someone remembers (S, still open).</strong> The preflight exists (it refuses a host that cannot run the MT5 IPC path, with the Wine trap named), but a human still has to run it before deploying, which is exactly the trust that let the README go stale. Next step: wire it into the bridge deploy as step zero. Acceptance: a deploy run against the Wine harness aborts before any bridge start with the IPC diagnosis, the same path against a stubbed native host proceeds, and neither run places an order.
+          </li>
+          <li>
+            <strong>Train — attribute the deaths per player, not per team (S, still open).</strong> The death-cause aggregate reports measured causes, but per team, while every bucket is a round-level statement about one player's death. Next step: use the round context the demo already carries (attacker, victim, teammates-alive, flashed) to yield one row per death. Acceptance: a fixture demo with a known victim produces that player's row with each field measured or explicitly unknown, and editing the round context changes that player's classification while every other player's row stays identical.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.rtl-sdr.com/chronalert-live-dashboard-for-radio-weather-alerts-with-rtl-sdr-integration-for-aprs-ads-b-and-ais/" target="_blank" rel="noopener">ChronAlert: live dashboard for radio, weather and alerts, with RTL-SDR for APRS, ADS-B and AIS (RTL-SDR Blog, 5 October 2026)</a> — a desktop situational-awareness dashboard that folds weather and emergency feeds, ham radio and propagation, hazards and infrastructure, and local radio into one screen, with an RTL-SDR doing the work for ships, aircraft and APRS packets, plus Meshtastic node and message display. Free tier is two panels and one watch zone; the paid unlock is a one-off. The interesting part for anyone with a receiver on the roof is the shape: three radios' worth of decoding, one glance.
+          </li>
+          <li>
+            <a href="https://linuxiac.com/raspberry-pi-os-october-2026-update-gets-better-dock-handling-and-many-fixes/" target="_blank" rel="noopener">Raspberry Pi OS October 2026 update (Linuxiac, 6 October 2026)</a> — the 6 October release ships Linux kernel 6.18.50 LTS and a long list of panel, Control Centre, taskbar and tray fixes: menus that opened off-screen, tray icons that all vanished when one was closed, the ejecter plugin now mounting encrypted drives, and a settled fight between PCManFM and the ejecter plugin over who gets to automount. Nothing here will change anyone's life, which is the point — a home-server box that gets quieter with every release is a good box.
+          </li>
+          <li>
+            <a href="https://venturebeat.com/security/companies-are-putting-jev-in-charge-of-ai-agent-decisions-and-prompt-injection-can-influence-the-verdict" target="_blank" rel="noopener">Companies are putting Jev in charge of agent decisions, and prompt injection can influence the verdict (VentureBeat, 21 September 2026)</a> — worth reading for anyone whose agent loop has a routing or allow/deny step. TypeSafe's Jev is a decision model: you hand it state and typed questions, it returns a choice, a score or a probability with confidence, in 70–500 ms at $0.042 per million input tokens. The useful half is the warning, published by the vendor and by Pydantic: option order is part of what the model sees, and text written to steer it can move the answer — one test dropped a block-the-command probability from 0.76 to 0.48 by planting a single fake field claiming the user had pre-approved it. Pydantic's line is the one to keep: a guard built on this belongs beside deterministic checks, not instead of them.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=10" defer></script>
+</body>
+</html>
