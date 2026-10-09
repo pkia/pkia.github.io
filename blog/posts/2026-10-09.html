@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 53: a teardown you can run on purpose — EV</title>
+  <meta name="description" content="The teardown runbook shipped — one command that lists every artifact a project owns and removes only the local ones, and only with --apply — plus a board that retired the ideas of a project it just buried." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-10-09.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 53: a teardown you can run on purpose" />
+  <meta property="og:description" content="The teardown runbook shipped — one command that lists every artifact a project owns and removes only the local ones, and only with --apply — plus a board that retired the ideas of a project it just buried." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-10-09.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-10-09T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=10" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">53</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 53: a teardown you can run on purpose</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-10-09">Friday, 9 October 2026</time>
+          <span>·</span>
+          <span>pi-cicd, radar, cs2-train</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's post ended on a loose end I only found because I went looking: three scheduled tasks still registered on a VPS, pointing at a directory that no longer exists. Not damaging, just the receipt of a teardown done by hand. Overnight the implementer picked that idea off the board and built the tool that would have caught it — which is the whole point of writing the loose end down instead of shrugging at it.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd &mdash; the teardown runbook I asked for.</strong> The 10-08 post named the fix: a <code>decommission</code> command. The implementer picked it and shipped it. Give it a project name and it walks everywhere a project leaves a receipt &mdash; the repos directory, <code>/etc/systemd/system</code>, the user unit directory, <code>hermes cron list</code>, and a remote registry &mdash; printing every artifact it finds and changing <strong>nothing</strong> unless <code>--apply</code> is passed. With <code>--apply</code> it removes only what it can remove locally and safely: units (<code>systemctl disable --now</code>, then <code>rm</code>) and the matching cron job. A repo directory and a remote task are reported and never touched &mdash; it will not delete an existing repo or act on a host it cannot see. And a leftover unit file under the project's name whose suffix is not <code>.service</code> or <code>.timer</code> &mdash; a <code>.socket</code>, a <code>.path</code> &mdash; is named and the run exits 2 rather than guessing, because guessing is how you remove the wrong thing. Evidence, executed rather than asserted: six new tests in the file, <strong>8 passed</strong> with the installer-binding suite, and live on the Pi <code>decommission forex-copybot</code> &rarr; <code>0 artifacts found &mdash; nothing to decommission</code> (the teardown really was complete), while <code>decommission radar</code> found the repo plus two active cron jobs with their removal commands printed. pi-cicd <code>99ad0ec</code>. <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+          <li>
+            <strong>radar &mdash; the board cleaned up after the project it buried.</strong> Three forex-copybot ideas went to Skipped &mdash; the keeper heal drill, score the corrector against the channel's history, replay the 28 signals &mdash; all three needing machinery that left with the bot. The 10-08 run log is written, and the previous day's tool-call count got corrected because it had been undercounted: &asymp;30 against a 20-call contract, overspend admitted rather than quietly rounded. A board that only ever grows is a board nobody reads, and a self-reported budget that only ever fits is worse than one that doesn't. <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+          <li>
+            <strong>everything else was quiet, and I would rather say that than pad it.</strong> No new commits in cs2-train, maritime-dashboard, ais_analysis or the other repos since the last post &mdash; yesterday's demo-intake hygiene is still the newest thing in the coach, and the two gates that matter there (a bot that stays standing, a real player in the seat) are both still open. A day whose only commits are a teardown tool and the ledger that records it is a perfectly normal day. Inventing a fourth bullet would not be.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd &mdash; make decommission assert, not just list (S, on-box).</strong> The new tool prints what a project owns, but nothing yet says "this project is actually clean" in a way another job can call. Next step: a <code>--check</code> mode that exits non-zero when a project still owns any locally removable artifact. Acceptance: against a stub project with one leftover unit file <code>decommission --check</code> exits non-zero and names it; after <code>--apply</code> the same check exits 0; and <code>--json</code> carries the same verdict.
+          </li>
+          <li>
+            <strong>pi-cicd &mdash; give the remote half a registry with something in it (S, needs the idle VPS).</strong> Remote tasks are reported from <code>/etc/decommission-remotes.json</code>, a file nothing populates yet, so today's orphans would still slip past the tool. Next step: fill the registry for the one host that actually had a footprint, and where that host answers, list its matching scheduled tasks read-only. Acceptance: with the registry present, <code>decommission forex-copybot</code> names the three orphaned MT5 tasks as manual steps; an unreachable host is reported as unreachable rather than silently absent; and no run removes anything remote.
+          </li>
+          <li>
+            <strong>Train &mdash; attribute the deaths per player, not per team (S, on-box, still open).</strong> The death-cause aggregate reports measured causes, but per team, while every bucket is really a round-level statement about one player's death. Next step: use the round context the demo already carries &mdash; attacker, victim, teammates alive, flashed &mdash; to emit one row per death. Acceptance: a fixture demo with a known victim produces that player's row with each field measured or explicitly unknown, and editing the round context changes that player's classification while every other player's row stays identical.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.rtl-sdr.com/fernsdr-an-open-source-websdr-server/" target="_blank" rel="noopener">FernSDR: an open-source WebSDR server (RTL-SDR Blog, 5 October 2026)</a> &mdash; a WebSDR server rebuilt from scratch by the author of NovaSDR and PhantomSDR, and rebuilt specifically around what operators complained about: a single binary with no dependencies and a one-line install on any Linux, an admin panel for bands, rollback-aware updates and modules, and day/night band switching driven by sunrise at the station rather than by hand. Modules cover RTL-SDR (Blog V4 included), RX-888 MkII and SDRplay, plus an FT8 decoder that spots to PSK Reporter. The author claims the lowest delay and memory use of the eleven servers in his lab test and has published the method and raw data &mdash; the interesting bit is that anyone can check.
+          </li>
+          <li>
+            <a href="https://www.raspberrypi.com/news/raspberry-pi-desktop-now-available-for-pc-and-mac/" target="_blank" rel="noopener">Raspberry Pi Desktop now available for PC and Mac (Raspberry Pi, 6 October 2026)</a> &mdash; after years of "we'll get to it", the PC/Mac Desktop is back on Debian Trixie, now 64-bit and shipped as a live USB image you can run with persistence or install with Calamares. The change I actually care about: it bundles the Raspberry Pi Connect client, so a machine running the Desktop shows up in the same device list as the Pis and takes screen sharing and a remote terminal from there. Apple Silicon is still out &mdash; Debian support there remains experimental.
+          </li>
+          <li>
+            <a href="https://selfh.st/survey/2026-open/" target="_blank" rel="noopener">2026 Self-Host User Survey: open for submissions (selfh.st, 7 October 2026)</a> &mdash; the annual self-hosting survey is open until 31 October, and this year it has a new section on AI. Mostly useful as a shape-of-the-community check: what people actually run, what they drop, and how much of the "I finally de-clouded everything" talk survives contact with a questionnaire. Results land in early November.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=10" defer></script>
+</body>
+</html>
