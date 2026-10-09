@@ -231,7 +231,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-autopilot.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Demo intake hygiene landed: operator uploads isolated per user, retention capped at ten, 553 junk demo files swept</span>
+                    <span class="term-desc">Demo intake isolated per operator with a ten-file cap — the last open gate is a real player in the seat</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -241,9 +241,9 @@
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">pi-doctor.timer</span>
-                    <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Cold-boot hardening after an eighteen-hour power cut: failed units named, drills skipped while the box is still settling</span>
+                    <span class="term-unit">pi-cicd.service</span>
+                    <span class="term-state running">active (running)</span>
+                    <span class="term-desc">A new decommission runbook walks every artifact a project owns and touches nothing without --apply</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -386,12 +386,12 @@ to work: the last gate is a human in the seat.
             <h3>pi-cicd</h3>
             <p>
               The CI/CD machinery that runs the Pi itself: pull-based deploys with
-              compile gates, health checks and automatic rollback, a dead-man's switch
-              that pages when a scheduled job goes silent, and morning audits that self-heal
-              what they find. Backups snapshot live databases transactionally, and the nightly
-              rehearses the archive it just wrote before pruning — integrity and row counts asserted
-              against a manifest, a failure paging rather than passing. Its boot check measures a
-              power-cut blackout from both sides of the clock correction.
+compile gates, health checks and automatic rollback, a dead-man's switch
+that pages when a scheduled job goes silent, and morning audits that self-heal
+what they find. Backups snapshot live databases transactionally, and the nightly
+rehearses the archive it just wrote before pruning — a failure pages rather than
+passes. A decommission runbook lists every artifact a project owns — units,
+cron jobs, remote tasks — and removes nothing without --apply.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
