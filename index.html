@@ -231,7 +231,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">train-autopilot.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Demo intake isolated per operator with a ten-file cap — the last open gate is a real player in the seat</span>
+                    <span class="term-desc">Readiness cycle only — the last gate belongs to a human, so the work is keeping that one session running current code</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -243,7 +243,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">pi-cicd.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">A new decommission runbook walks every artifact a project owns and touches nothing without --apply</span>
+                    <span class="term-desc">decommission now has a --check gate: it exits non-zero while a project still owns a unit or cron job it could remove</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -390,8 +390,8 @@ compile gates, health checks and automatic rollback, a dead-man's switch
 that pages when a scheduled job goes silent, and morning audits that self-heal
 what they find. Backups snapshot live databases transactionally, and the nightly
 rehearses the archive it just wrote before pruning — a failure pages rather than
-passes. A decommission runbook lists every artifact a project owns — units,
-cron jobs, remote tasks — and removes nothing without --apply.
+passes. A decommission runbook walks every artifact a project owns, changes
+nothing without --apply, and fails its own check while anything removable is left.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
@@ -753,7 +753,7 @@ cron jobs, remote tasks — and removes nothing without --apply.
           <span><i class="dim"></i>remote / agents</span>
         </div>
         <ul class="chips chips-sm arch-chips reveal">
-          <li>Pi 5 · 8 GB</li><li>15 network services</li><li>12 cron jobs</li>
+          <li>Pi 5 · 8 GB</li><li>15 network services</li><li>24 cron jobs</li>
           <li>Tailscale VPN</li><li>AdGuard DNS</li><li>auto-rollback CD</li><li>borg backups + drills</li><li>pytest on every push</li>
         </ul>
       </div>
