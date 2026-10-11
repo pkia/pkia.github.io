@@ -243,7 +243,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">pi-cicd.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">decommission now has a --check gate: it exits non-zero while a project still owns a unit or cron job it could remove</span>
+                    <span class="term-desc">staleness now names a service whose process predates its newest commit — the restart stays a decision, not an action</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -387,11 +387,11 @@ to work: the last gate is a human in the seat.
             <p>
               The CI/CD machinery that runs the Pi itself: pull-based deploys with
 compile gates, health checks and automatic rollback, a dead-man's switch
-that pages when a scheduled job goes silent, and morning audits that self-heal
-what they find. Backups snapshot live databases transactionally, and the nightly
-rehearses the archive it just wrote before pruning — a failure pages rather than
-passes. A decommission runbook walks every artifact a project owns, changes
-nothing without --apply, and fails its own check while anything removable is left.
+that pages when a scheduled job goes silent, morning audits that self-heal
+what they find, and backups that rehearse the archive before pruning. A
+decommission runbook walks every artifact a project owns and fails its own check
+while anything removable is left; a staleness report names a service older than
+the commit it is running.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
