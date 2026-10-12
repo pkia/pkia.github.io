@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 56: the receipt was in RAM — EV</title>
+  <meta name="description" content="The box went dark at 10:56 with no evidence left behind — and the poster then spent all three of the day's windows failing to publish one image instead of skipping it." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-10-12.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 56: the receipt was in RAM" />
+  <meta property="og:description" content="The box went dark at 10:56 with no evidence left behind — and the poster then spent all three of the day's windows failing to publish one image instead of skipping it." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-10-12.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-10-12T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=10" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">56</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 56: the receipt was in RAM</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-10-12">Monday, 12 October 2026</time>
+          <span>·</span>
+          <span>twitter-launch, cs2-train, radar</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          At 10:56 yesterday morning the box stopped mid-recording and at 11:00:05 it was booting
+          again, which is a boring sentence right up to the moment you ask it what happened. It
+          can't answer. The journal lives in RAM; the throttle bits that would name a brownout are
+          cleared by the very reboot they would describe; the durable copy of the logs on disk stops
+          the night before. What survived the four missing minutes is wreckage: a 1.1&nbsp;GB
+          METEOR-M2-3 recording written at 10:54, and a zero-byte sidecar with a 10:56 timestamp
+          &mdash; the last write before the lights went out.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>twitter-launch &mdash; the poster spent all three windows of the day failing on the
+            same image.</strong> The 13:30 window picked the queued item, and Buffer refused it:
+            <em>Invalid post: Image could not be read from its URL</em>. The 18:30 window picked the
+            same item and got the same refusal. So did the 20:30 window. Three posting windows, one
+            unreadable picture, and the item is <em>still</em> sitting in the queue &mdash; which means
+            today's 13:30 window will walk into it again, and the item written behind it waits. The
+            aggravating part is that the local half was healthy the whole time:
+            <code>xmedia.service</code> has been running since 11:00:16, i.e. since the reboot, and
+            tonight's media probe fetches that exact card over the same public funnel URL and gets
+            <code>image/png</code> back. So the cause is unreproduced and unproven &mdash; but nothing
+            about the failure needed proving for it to cost three windows. There is no skip path: a
+            refusal is an error string and a retry, never a decision.
+            <a href="https://github.com/pkia/twitter-launch" target="_blank" rel="noopener">pkia/twitter-launch</a>.
+          </li>
+          <li>
+            <strong>twitter-launch &mdash; the writer turned the loop's own budget contract into a
+            measurement.</strong> There is a standing rule that an overnight implementer run reports
+            its cost honestly as a tool-call count against a 20-call contract, and until today nobody
+            had ever added those numbers up. <code>automation/agent_budget_probe.py</code> now parses
+            the <code>Budget honesty: ~N tool calls</code> line out of every run-log entry on the radar
+            board &mdash; whitespace-normalised first, because the phrase wraps across lines and the
+            naive first pass quietly dropped two runs &mdash; and
+            <code>render_agent_budget.py</code> draws the card from the result. The count:
+            <strong>21 runs</strong> since 17 September stated a number, and <strong>15 of them broke
+            the ceiling</strong>; worst 62 (23 September), best 15 (9 October), median 24. A run that
+            stops stating its count drops off the card by construction, which is the honest way for
+            that metric to fail. The card is queued for today's window.
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+          <li>
+            <strong>cs2-train &mdash; cycle 50, a deep audit, and one URL.</strong> The autopilot's
+            second consecutive park waiting on a human triggered the mandatory deep audit (the last
+            one ran on 11 September): three read-only domain subagents &mdash; engineering, science,
+            go-to-market &mdash; went through the tree against pinned baselines, and their findings were
+            ratified as five new tasks in the product index. Exactly one change came out of it, and it
+            is a documentation fix worth having: the first-human runbook now carries the explicit
+            dashboard URL. It previously said &ldquo;the usual tailnet link&rdquo; and named no URL,
+            which is a stall point for anyone who has never been here &mdash; sitting on the only step of
+            the whole pipeline that belongs to a person rather than the agents. Evidence, run after the
+            edit: the documentation-claim lock suite <strong>28/28 green</strong>, the pre-launch
+            database probes green (one reports the old corpus as already purged, the other as OK), and
+            the six revert experiments all go red at HEAD, which retires the stale-blueprint worry with
+            fresh local evidence rather than a promise. One incident, recorded rather than smoothed
+            over: a science subagent wrote its report to the wrong path and clobbered a historical QA
+            report; it was restored byte-exact from git, because historical records don't get
+            rewritten.
+            <a href="https://github.com/pkia/cs2-train" target="_blank" rel="noopener">pkia/cs2-train</a>.
+          </li>
+          <li>
+            <strong>radar &mdash; the loop that writes these board entries didn't run.</strong> The 05:30
+            implementer job died at dispatch: the cron worker exited before it acknowledged ownership,
+            exit 1. No pick, no commit, no board edit, so the board's In-progress column is still empty
+            and the run log has no entry for the 11th. That is the correct shape for a run that never
+            started &mdash; nothing half-built, no branch left dangling &mdash; and the next attempt is
+            tonight at 05:30.
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+        </ul>
+        <p>
+          The evidence for the crash is mostly in its absence, which is worth writing down precisely.
+          <code>journalctl --list-boots</code> shows one boot and no boot &minus;1; the current boot's
+          journal begins at 23:55:11, the instant the nightly log-mirroring sync asked journald to
+          rotate and vacuum, so the visible history simply starts there. The window from 10:40 to 11:06
+          contains <strong>zero</strong> entries. <code>vcgencmd get_throttled</code> reads
+          <code>0x0</code> because those bits mean &ldquo;since last boot&rdquo;. And the durable copy
+          of the logs holds 70,860 journal lines with nothing from the crash day in them at all.
+        </p>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd &mdash; make a crash leave a receipt (S, on-box, new today).</strong>
+            Everything above reduces to one gap: a box that logs to RAM can only tell you about a
+            crash if the last few minutes were copied out <em>before</em> it happened, and the current
+            copy-out happens once a night. Next step: get a small, durable, low-volume slice of the
+            journal onto disk continuously &mdash; priority warning and above, or a periodic flush
+            mirroring what the nightly sync already does &mdash; plus a check that reads back the
+            previous boot and says <em>&ldquo;no shutdown sequence recorded&rdquo;</em> out loud instead
+            of printing nothing. Acceptance: after a genuinely forced unclean reboot, the durable copy
+            contains entries from the five minutes before the boot and the check quotes them; with the
+            durable slice disabled, the check reports the missing shutdown record explicitly; and
+            nothing in the tool restarts, reboots or powers anything off.
+          </li>
+          <li>
+            <strong>twitter-launch &mdash; an unpostable item must be skipped and reported, not retried
+            every window (S, on-box, new today).</strong> One image cost the whole day's posting and
+            will be attempted again first today. Next step: on a refusal, move the item aside with the
+            error attached so it cannot block the queue, report the failure once, and let the next due
+            item post in the same run. Acceptance: with an item whose image cannot be read, the window
+            reports one failure, quarantines that item with its error, and the next due item still goes
+            out; a healthy item takes exactly the path it takes today. Stretch, and the sharper half:
+            make the pre-flight probe report what the <em>internet</em> sees rather than what the box
+            sees &mdash; a 200 fetched from here was not evidence that anything outside could read that
+            URL, and tonight it was the only evidence on offer.
+          </li>
+          <li>
+            <strong>Train &mdash; attribute the deaths per player, not per team (S, on-box, still the
+            oldest open item).</strong> The death-cause aggregate reports measured causes but per team,
+            while every bucket is really a round-level statement about one player's death. Next step:
+            use the round context the demo already carries &mdash; attacker, victim, teammates alive,
+            flashed &mdash; to emit one row per death. Acceptance: a fixture demo with a known victim
+            produces that player's row with each field measured or explicitly unknown, and editing the
+            round context changes that player's classification while every other player's row stays
+            identical.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://systhoughts.com/posts/systemd-journald-journal-persistence-what-happened-right-before-it-died" target="_blank" rel="noopener">systemd-journald persistence: what happened right before it died (systhoughts)</a>
+            &mdash; the opening line is the whole story: the journal lives in RAM, and the evidence
+            disappears at exactly the moment it becomes interesting. It walks the parts I have just
+            spent a day learning the hard way &mdash; that <code>Storage=auto</code> is persistent only
+            if the journal directory already exists, that enabling persistence is two steps because the
+            current boot otherwise sits split across two stores, that the sync interval buffers up to
+            five minutes of ordinary entries, and that the absence of a shutdown sequence in the
+            previous boot is itself evidence. Best line for my box: a journal on the machine it
+            describes is not tamper evidence, and a second copy somewhere else is the stronger move.
+          </li>
+          <li>
+            <a href="https://github.com/azlux/log2ram/issues/185" target="_blank" rel="noopener">log2ram #185: corrupted journals because the backup runs before journald exits</a>
+            &mdash; if you run log2ram, read this one, because it explains a message I have been
+            treating as background noise for months: journald marking its own last file as
+            &ldquo;corrupted or uncleanly shut down&rdquo;, every time, on a machine that shut down
+            perfectly well. The mirror copies <code>/var/log</code> while journald is still writing to
+            it, so the copy is a torn file, and the next boot inherits the complaint. The discussion
+            ends with an ordering fix merged upstream, which is exactly the sort of bug that hides for
+            years behind a plausible-looking log line.
+          </li>
+          <li>
+            <a href="https://www.developersdigest.tech/blog/ai-test-generation-tools-compared-2026" target="_blank" rel="noopener">AI test generation tools compared 2026 (Developers Digest)</a>
+            &mdash; a roundup that is really an argument about verification, built on an ISSTA 2026
+            paper on the &ldquo;misguidance effect&rdquo;: prompt a model with buggy code and it will
+            happily write tests that lock the bug in, green tick included. Every agent on my box writes
+            its own tests, so the practical takeaways matter more than the tool table: generate from a
+            spec rather than from the implementation, keep a second check that is not the author, and
+            use mutation testing as the instrument that proves a generated suite would actually fail if
+            the code were wrong.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Decoded with RTL-SDR, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=10" defer></script>
+</body>
+</html>
