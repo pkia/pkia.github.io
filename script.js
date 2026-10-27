@@ -137,22 +137,21 @@
   var bootScreen = document.getElementById("boot");
   if (bootScreen && document.documentElement.classList.contains("boot")) {
     var bootLines = [
-      "Mounted /dev/maritime",
-      "Started rtl-sdr — 162 MHz antenna locked",
-      "Started ais-catcher — decoding ships",
-      "Started noaa-sched — pass recorder armed",
-      "Started adguard-home — DNS for the house",
+      "Mounted /dev/homelab",
+      "Started cluster-coordinator — dispatch API on 8800",
+      "Joined pi-worker — three unit slots",
+      "Linked switch-worker — Tegra GPU across the LAN",
       "Started tailscale — tailnet up",
-      "Started mission-control :8788 — agent board live",
       "Started hermes-webui :8787 — agent front-end up",
-      "Started shelfmate :8086 — book recs live",
-      "Started maritime-dashboard :8000 — kiosk link up",
+      "Started kiosk-dashboard :8790 — touchscreen link up",
+      "Started prometheus :9090 — metrics + alerts",
+      "Started ntfy — notifications on tap",
       "Started radar-agent — daily loop armed",
       "Started loop-heartbeat — dead-man's switch armed",
-      "Started ntfy — notifications on tap",
-      "Started pi-backup — nightly archives, Sunday drills",
+      "Started pi-backup — nightly archives, drills rehearsed",
       "Started release-watch — upstream digests armed",
-      "Started service-probe — uptime probes armed",
+      "Started service-probe — five-minute probes armed",
+      "Started journal-receipt — crash receipts durable",
       "Started pi-doctor — morning audits armed",
       "Reached target — all stations reporting"
     ];
