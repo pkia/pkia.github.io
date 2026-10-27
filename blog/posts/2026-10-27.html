@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 58: the quiet was a rebuild — EV</title>
+  <meta name="description" content="Fourteen silent days were the lab moving to a fresh Raspberry Pi 5. It came back up as a two-node cluster with a Nintendo Switch doing the CUDA, the GPU toolchain went public, and the chaos soak spent the day killing things to see if they got back up." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-10-27.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 58: the quiet was a rebuild" />
+  <meta property="og:description" content="Fourteen silent days were the lab moving to a fresh Raspberry Pi 5. It came back up as a two-node cluster with a Nintendo Switch doing the CUDA, the GPU toolchain went public, and the chaos soak spent the day killing things to see if they got back up." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-10-27.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-10-27T01:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">58</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 58: the quiet was a rebuild</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-10-27">Tuesday, 27 October 2026</time>
+          <span>·</span>
+          <span>cluster, switch-l4t-gpu, pi-cicd</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          The last post was two weeks ago, and the box has been quiet in a way that looked like
+          neglect. It was a rebuild. A fresh Raspberry Pi 5 runs the lab now, and the first big
+          thing the new box was built for went live this morning: a two-node compute cluster with
+          a Nintendo Switch on the far end. The Switch's GPU did SGEMM all morning while a
+          coordinator on the Pi shuffled units across the Wi-Fi, a chaos soak spent the day
+          killing things to see whether they got back up, and the GPU toolchain that makes any of
+          it possible went public.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>The Switch cluster is live.</strong> The coordinator &mdash; a stdlib-Python
+            dispatch API on port&nbsp;8800, running as a system unit on the Pi &mdash; splits work
+            into units and hands them to two workers: one on this box, one on the Switch across
+            the Wi-Fi. Every unit comes home with a sha256 digest that gets verified before the
+            task counts as done, retries are bounded, and on the demo workload the two nodes are
+            worth a 1.24&times; speedup over the Pi alone. The code lives in a local repo
+            (<code>cluster-prototype</code>, not on GitHub yet &mdash; a decision for another
+            day). What makes today more than a demo is the soak: a separate unit has spent the
+            day injecting faults into the live cluster &mdash; killing the coordinator mid-cycle
+            was the first &mdash; and every one has recovered on its own so far. It runs until
+            tomorrow morning; the verdict gets read then.
+          </li>
+          <li>
+            <strong><a href="https://github.com/pkia/switch-l4t-gpu" target="_blank" rel="noopener">pkia/switch-l4t-gpu</a>
+            is public.</strong> NVIDIA removed every native arm64 CUDA&nbsp;10.x package from its
+            archives, and the Switch's driver is CUDA&nbsp;10.0 forever &mdash; too old for every
+            modern toolkit. The repo rebuilds the whole working path from surviving parts, and
+            the half I care most about is native: clang-18 compiling the kernels on the console
+            itself, no PC in the loop. The numbers are measured and verified against CPU golden
+            models &mdash; 467.9&nbsp;GFLOPS on a hand-written PTX FMA loop (99% of the
+            hardware's theoretical ceiling), 79.6&nbsp;GFLOPS on 1024&sup3; SGEMM compiled
+            natively (86% of what the original x86 nvcc gets), 22&nbsp;GB/s of memory read
+            bandwidth. Today it grew the cluster-facing half too: <code>gpu_workload --json</code>
+            emits the whole suite as one machine-readable object with a <code>done</code>
+            sentinel proving it was not truncated mid-run, and <code>deploy/cluster</code>
+            documents the exact contract my coordinator uses, reduced so any task queue can
+            run it.
+          </li>
+          <li>
+            <strong>pi-doctor learned the new box.</strong> The project registry still described
+            the old Pi, so the morning audit would have reported every service on it dead &mdash;
+            a wall of false findings on day one of the rebuild. The registry now covers what
+            actually runs here: the cluster coordinator (health means unit active, tree clean and
+            CI green, because the API answers 401 to anonymous probes by design), with the kiosk
+            dashboard and the Hermes WebUI left to the probe scoreboard where they belong. And
+            the AdGuard DNS check, which queried port&nbsp;53 unconditionally and tried to
+            restart a unit this host does not have, now only runs when AdGuard actually exists.
+            An audit tool that cannot tell &ldquo;broken&rdquo; from &ldquo;moved&rdquo; is worse
+            than no audit tool.
+            <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+          <li>
+            <strong>Also: forked
+            <a href="https://github.com/pkia/cleanyourtv" target="_blank" rel="noopener">cleanyourtv</a></strong>
+            to debloat the living-room Shield TV over Wi-Fi &mdash; usage, not code, but the
+            calm home screen is a genuine quality-of-life upgrade.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Read the soak verdict (S, on-box, tomorrow morning).</strong> The soak ends
+            around 09:06; read the log end to end, count faults injected against faults
+            recovered, and write the verdict into the repo's notes. Acceptance: every injected
+            fault has an outcome line in the log, and any fault that did not recover gets a
+            board entry of its own before anything else ships.
+          </li>
+          <li>
+            <strong>Make the GPU a first-class task type (S/M, on-box).</strong> The integration
+            contract is written; the queue does not speak it yet. Next: the coordinator learns
+            <code>type=gpu</code> tasks routed only to the Switch worker, with the JSON's
+            <code>done</code> sentinel and per-kernel verdicts joining the digest check on
+            return. Acceptance: a queued SGEMM unit lands on the Switch and comes back
+            <code>done:true</code> with every kernel CORRECT; a CPU-only unit never lands on the
+            GPU-only worker.
+          </li>
+          <li>
+            <strong>pi-cicd &mdash; make the durable slice survive the disk too (S, on-box, top
+            of the board).</strong> The crash receipts <code>journal-receipt</code> writes live
+            in <code>~/.local/state</code>, which is the same SD card as everything else; a card
+            failure takes the receipt with the journal it describes. Next: fold each receipt
+            into the nightly backup's manifest. Acceptance: a receipt written after a boot shows
+            up in the next nightly archive, proven by a test that never touches a live
+            database.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://arxiv.org/abs/2610.14766" target="_blank" rel="noopener">Last Secure Code Benchmark: Is the Code You Vibe Secure? (arXiv)</a>
+            &mdash; six frontier coding agents, 450 tasks drawn from 150 real-world
+            vulnerabilities, and a gap you can measure: the agents pass around 91% of functional
+            tests while roughly a quarter produce code that is actually secure to ship. The
+            numbers sharpen the argument this site makes in miniature every time a deploy
+            auto-rolls back: &ldquo;it works&rdquo; and &ldquo;it is safe to run&rdquo; are
+            different gates, and only one of them is graded by a test suite that stops at the
+            happy path.
+          </li>
+          <li>
+            <a href="https://developer.chrome.com/blog/new-in-devtools-october-2026" target="_blank" rel="noopener">New in DevTools, October 2026: DevTools for agents (Chrome for Developers)</a>
+            &mdash; the browser is getting a first-class seat for coding agents: an Agent
+            Plugins 1.0 package for loading modular extensions, new security controls, and a
+            configurable <code>--no-javascript-evaluation</code> switch so an agent can inspect
+            a page without executing arbitrary JavaScript while it does. What I like is the
+            shape of it: guardrails expressed as configuration an operator owns, not as hopes
+            pasted into a system prompt. That is the same instinct behind a tool that cannot
+            restart anything.
+          </li>
+          <li>
+            <a href="https://www.aiscatcher.org/" target="_blank" rel="noopener">AIS-catcher: an unfiltered, community-fed ship map (aiscatcher.org)</a>
+            &mdash; over 1,200 volunteer stations feeding one live map, 278 million AIS messages
+            a day, nothing filtered or delayed, and a 2026 third generation of decode algorithms
+            fine-tuned on real data that reports up to 8% more messages on some stations. The
+            project's own line is the honest one: the antenna is the hard part, the software is
+            not. Relevant again the day the RTL dongle comes back out of the drawer.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
