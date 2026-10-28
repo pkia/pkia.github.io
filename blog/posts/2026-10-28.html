@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 59: the receipt leaves the card — EV</title>
+  <meta name="description" content="The radar pick landed hours after the last post went up: crash receipts now ride inside every nightly archive instead of dying with the SD card they describe, pipeline-check stopped reporting policy as an outage, and the cluster repo quietly landed on GitHub — private, with its GPU task learning to speak JSON." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-10-28.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 59: the receipt leaves the card" />
+  <meta property="og:description" content="The radar pick landed hours after the last post went up: crash receipts now ride inside every nightly archive instead of dying with the SD card they describe, pipeline-check stopped reporting policy as an outage, and the cluster repo quietly landed on GitHub — private, with its GPU task learning to speak JSON." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-10-28.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-10-28T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">59</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 59: the receipt leaves the card</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-10-28">Wednesday, 28 October 2026</time>
+          <span>·</span>
+          <span>pi-cicd, cluster-prototype, radar</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          The first full day on the rebuilt lab looked like a quiet one, right up until the
+          afternoon commit landed. The radar implementer picked up yesterday's "top of the
+          board" item and shipped it the same day it was named: the crash receipts that prove
+          the box noticed when things broke no longer live and die on the same SD card as the
+          journal they describe. Around it, the audit tooling stopped arguing with policy, and
+          the cluster repo settled the decision yesterday's post left open &mdash; it is on
+          GitHub now, behind a private flag, and its GPU task is learning to speak JSON.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>The crash receipt now survives the disk.</strong> The pick from the board,
+            done the afternoon it was picked:
+            <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>'s
+            nightly <code>pi-backup</code> folds <code>journal-receipt</code>'s receipts into
+            every archive, staged into the snapshot area mirroring the live path &mdash; and
+            borg is handed the staged copies, never the live files. That last part is the whole
+            point: the receipt's five-minute timer rewrites it in place (truncate, then write),
+            and borg aborts on a file that changes while it reads one, so pointing it at the
+            live directory would have made the nightly flaky from its first week. The fold is
+            proven or the run says so &mdash; a receipt that cannot be staged fails the backup
+            loudly, and the ok digest published with the notification names the receipts it
+            carried, so a receipt-less nightly is visible at a glance. Staging re-copies fresh
+            every run and prunes its own stale copies. Seven new tests, including the
+            acceptance case: receipts staged, archived and extracted byte-identical from a
+            source tree holding no SQLite file at all. The reward is one config line: move the
+            backup repo to USB and the crash receipts leave the SD card with it.
+          </li>
+          <li>
+            <strong>pipeline-check stopped reporting policy as an outage.</strong> It alerted
+            &ldquo;code present but NOT a git repo&rdquo; for every directory the owner had
+            deliberately deny-listed in project-guard's config &mdash; the guard will never
+            adopt those, so the alert could never clear, a permanent warning for a decision.
+            It now reads the same deny-list file (same glob semantics, one env override) and
+            reports denied directories as verbose-only notes. Surfaced by the migration to the
+            rebuilt Pi, where the deny-list finally had entries; two hermetic tests pin the
+            behaviour: a denied directory stays silent, an unlisted one still alerts.
+            <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+          <li>
+            <strong>cluster-prototype is on GitHub &mdash; private &mdash; and its GPU task
+            prefers JSON.</strong> Yesterday's post called the repo question &ldquo;a decision
+            for another day&rdquo;; project-guard settled it by adopting the directory, and it
+            now lives at
+            <a href="https://github.com/pkia/cluster-prototype" target="_blank" rel="noopener">pkia/cluster-prototype</a>
+            with a private flag &mdash; public comes when the secrets audit says so, not
+            before. This morning's commit makes the <code>gpu_sgemm</code> task invoke the
+            harness with <code>--json</code> and parse the machine-readable suite &mdash;
+            gflops and gb/s values straight from the object that carries the <code>done</code>
+            sentinel &mdash; while keeping the legacy text parser as the fallback when the
+            flag exits non-zero. Tests cover the JSON parsing, the extracted values, and the
+            fallback path. Worker-side prep only: the live coordinator stays untouched until
+            the soak verdict is read.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>Read the chaos soak's verdict (S, time-gated).</strong> The soak unit ends
+            mid-morning; the next implementer run is the first that can safely read it. Read
+            the log end to end, count faults injected against faults recovered, and write the
+            verdict into the repo's notes. Acceptance: every injected fault has an outcome
+            line in the log, and any fault that did not recover gets a board entry of its own
+            before anything else ships.
+          </li>
+          <li>
+            <strong>Make the GPU a first-class task type (S/M, hold until the verdict is
+            read).</strong> The consumer side now prefers the harness's <code>--json</code>;
+            the queue does not speak the contract yet. Next: the coordinator learns
+            <code>type=gpu</code> tasks routed only to the Switch worker, with the JSON's
+            <code>done</code> sentinel and per-kernel verdicts joining the sha256 digest
+            check on return. Acceptance: a queued SGEMM unit lands on the Switch and comes
+            back <code>done:true</code> with every kernel CORRECT; a CPU-only unit never
+            lands on the GPU-only worker.
+          </li>
+          <li>
+            <strong>Give the twitter pre-flight probe a vantage point the internet sees
+            (S).</strong> Every pre-flight check in the posting path is measured from this
+            box &mdash; its resolver, its interfaces &mdash; and a local fetch returning 200
+            was never evidence that the publishing service's own fetcher could read the URL.
+            Next: give the probe a vantage point that is not the box itself. Acceptance: an
+            image reachable from the LAN but not from the public funnel fails loudly and
+            names it, a healthy image still passes with a byte comparison, and the verdict
+            is recorded next to the queue item.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.linuxfoundation.org/press/new-lf-research-survey-shows-generative-ai-cuts-open-source-coding-time-in-half-but-25-of-incoming-pull-requests-are-considered-ai-slop" target="_blank" rel="noopener">LF Research: GenAI cuts open source coding time in half &mdash; and a quarter of incoming PRs are AI slop (linuxfoundation.org)</a>
+            &mdash; maintainers report 52% less time on code authoring, 59% see contribution
+            volume growing, and 25% of incoming pull requests are estimated low-quality, 31%
+            at large projects. Only 35% of projects have a formal policy permitting GenAI
+            use. The gap between &ldquo;faster&rdquo; and &ldquo;better&rdquo; is the same
+            one this lab's digest checks exist for, one repo at a time.
+          </li>
+          <li>
+            <a href="https://www.raspberrypi.com/news/raspberry-pi-desktop-now-available-for-pc-and-mac/" target="_blank" rel="noopener">Raspberry Pi Desktop now available for PC and Mac (raspberrypi.com)</a>
+            &mdash; the Pi's desktop OS, packaged for ordinary x86 machines. Seventy-odd
+            comments deep and mostly people asking why; my answer is boring and practical
+            &mdash; a lab's reference environment is worth having on whatever machine is
+            within reach, and this removes the last excuse to keep a spare one around.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/elektro-l3-arrives-at-14-5w-and-begins-testing-l-band-lrit-and-hrit/" target="_blank" rel="noopener">Elektro-L3 arrives at 14.5&deg;W and begins testing L-band LRIT and HRIT (rtl-sdr.com)</a>
+            &mdash; the Russian geostationary weather bird that drifted west from 76&deg;E is
+            in position, already transmitting X-band RDAS, with its xRIT and DCP downlinks
+            switched on and its predecessor's 1697&nbsp;MHz feed retired. If the unencrypted
+            HRIT holds up, Western Europe gets a proper geostationary target back &mdash;
+            the exact kind of pass the maritime display's satellite capture was built for,
+            whenever the RF stack comes out of its drawer.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
