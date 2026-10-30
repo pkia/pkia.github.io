@@ -4,13 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>EV — Technical Support Engineer</title>
-  <meta name="description" content="EV is a Technical Support Engineer at Cohesity in Ireland — solving deep enterprise troubleshooting cases by day, vibe coding with AI, and running self-hosted maritime infrastructure on a Raspberry Pi by night." />
+  <meta name="description" content="EV is a Technical Support Engineer at Cohesity in Ireland — solving deep enterprise troubleshooting cases by day, vibe coding with AI, and running a two-node Raspberry Pi ↔ Nintendo Switch compute cluster at home." />
   <link rel="canonical" href="https://pkia.github.io/" />
   <meta name="theme-color" content="#070d18" />
   <meta name="color-scheme" content="dark" />
   <meta property="og:site_name" content="EV" />
   <meta property="og:title" content="EV — Technical Support Engineer" />
-  <meta property="og:description" content="Deep technical support by day, ship radar and AI-assisted building at home. Technical Support Engineer @ Cohesity, Ireland." />
+  <meta property="og:description" content="Deep technical support by day, a Pi ↔ Switch compute cluster and AI-assisted building at home. Technical Support Engineer @ Cohesity, Ireland." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://pkia.github.io/" />
   <meta property="og:image" content="https://pkia.github.io/og.png" />
@@ -112,8 +112,9 @@
             <strong>reliability</strong>, <strong>radio antennas</strong>, the
             <strong>south coast of Ireland</strong> — and, lately, <strong>building
             things with AI</strong>. I dig into the toughest
-            enterprise support cases at work — and run a 24/7 ship-tracking station from a
-            Raspberry Pi at home.
+            enterprise support cases at work — and at home run a two-node cluster
+            where a Raspberry Pi dispatches <strong>CUDA work to a Nintendo Switch</strong>
+            across the LAN, digest-verified on return.
           </p>
           <div class="hero-actions reveal">
             <a class="btn btn-primary" href="#projects">View my work
@@ -236,15 +237,15 @@
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">cluster-soak.service</span>
+                    <span class="term-unit">gpu-llm.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Chaos soak over the live cluster — injected faults so far have all self-recovered, verdict lands when the run ends</span>
+                    <span class="term-desc">OpenAI-compatible Qwen2.5-0.5B endpoint served from hand-written PTX on the Switch — the cluster's third fallback brain</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one idea off the board each run and ships it — code, tests, and the board entry that records the outcome</span>
+                    <span class="term-desc">Picks one idea off the board each 14:00 run and ships it — next in line: soak #2's verdict read or type=gpu in the queue</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -273,7 +274,30 @@
         <div class="project-grid">
           <article class="project-card featured reveal">
             <div class="project-top">
-              <span class="project-badge">🛟 Flagship</span>
+              <span class="project-badge">⚡ Flagship · live</span>
+              <span class="project-year">2026</span>
+            </div>
+            <h3>Switch Cluster</h3>
+            <p>
+              A two-node compute cluster, live: a stdlib-Python coordinator on the Pi
+              splits work into units, routes GPU tasks to the Switch's Tegra X1 across
+              the LAN, and verifies every returned sha256 digest — token auth, SQLite
+              store of record, bounded retries, one worker per box. The first 24-hour
+              chaos soak came back green — 44 injected faults, every landed one
+              recovered — and the second stacked 322 green cycles before a deadline
+              bug in its own harness ended it by hand.
+            </p>
+            <ul class="chips chips-sm">
+              <li>Python&nbsp;stdlib</li><li>SQLite</li><li>systemd</li><li>CUDA</li>
+            </ul>
+            <a class="project-link" href="/blog/posts/2026-10-27.html" target="_blank" rel="noopener">Read the devlog
+              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+
+          <article class="project-card reveal">
+            <div class="project-top">
+              <span class="project-badge subtle">🛟 Radio fleet</span>
               <span class="project-year">2026</span>
             </div>
             <h3>Maritime Dashboard</h3>
@@ -282,6 +306,7 @@
               built for a Raspberry Pi touchscreen kiosk. Decodes AIS signals
               from the station's own antenna, captures NOAA weather-satellite imagery
               as birds pass overhead, and blends in an online vessel feed.
+              The RF stack is being redeployed after the October 2026 lab rebuild.
             </p>
             <ul class="chips chips-sm">
               <li>RTL-SDR</li><li>AIS</li><li>NOAA satellites</li><li>Flask</li><li>pytest CI/CD</li>
@@ -300,12 +325,15 @@
             <p>
               CUDA compute on a Nintendo Switch — the Tegra X1 under switchroot Linux,
               with a toolchain that compiles kernels natively on the console, because
-              the arm64 CUDA 10.x archives are gone. Verified SGEMM and bandwidth
-              kernels reach 467.9 GFLOPS peak and 22 GB/s, and the harness doubles as
-              a cluster workload with one JSON object per unit.
+              the arm64 CUDA 10.x archives are gone. Hand-written PTX reaches 467.9
+              GFLOPS — 99% of the chip's FMA ceiling — and now runs real inference:
+              GPT-2 124M at 36 tok/s and Qwen2.5-0.5B at 10.1 tok/s, served over an
+              OpenAI-compatible endpoint. Every kernel is verified against an on-device
+              golden model; the harness doubles as a cluster workload, one JSON object
+              per unit.
             </p>
             <ul class="chips chips-sm">
-              <li>CUDA</li><li>Tegra&nbsp;X1</li><li>clang-18</li><li>Cluster&nbsp;workload</li>
+              <li>CUDA</li><li>Tegra&nbsp;X1</li><li>PTX</li><li>LLM&nbsp;inference</li>
             </ul>
             <a class="project-link" href="https://github.com/pkia/switch-l4t-gpu" target="_blank" rel="noopener">View on GitHub
               <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -319,8 +347,8 @@
             </div>
             <h3>radar</h3>
             <p>
-              An autonomous improvement loop for everything else on this page: at 01:00 an
-agent writes the daily devlog and proposes what's next; at 04:00 a second
+              An autonomous improvement loop for everything else on this page: at 07:00 an
+agent writes the daily devlog and proposes what's next; at 14:00 a second
 agent picks one idea and ships it — code, tests, docs, brand-new repos
 included. Its ledger runs from a dead-man's switch and an alert-storm kill
 switch to a Prometheus backbone with edge-triggered alerting, a self-healing
@@ -368,8 +396,8 @@ to work: the last gate is a human in the seat.
               Single-page operations portal for my Raspberry Pi home server: live
               port and systemd health for every project on the box, an uptime
               scoreboard fed by five-minute probes, host vitals, pull-based CD
-              with auto-rollback. The bookmark I actually use dozens of times a
-              day.
+              with auto-rollback. Offline during the October 2026 rebuild —
+              first in line to come back.
             </p>
             <ul class="chips chips-sm">
               <li>Flask</li><li>systemd</li><li>Self-hosted</li><li>CI/CD</li>
@@ -417,27 +445,7 @@ the commit it is running.
             <ul class="chips chips-sm">
               <li>FastAPI</li><li>WebSockets</li><li>PWA</li><li>SQLite</li>
             </ul>
-            <a class="project-link" href="/projects/sudoku/" target="_blank" rel="noopener">Play a puzzle
-              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-          </article>
-
-          <article class="project-card reveal">
-            <div class="project-top">
-              <span class="project-badge subtle">Agent ops</span>
-              <span class="project-year">2026</span>
-            </div>
-            <h3>Mission Control</h3>
-            <p>
-              The phone dashboard for AI-agent work: a live kanban view over the
-              agents' own board database, an SSE activity feed, and an mc CLI the
-              agents drive. Cards move start → review → done as work actually
-              happens; a view layer, not another orchestrator.
-            </p>
-            <ul class="chips chips-sm">
-              <li>SSE</li><li>SQLite</li><li>Single-file&nbsp;stdlib</li><li>Agent&nbsp;workflow</li>
-            </ul>
-            <a class="project-link" href="/projects/mission-control/" target="_blank" rel="noopener">View the tour
+            <a class="project-link" href="/projects/sudoku/" target="_blank" rel="noopener">View the tour
               <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
           </article>
@@ -449,7 +457,8 @@ the commit it is running.
           the 🏆 <a href="https://github.com/pkia/Covid-Pool-Testing" target="_blank" rel="noopener">Covid Pool Testing optimiser</a> that won the 2021 university hackathon,
           <a href="https://github.com/pkia/Twitter_Threat_Scanner" target="_blank" rel="noopener">Tweet Guard</a> (NLP timeline scanning from a team-of-five hack build),
           the <a href="https://github.com/pkia/kiosk-home" target="_blank" rel="noopener">kiosk chooser</a> that flips the touchscreen between dashboards,
-          a live <a href="/projects/sat-audio/" target="_self">satellite-audio tap (with real audio)</a>,
+          the <a href="/projects/mission-control/" target="_self">mission-control tour</a> (the agent-board dashboard),
+          a <a href="/projects/sat-audio/" target="_self">satellite-audio tap</a> (tour with real pass audio),
           the <a href="/projects/cs2-tracker/">CS2 match tracker tour</a> whose service I retired in September (code stays public),
           the <a href="https://github.com/pkia/cs2-dashboard" target="_blank" rel="noopener">pro-match kiosk ticker</a> it replaced,
           a <a href="https://github.com/pkia/CoinMarketCap_Scraper" target="_blank" rel="noopener">CoinMarketCap dataset scraper</a>,
@@ -645,7 +654,7 @@ the commit it is running.
                   <svg class="arch-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 0 1 13-5.1M19.5 12a7.5 7.5 0 0 1-13 5.1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M17.6 3.4v3.6H14M6.4 20.6V17H10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <span class="arch-name">PULL-BASED CD</span>
-                <span class="arch-sub">3-min poll · auto-rollback</span>
+                <span class="arch-sub">compile + health gates · auto-rollback</span>
                 <span class="arch-src">☁ GitHub Actions</span>
               </div>
               <div class="arch-card" data-node="guard" style="--x:51.03%;--y:2%;--w:46.9%;--h:21%">
@@ -669,7 +678,7 @@ the commit it is running.
                   <span class="arch-led"></span>
                 </div>
                 <span class="arch-name">CRON · AI AGENTS</span>
-                <span class="arch-sub">devlog · radar · 07:00 doctor</span>
+                <span class="arch-sub">devlog 07:00 · radar 14:00 · doctor 06:30</span>
               </div>
               <div class="arch-card" data-node="watchdog" style="--x:2.07%;--y:52%;--w:46.9%;--h:21%">
                 <div class="arch-card-top">
@@ -685,7 +694,7 @@ the commit it is running.
                   <span class="arch-led"></span>
                 </div>
                 <span class="arch-name">PIPELINE CHECK</span>
-                <span class="arch-sub">hourly · CI compliance audit</span>
+                <span class="arch-sub">01:00 &amp; 13:00 · CI compliance audit</span>
               </div>
               <div class="arch-card" data-node="ntfy" style="--x:2.07%;--y:77%;--w:46.9%;--h:21%">
                 <div class="arch-card-top">

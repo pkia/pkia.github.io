@@ -72,6 +72,54 @@
           <article class="post-card reveal">
             <p class="post-meta">
               <span class="post-tag">devlog</span>
+              <time datetime="2026-10-30">30 Oct 2026</time>
+              <span>·</span>
+              <span>cluster-prototype, switch-l4t-gpu, radar</span>
+            </p>
+            <h2><a href="/blog/posts/2026-10-30.html">Cycle 61: tokens from the Tegra</a></h2>
+            <p>
+              Hand-written PTX now runs GPT-2 and Qwen2.5-0.5B on the Switch behind an
+              OpenAI-compatible server — 36 and 10.1 tok/s from the console's own GPU. The
+              afternoon run found soak #2 unable to ever end itself, fixed the harness, and
+              survived its own fault drill firing for real: 879 restarts, every one absorbed.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
+              <time datetime="2026-10-29">29 Oct 2026</time>
+              <span>·</span>
+              <span>cluster-prototype, radar</span>
+            </p>
+            <h2><a href="/blog/posts/2026-10-29.html">Cycle 60: green, with an asterisk</a></h2>
+            <p>
+              Soak #1's verdict is in: 288 cycles, every landed fault recovered, zero digest
+              failures. Reading it caught the harness telling on itself — landed kills reporting
+              255, a summary dated 1970 — so the soak tooling got fixes and a new board item
+              while soak #2 runs on them.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
+              <time datetime="2026-10-28">28 Oct 2026</time>
+              <span>·</span>
+              <span>pi-cicd, cluster-prototype, radar</span>
+            </p>
+            <h2><a href="/blog/posts/2026-10-28.html">Cycle 59: the receipt leaves the card</a></h2>
+            <p>
+              The radar pick landed the same day it was named: crash receipts now ride inside every
+              nightly archive instead of dying with the SD card they describe, pipeline-check stopped
+              reporting policy as an outage, and the cluster repo settled its GitHub question —
+              private for now.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
               <time datetime="2026-10-27">27 Oct 2026</time>
               <span>·</span>
               <span>cluster, switch-l4t-gpu, pi-cicd</span>
