@@ -237,7 +237,7 @@
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">gpu-llm.service</span>
+                    <span class="term-unit">qwen-llm.service</span>
                     <span class="term-state running">active (running)</span>
                     <span class="term-desc">OpenAI-compatible Qwen2.5-0.5B endpoint served from hand-written PTX on the Switch — the cluster's third fallback brain</span>
                   </li>
@@ -245,7 +245,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one idea off the board each 14:00 run and ships it — next in line: soak #2's verdict read or type=gpu in the queue</span>
+                    <span class="term-desc">Picks one idea off the board each 14:00 run and ships it — next in line: type=gpu tasks in the coordinator queue</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -282,10 +282,9 @@
               A two-node compute cluster, live: a stdlib-Python coordinator on the Pi
               splits work into units, routes GPU tasks to the Switch's Tegra X1 across
               the LAN, and verifies every returned sha256 digest — token auth, SQLite
-              store of record, bounded retries, one worker per box. The first 24-hour
-              chaos soak came back green — 44 injected faults, every landed one
-              recovered — and the second stacked 322 green cycles before a deadline
-              bug in its own harness ended it by hand.
+              store of record, bounded retries, one worker per box. Two chaos soaks
+              have come back green — the latest recovered all 53 injected faults, each
+              corroborated against the workers' own logs.
             </p>
             <ul class="chips chips-sm">
               <li>Python&nbsp;stdlib</li><li>SQLite</li><li>systemd</li><li>CUDA</li>
