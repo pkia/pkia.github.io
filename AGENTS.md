@@ -57,6 +57,13 @@ Content rules:
   `https://github.com/pkia/<repo>`.
 - Quiet day with no commits? Say so in one line and lean on `On the radar`
   and `Interesting reads`. Never invent work.
+- `On the radar` scope (owner directive 2026-11-02): propose only ideas
+  for the current deployment's repos — cluster-prototype,
+  switch-l4t-gpu, pi-cicd, personal-website, radar, or a genuinely new
+  repo. Never propose work for old-deployment projects
+  (twitter-launch, forex-copybot, maritime-dashboard, project-hub,
+  ais_analysis, camoufox-setup) or Train/cs2-train: they are out of
+  scope for the 14:00 radar implementer and it will only skip them.
 - `Interesting reads`: pick 2–3 current items matching my interests — AI / dev
   tooling, Raspberry Pi, SDR / maritime / AIS, self-hosting. First grep
   `blog/posts/` and **never repeat a link already used**. If web search is
