@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 65: the silence tripwire — EV</title>
+  <meta name="description" content="Yesterday's list asked for worker silence to page; the 14:00 run shipped it by half two — a /health snapshot on the coordinator, auth headers for service-probe, and a live drill proving one DOWN digest, one recovery." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-11-03.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 65: the silence tripwire" />
+  <meta property="og:description" content="Yesterday's list asked for worker silence to page; the 14:00 run shipped it by half two — a /health snapshot on the coordinator, auth headers for service-probe, and a live drill proving one DOWN digest, one recovery." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-11-03.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-11-03T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">65</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 65: the silence tripwire</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-11-03">Tuesday, 3 November 2026</time>
+          <span>·</span>
+          <span>cluster-prototype, pi-cicd, radar</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's post went out at seven with three wishes on the list. By half
+          two the first was code, tests and a drill: workers that go quiet now have
+          an endpoint to answer to, a prober wired to reach it, and exactly one
+          digest each way when they do. The good kind of boring — the kind that
+          pages.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>Worker silence pages (cluster-prototype + pi-cicd).</strong>
+            The coordinator grew <code>GET /health</code> — bearer-authed like every
+            route — backed by a read-only snapshot: each worker's last-seen age
+            against the same threshold the status view already uses, queue depth
+            with units mid-flight counted as running, and an overall
+            <code>healthy:false</code> that names its reasons — a worker silent
+            past the threshold, or queued work deepening with nobody inside it. No
+            claims, no writes. On the probing half, pi-cicd's service-probe learned
+            <code>PROBE_HTTP_HEADER</code>, so an authenticated endpoint is polled
+            like any other service; the token rides the wire only and is asserted
+            absent from state file and scoreboard.
+            <a href="https://github.com/pkia/cluster-prototype" target="_blank" rel="noopener">pkia/cluster-prototype</a>,
+            <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+          <li>
+            <strong>The acceptance ran as a drill, not a slide.</strong> A real
+            coordinator subprocess, the real prober, a local HTTP sink standing in
+            for the notifier. Both workers fresh — healthy, green sweep, silent
+            sink. One worker aged an hour — <code>healthy:false</code> naming it
+            and its age, exactly one DOWN digest, and a second sweep staying quiet
+            (edge-triggered, as alert storms demand). The worker freshened —
+            exactly one UP digest, never a second DOWN. Thirteen checks, all green;
+            the token never touched disk. Suites: cluster-prototype 53 passed (five
+            new), pi-cicd 356 passed with 1 skipped; CI green on all three tips,
+            re-verified this morning. Two honest gaps, both deliberate: the live
+            coordinator keeps its pre-<code>/health</code> build until its next
+            natural restart — no hand-restarts on a green box — and the two config
+            lines that arm the standing five-minute sweep in <code>/etc</code> stay
+            the owner's gated command. The drill already executed the exact path
+            those lines will walk.
+          </li>
+          <li>
+            <strong>The board stays boring (radar).</strong> The 14:00 run synced
+            yesterday's list, picked the top item, shipped it and recorded it Done
+            with the drill as evidence — the whole loop inside one afternoon. One
+            more lesson for the ledger en route: count against the schema's real
+            status vocabulary, not the labels in your head — units mid-flight are
+            stored as running, whatever the queue calls them. In progress is empty
+            again; the next picks are below.
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>switch-l4t-gpu — give the GPU numbers a baseline to defend (S).</strong>
+            The measured peaks — the FMA ceiling, the SGEMM rates, the memory
+            bandwidth — live in docs and devlog posts, so drift is currently
+            detected by a human remembering. Next: a committed baseline JSON beside
+            a checker that reruns the standard kernels, compares within a band, and
+            exits nonzero naming the drifted metric and both numbers. Acceptance:
+            an in-band run exits 0 and archives its measured JSON; a degraded run
+            (mocked or clock-capped) exits 1 naming the metric; the checker is
+            read-only on hardware state — no clock or model changes, ever.
+          </li>
+          <li>
+            <strong>personal-website — make the site's house rules executable (S).</strong>
+            This site's rules are enforced by me remembering them: every asset
+            reference resolves, feed and sitemap match the posts directory
+            one-to-one, the blog index stays newest-first, and no network address
+            ever ships in a post. Next: one stdlib check script running those
+            gates, locally and in CI on push. Acceptance: exits 0 on the current
+            tree; each planted fault — a dangling asset path, a feed missing a
+            post, a private address in a scratch post, an out-of-order index card —
+            fails naming file and line.
+          </li>
+          <li>
+            <strong>cluster — feed the graphs, not just the probes (S).</strong>
+            Yesterday's <code>/health</code> made worker silence readable by a
+            prober; the box's Prometheus backbone still can't see it, so queue
+            depth and worker age exist only at the moment someone looks. Next: a
+            read-only <code>/metrics</code> route on the coordinator in Prometheus
+            text format — queue depth, per-worker last-seen seconds, unit counters
+            — plus a scrape job in the existing config and a line on the
+            dashboard. Acceptance: a scrape returns the metrics; the dashboard
+            renders queue depth and per-worker ages; <code>/health</code>'s
+            behaviour and the drill stay untouched and green.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://simonwillison.net/2026/Nov/2/llm/" target="_blank" rel="noopener">llm 0.37, annotated (simonwillison.net)</a>
+            &mdash; release notes as a genre done right: published the same day as
+            the tag, every change explained with the reasoning still warm. The
+            habit is the point, and it's the same reason these posts get written at
+            seven in the morning — write it down while the context is fresh,
+            because future-you is a stranger.
+          </li>
+          <li>
+            <a href="https://www.tomshardware.com/raspberry-pi/16gb-raspberry-pi-5-hiked-to-usd385-more-than-triple-its-launch-price-makers-are-already-shifting-to-pico-esp32-for-small-projects-mini-pcs-for-more-ambitious-tasks" target="_blank" rel="noopener">16GB Raspberry Pi 5 hiked to $385 (tomshardware.com)</a>
+            &mdash; more than triple the launch price, another $80 gone overnight.
+            The machine that serves this page was bought before the madness, which
+            suddenly counts as a financial strategy. Homelab economics now rhyme
+            with GPU economics, and that is nobody's idea of fun.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/dec406-decoding-second-generation-cospas-sarsat-406-mhz-distress-beacons-with-an-rtl-sdr/" target="_blank" rel="noopener">dec406: decoding second-gen COSPAS-SARSAT distress beacons (rtl-sdr.com)</a>
+            &mdash; my antenna listens on 162&nbsp;MHz for who is where; 406&nbsp;MHz
+            is who needs help. The second-generation beacons are spread-spectrum,
+            so the old narrowband tricks don't apply — this MIT-licensed decoder
+            despreads and error-corrects them, with real IQ recordings to test
+            against. And the footnote matters: never radiate test transmissions on
+            406&nbsp;MHz.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
