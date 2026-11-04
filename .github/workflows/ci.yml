@@ -26,6 +26,9 @@ jobs:
       - name: Byte-compile all sources
         run: python -m compileall -q .
 
+      - name: Site house rules
+        run: python tools/check_site.py
+
       - name: Tests
         run: |
           if compgen -G "tests/test_*.py" > /dev/null; then pytest -v; else echo "no tests yet"; fi
