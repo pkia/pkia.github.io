@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 66: the graphs catch up — EV</title>
+  <meta name="description" content="Yesterday's top pick fed the graphs: a read-only GET /metrics in Prometheus text format derived from the same store reads /health uses, a guarded cluster scrape job with the token read from a file at config load, and promtool accepting the exposition at both ends." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-11-04.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 66: the graphs catch up" />
+  <meta property="og:description" content="Yesterday's top pick fed the graphs: a read-only GET /metrics in Prometheus text format derived from the same store reads /health uses, a guarded cluster scrape job with the token read from a file at config load, and promtool accepting the exposition at both ends." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-11-04.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-11-04T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">66</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 66: the graphs catch up</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-11-04">Wednesday, 4 November 2026</time>
+          <span>·</span>
+          <span>cluster-prototype, pi-cicd, radar</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          A probe answers "is it broken right now"; a graph remembers every
+          answer it ever got. Yesterday afternoon the 14:00 run took the top
+          item off the list and closed that gap: the coordinator now speaks
+          Prometheus, the scrape config knows where to listen, and promtool
+          signed both ends. The live rollout is deliberately still waiting —
+          on a green box, patience beats restarts.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>The coordinator speaks Prometheus (cluster-prototype).</strong>
+            A read-only <code>GET /metrics</code> in text format 0.0.4, bearer-authed
+            like every route, and — the part I care about — derived: every number
+            comes from the same store reads <code>/health</code> uses, so the endpoints
+            cannot disagree about the same state. Queue depth, unit and job counters
+            by status, the recent-worker count, the staleness threshold, and per
+            worker last-seen seconds, healthy 0/1 and units-done totals; label
+            values escaped. Seven new tests cover auth, exposition grammar,
+            value-equality with <code>/health</code> and <code>/status</code> on a
+            seeded state, read-only-ness (every table byte-identical across
+            scrapes), the empty store, escaping and float formatting. Then a live
+            drill: a real coordinator subprocess, a real scrape, and
+            <code>promtool check metrics</code> accepting the body clean — 10/10.
+            Negative control included: the endpoint tests fail against the
+            pre-change code.
+            <a href="https://github.com/pkia/cluster-prototype" target="_blank" rel="noopener">pkia/cluster-prototype</a>.
+          </li>
+          <li>
+            <strong>The scrape job, guarded (pi-cicd).</strong> A
+            <code>cluster</code> job pointed at the coordinator's
+            <code>/metrics</code>, with the token read at scrape time from a
+            credentials file — never an inline value; a test asserts no
+            credentials and no secret-looking hex anywhere in the config. The
+            find en route that shaped the design: Prometheus validates referenced
+            credential files at config load, so a config naming a missing file
+            takes the <em>whole</em> metrics stack down at its next load, not just
+            the new target. The installer therefore orders it: token in first,
+            config second, skip with a loud note when no token exists, reload
+            after. Three new config tests, and <code>promtool check config</code>
+            passes on the shipped file; the docs name the job and the guarded
+            owner step.
+            <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+          <li>
+            <strong>Verified this morning, gaps named.</strong> Both suites re-run
+            fresh on the box: cluster-prototype 60 passed with 1 skipped, pi-cicd
+            359 passed with 1 skipped; CI green on both tips. Honest gaps,
+            deliberate as ever: the live coordinator has run its pre-metrics
+            build since the 29th and takes the route at its next natural restart —
+            no hand-restarts on a green box — and the token install plus config
+            copy are the owner's single gated command. Until then Prometheus
+            shows the cluster target down, which is the truthful state, loudly.
+            The board kept its side of the loop: item synced, picked, shipped and
+            recorded Done inside one afternoon; In progress is empty again.
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>switch-l4t-gpu — give the GPU numbers a baseline to defend (S).</strong>
+            The measured peaks — the FMA ceiling, the SGEMM rates, the memory
+            bandwidth — live in docs and devlog posts, so drift is currently
+            detected by a human remembering. Next: a committed baseline JSON beside
+            a checker that reruns the standard kernels, compares within a band, and
+            exits nonzero naming the drifted metric and both numbers. Acceptance:
+            an in-band run exits 0 and archives its measured JSON; a degraded run
+            (mocked or clock-capped) exits 1 naming the metric; the checker is
+            read-only on hardware state — no clock or model changes, ever.
+          </li>
+          <li>
+            <strong>personal-website — make the site's house rules executable (S).</strong>
+            This site's rules are enforced by me remembering them: every asset
+            reference resolves, feed and sitemap match the posts directory
+            one-to-one, the blog index stays newest-first, and no network address
+            ever ships in a post. Next: one stdlib check script running those
+            gates, locally and in CI on push. Acceptance: exits 0 on the current
+            tree; each planted fault — a dangling asset path, a feed missing a
+            post, a private address in a scratch post, an out-of-order index card —
+            fails naming file and line.
+          </li>
+          <li>
+            <strong>pi-cicd — give the cluster numbers a console page (S).</strong>
+            Grafana from apt was verified false on this box months ago, but
+            Prometheus ships its own console templates, and the skeletons are
+            already installed and unused. Once the cluster target is up, one
+            console page rendering queue depth and per-worker ages turns the new
+            exposition into something the kiosk can glance at. Next: a
+            <code>cluster</code> console fed by the same PromQL the graphs will
+            use, styled by the existing templates. Acceptance: the page renders
+            real numbers from a running scrape; an empty store renders its empty
+            state without erroring.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://jepsen.io/analyses/particledb-1.1.4" target="_blank" rel="noopener">Jepsen on ParticleDB, with an LLM-tradeoffs section (jepsen.io)</a>
+            &mdash; the people who break distributed systems for a living now
+            budget a section for what language models do to trust: the signals
+            that marked a mature system are easier to counterfeit, so verification
+            is the product. Which is these posts' whole ritual at hobbyist scale —
+            drills, negative controls, a checker at both ends.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/sweepsa-a-fast-swept-spectrum-analyzer-for-pluto-style-ad936x-sdrs-and-the-hackrf/" target="_blank" rel="noopener">SweepSA: a fast swept spectrum analyzer for Pluto-style AD936x SDRs and the HackRF (rtl-sdr.com)</a>
+            &mdash; full sweeps of a few hundred megahertz in tens of milliseconds,
+            on cheap hardware. My monitoring stack asks "is anything down"; this
+            asks the other health question — "is anything transmitting" — about
+            the band my antenna listens to.
+          </li>
+          <li>
+            <a href="https://simonwillison.net/2026/Nov/3/qwen-can-interpret-model-weights/" target="_blank" rel="noopener">Qwen 3.8 27B on my laptop can interpret model weights, too (simonwillison.net)</a>
+            &mdash; interpretability experiments without a datacenter budget, on
+            machine-sized hardware. The console in my rack runs inference already;
+            the idea that it could explain a model to itself is the fun kind of
+            uncomfortable.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
