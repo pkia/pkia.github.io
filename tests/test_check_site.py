@@ -78,6 +78,9 @@ def make_site(root, posts=("2026-11-02.html", "2026-11-01.html"),
     (root / "index.html").write_text(page("<h1>EV</h1><a href=\"/blog/\">blog</a>"))
     (root / "404.html").write_text(page("<h1>lost</h1>"))
     (root / "blog" / "index.html").write_text(blog_index(cards or posts))
+    (root / "robots.txt").write_text(
+        "User-agent: *\nAllow: /\n\n"
+        f"Sitemap: {BASE}/sitemap.xml\n")
     for i, name in enumerate(posts):
         (root / "blog" / "posts" / name).write_text(page(f"<p>post {i}</p>"))
     (root / "feed.xml").write_text(feed_xml(feed or posts))
@@ -235,6 +238,71 @@ def test_tailnet_hostname_is_an_address(site):
     assert r.returncode == 1
     assert "tailnet hostname" in r.stdout
     assert "switchlab.tailnet.ts.net" in r.stdout
+
+
+# ---- addresses gate over published non-HTML text ------------------------
+# feed.xml item text, robots.txt, sitemap.xml and the CSS/JS assets are
+# all served public; an address can ride in a feed description or a
+# robots directive exactly as it can ride in a page.
+
+def _first_item_description(site, description):
+    feed_p = site / "feed.xml"
+    text = feed_p.read_text().replace(
+        "    </item>",
+        f"      <description>{description}</description>\n    </item>", 1)
+    feed_p.write_text(text)
+    lineno = next(i for i, line in enumerate(text.splitlines(), 1)
+                  if description in line)
+    return lineno
+
+
+def test_address_in_feed_description_names_file_and_line(site):
+    lineno = _first_item_description(
+        site, "tonight the worker answered at 192.168.0.25")
+    r = run(site)
+    assert r.returncode == 1
+    assert f"FAIL feed.xml:{lineno} addresses" in r.stdout
+    assert "192.168.0.25" in r.stdout
+
+
+def test_ts_net_hostname_in_feed_description_faults(site):
+    _first_item_description(
+        site, "read it on switchlab.tailnet.ts.net while it lasted")
+    r = run(site)
+    assert r.returncode == 1
+    assert "FAIL feed.xml:" in r.stdout
+    assert "tailnet hostname" in r.stdout
+    assert "switchlab.tailnet.ts.net" in r.stdout
+
+
+def test_address_in_robots_txt_names_file_and_line(site):
+    (site / "robots.txt").write_text(
+        "User-agent: *\nAllow: /\n"
+        "# stage mirror lives at 10.0.0.7\n"
+        "Sitemap: https://pkia.github.io/sitemap.xml\n")
+    r = run(site)
+    assert r.returncode == 1
+    assert re.search(r"FAIL robots\.txt:3 addresses", r.stdout)
+    assert "10.0.0.7" in r.stdout
+
+
+def test_address_in_stylesheet_faults(site):
+    (site / "styles.css").write_text(
+        "body { background: url(http://192.168.0.9/cam.png); }\n")
+    r = run(site)
+    assert r.returncode == 1
+    assert re.search(r"FAIL styles\.css:1 addresses", r.stdout)
+    assert "192.168.0.9" in r.stdout
+
+
+def test_public_origin_urls_in_published_text_are_not_faults(site):
+    # the site's own public-origin URLs ride in feed item text and
+    # robots.txt on every real page of this repo — never a fault
+    _first_item_description(
+        site, "full story at https://pkia.github.io/blog/")
+    r = run(site)
+    assert r.returncode == 0, r.stdout
+    assert "no network addresses" in r.stdout
 
 
 def test_public_ip_is_not_flagged(site):
