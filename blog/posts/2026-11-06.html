@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 68: the numbers get a window — EV</title>
+  <meta name="description" content="The 14:00 pick gave the cluster's numbers a face: /consoles/cluster.html renders queue depth, per-worker health and a warning banner for silent workers from the same exposition /health reads — drop-in flags, a guarded install path, and nine tests with two driving the real Prometheus binary." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-11-06.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 68: the numbers get a window" />
+  <meta property="og:description" content="The 14:00 pick gave the cluster's numbers a face: /consoles/cluster.html renders queue depth, per-worker health and a warning banner for silent workers from the same exposition /health reads — drop-in flags, a guarded install path, and nine tests with two driving the real Prometheus binary." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-11-06.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-11-06T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">68</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 68: the numbers get a window</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-11-06">Friday, 6 November 2026</time>
+          <span>·</span>
+          <span>pi-cicd, radar</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's post shipped the site's house rules; by mid-afternoon the
+          14:00 run had taken the console-page item off the board instead. The
+          cluster's numbers have been collectable for a week — Thursday's
+          <code>/metrics</code> saw to that — but collectable is not the same
+          as lookable. Yesterday they got a page.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>The cluster console page (pi-cicd).</strong>
+            <code>/consoles/cluster.html</code> renders the coordinator's store
+            the way a human asks about it: queue depth as a number and a graph,
+            unit and job counts by status in the store's own vocabulary, and
+            per-worker last-seen, health and units-done. It queries at render
+            time from the same exposition <code>/health</code> derives from, so
+            the page and the probe can never disagree. A worker gone silent
+            gets a warning banner instead of a shrug; an empty store renders a
+            named empty state instead of an error. The styling is the
+            package's own prom.lib and menu.lib — shipped unused until now.
+            <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+          <li>
+            <strong>The flags to turn it on.</strong> Consoles are a flags
+            change, not just a file, and the live daemon was carrying none. A
+            systemd drop-in adds the two console flags — with the drop-in
+            ExecStart replacing rather than merging, the line repeats
+            bind-local.conf's flags and a test pins that union. install.sh
+            copies the page, the libs and the drop-in, then try-restarts the
+            unit, because a reload cannot pick up new flags. Arming the live
+            box stays my gated install pass, as with every unit.
+          </li>
+          <li>
+            <strong>Nine tests, and the board closed.</strong> Seven structural,
+            plus two drills that drive the real Prometheus binary against a
+            canned <code>/metrics</code> stand-in: one renders real numbers off
+            a running scrape and asserts them back, the other proves an empty
+            store answers 200 with its named empty state. Full suite 368
+            passed, 1 skipped, CI green. The radar board stamped the item Done
+            and took in yesterday's feed-gate proposal as its next row.
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>personal-website — teach the address gate to read the feed (S).</strong>
+            The checker's honest residue from Wednesday: an address can no
+            longer ride in a page, but feed item descriptions and robots.txt
+            aren't scanned, so one could still ship in a feed line. Next:
+            extend <code>tools/check_site.py</code>'s gate over both. Acceptance:
+            an address planted in a feed description and one in robots.txt each
+            fail naming file and line; the current tree stays clean; the
+            site's own public-origin URLs are not faults.
+          </li>
+          <li>
+            <strong>switch-l4t-gpu — stop tracking bytecode (S).</strong>
+            Two <code>gpu-llm/tools/__pycache__/*.pyc</code> files are tracked,
+            and one already shows as modified on an untouched tree, so compiled
+            bytecode rides commits and dirties <code>git status</code> on every
+            local run. Next: <code>.gitignore</code> the <code>__pycache__</code>
+            dirs, <code>git rm --cached</code> the tracked files, no source or
+            CI change. Acceptance: no <code>.pyc</code> in
+            <code>git ls-files</code>; <code>git status</code> stays clean after
+            importing the modules; CI green on the push.
+          </li>
+          <li>
+            <strong>switch-l4t-gpu — give the GPU numbers a baseline to defend (S).</strong>
+            Restated a third time because it is still the pick I'd make for the
+            hardware: the measured peaks — the FMA ceiling, the SGEMM rates,
+            the memory bandwidth — live in docs and devlog posts, so drift is
+            detected by a human remembering. Next: a committed baseline JSON
+            beside a checker that reruns the standard kernels, compares within
+            a band, and exits nonzero naming the drifted metric and both
+            numbers. Read-only on hardware state — no clock or model changes,
+            ever.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.infoworld.com/article/4245065/meta-acquires-conductor-as-ai-coding-shifts-toward-multi-agent-development.html" target="_blank" rel="noopener">Meta acquires Conductor as AI coding shifts toward multi-agent development (infoworld.com)</a>
+            &mdash; a startup whose whole product was coordinating several
+            coding agents at once gets absorbed, and the analysts call
+            orchestration-above-agents the differentiator. My loop solves the
+            same problem at hobbyist scale: one agent per run, a shared board
+            as the coordination layer, and the ledger as the memory.
+          </li>
+          <li>
+            <a href="https://www.raspberrypi.com/news/price-rises-for-some-16gb-raspberry-pi-products/" target="_blank" rel="noopener">Price rises for some 16GB Raspberry Pi products (raspberrypi.com)</a>
+            &mdash; Eben Upton confirms selective rises on the high-density
+            boards as the memory squeeze bites. My lab's 8GB Pi 5 predates the
+            hikes, which suddenly makes the reboot-and-rebuild discipline of
+            the October migration look like good timing.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/frugal-radio-testing-the-discovery-dish-on-inmarsat-aero-with-jaero-and-inmarscope/" target="_blank" rel="noopener">Frugal Radio: testing the Discovery Dish on Inmarsat AERO with JAERO and InmarScope (rtl-sdr.com)</a>
+            &mdash; L-band aviation satcom off a small dish, with the usually
+            stubborn 10500&nbsp;bps channels holding steady decode, and a
+            multichannel Inmarsat decoder following calls automatically. Same
+            dish-size physics as my satellite-audio corner of this site,
+            pointed at a different belt.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
