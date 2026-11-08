@@ -17,8 +17,8 @@ This script runs the gates instead:
   addresses   no LAN/tailnet IP literals, no .ts.net hostnames and no
               known LAN hostnames in any page — or in any other
               published text file: the feed's item text, sitemap.xml,
-              robots.txt, and the CSS/JS assets (AGENTS.md: "Never
-              publish network addresses")
+              robots.txt, and the CSS/JS/SVG/JSON assets (AGENTS.md:
+              "Never publish network addresses")
 
 Every fault names its file and line. Exit 0 clean, 1 on any fault.
 Stdlib only; the script is read-only — it never writes or removes
@@ -262,14 +262,14 @@ def find_faults(root):
 
     # ---- gate: no network addresses ---------------------------------------
     # Pages, plus every other published text file: the feed's item text,
-    # the sitemap, robots.txt, and the CSS/JS assets. A private address
-    # can ride in a feed description or a robots directive exactly as it
-    # can ride in a page.
+    # the sitemap, robots.txt, and the CSS/JS/SVG/JSON assets. A private
+    # address can ride in a feed description, a robots directive or an
+    # SVG <desc> exactly as it can ride in a page.
     addr_files = list(html_files)
     for extra in (feed_path, sm_path, root / "robots.txt"):
         if extra.is_file() and extra not in addr_files:
             addr_files.append(extra)
-    for pattern in ("*.css", "*.js"):
+    for pattern in ("*.css", "*.js", "*.svg", "*.json"):
         for p in sorted(root.rglob(pattern)):
             if ".git" not in p.parts and p not in addr_files:
                 addr_files.append(p)

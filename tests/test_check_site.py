@@ -295,6 +295,57 @@ def test_address_in_stylesheet_faults(site):
     assert "192.168.0.9" in r.stdout
 
 
+# ---- SVG and JSON are served text too ------------------------------------
+# The favicon is an SVG; any manifest or data file would be JSON. SVG
+# markup carries text nodes (<desc>, <title>) the same way a feed line
+# does, so the scan follows the served-text set, not the HTML set.
+
+def test_address_in_svg_desc_names_file_and_line(site):
+    (site / "favicon.svg").write_text(
+        "<svg xmlns='http://www.w3.org/2000/svg'>\n"
+        "  <desc>cluster switch lives at 192.168.0.25</desc>\n"
+        "</svg>\n")
+    r = run(site)
+    assert r.returncode == 1
+    assert re.search(r"FAIL favicon\.svg:2 addresses", r.stdout)
+    assert "192.168.0.25" in r.stdout
+
+
+def test_ts_net_hostname_in_svg_faults(site):
+    (site / "favicon.svg").write_text(
+        "<svg xmlns='http://www.w3.org/2000/svg'>\n"
+        "  <desc>read it on switchlab.tailnet.ts.net while it lasted</desc>\n"
+        "</svg>\n")
+    r = run(site)
+    assert r.returncode == 1
+    assert "tailnet hostname" in r.stdout
+    assert "switchlab.tailnet.ts.net" in r.stdout
+
+
+def test_address_in_json_faults(site):
+    (site / "manifest.json").write_text(
+        '{\n  "name": "EV",\n'
+        '  "debug_endpoint": "http://10.0.0.7:8800"\n}\n')
+    r = run(site)
+    assert r.returncode == 1
+    assert re.search(r"FAIL manifest\.json:3 addresses", r.stdout)
+    assert "10.0.0.7" in r.stdout
+
+
+def test_public_urls_in_svg_and_json_are_not_faults(site):
+    # the site's own public origin rides in served SVG/JSON the same way
+    # it rides in the feed and robots.txt — never a fault
+    (site / "favicon.svg").write_text(
+        "<svg xmlns='http://www.w3.org/2000/svg'>\n"
+        f"  <desc>home is {BASE}/blog/</desc>\n"
+        "</svg>\n")
+    (site / "manifest.json").write_text(
+        f'{{\n  "start_url": "{BASE}/blog/"\n}}\n')
+    r = run(site)
+    assert r.returncode == 0, r.stdout
+    assert "no network addresses" in r.stdout
+
+
 def test_public_origin_urls_in_published_text_are_not_faults(site):
     # the site's own public-origin URLs ride in feed item text and
     # robots.txt on every real page of this repo — never a fault
