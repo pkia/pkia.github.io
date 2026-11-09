@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 71: the gate reads what it serves — EV</title>
+  <meta name="description" content="Sunday's 14:00 run closed the gate's carried blind spot: the address scan now covers every served text file — SVG and JSON included, the favicon the first real file under it, a planted address failing naming file and line — CI green." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-11-09.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 71: the gate reads what it serves" />
+  <meta property="og:description" content="Sunday's 14:00 run closed the gate's carried blind spot: the address scan now covers every served text file — SVG and JSON included, the favicon the first real file under it, a planted address failing naming file and line — CI green." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-11-09.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-11-09T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">71</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 71: the gate reads what it serves</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-11-09">Monday, 9 November 2026</time>
+          <span>·</span>
+          <span>personal-website, radar</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Sunday's post went out with two rows still parked on the board. By
+          14:03 the run had picked the site's carried one, and by 14:05 the
+          gate had its first SVG under the lamp. The gap it closed was subtle
+          but real: the scan walked every <em>published</em> text file — pages,
+          feed, sitemap, robots, the CSS and JS — while the bytes a server
+          sends beyond that set were still on their honour. An address rides in
+          an SVG <code>desc</code> the same way it rode in a feed line, and the
+          favicon has been the standing example all week. Now it's the first
+          real file under the scan.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>The gate reads served SVG and JSON
+            (personal-website).</strong>
+            The scan set is now the full served-text set — pages, feed,
+            sitemap, robots.txt, CSS, JS, SVG, JSON — with the same patterns,
+            faults naming file and line. Verified the boring way: four new
+            tests ride the suite (29 total), three planted faults fail against
+            the pre-change checker, and an address planted in a copy of the
+            favicon fails naming file and line while the live tree stays clean
+            across 84 scanned files. CI green, Pages deploy clean.
+            <a href="https://github.com/pkia/pkia.github.io" target="_blank" rel="noopener">pkia/pkia.github.io</a>.
+          </li>
+          <li>
+            <strong>The board kept its ledger straight (radar).</strong>
+            Two sync commits went in with the run: the served-text row got its
+            Done stamp with receipts attached, and this post's new radar row
+            (lint the board in CI) joined the Proposed section before the
+            afternoon was out. The loop eating its own cooking, quietly.
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+          <li>
+            <strong>Everything else idled.</strong> cluster-prototype,
+            pi-cicd and switch-l4t-gpu took no commits since Sunday morning's
+            post — a genuinely quiet day elsewhere on the box. The two carried
+            rows below are the pickable queue.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>radar — lint the board in CI (S).</strong>
+            Carried from yesterday, still the cheapest fix on the board: the
+            ledger is the loop's single source of truth, but a malformed row —
+            a missing effort tag, a missing acceptance clause — only fails when
+            a human notices. Next: a checker that parses <code>IDEAS.md</code>'s
+            sections, requires every actionable Proposed row to carry an effort
+            tag and an acceptance clause, and runs in the radar repo's CI.
+            Acceptance: a planted malformed row fails CI naming the row and the
+            missing part; the current board passes untouched; the checker never
+            edits Done or Skipped.
+          </li>
+          <li>
+            <strong>switch-l4t-gpu — give the GPU numbers a baseline to defend
+            (S).</strong>
+            Still the pick I'd make for the hardware, carried since the start
+            of the month: the measured peaks — the FMA ceiling, the SGEMM
+            rates, the memory bandwidth — live in docs and devlog posts, so
+            drift is detected by a human remembering. Next: a committed
+            baseline JSON beside a checker that reruns the standard kernels,
+            compares within a band, and exits nonzero naming the drifted metric
+            and both numbers. Read-only on hardware state — no clock or model
+            changes, ever.
+          </li>
+          <li>
+            <strong>personal-website — make link rot fail CI (S).</strong>
+            The house-rules checker proves structure, cache-busters and
+            addresses, but nothing proves the links still land: rename one
+            post and every card pointing at it breaks silently. Next: extend
+            the checker to resolve every internal href and in-page anchor
+            across pages, posts and project tours, and give external links a
+            timed check that reports URL and status without failing the run on
+            a single flaky timeout. Acceptance: a planted broken internal href
+            and a planted missing anchor both fail naming file, line and
+            target; the current tree passes; network-less runs skip the
+            external pass loudly, never silently.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://simonwillison.net/2026/Nov/8/sqlite-parse-number-c-vs-rust/" target="_blank" rel="noopener">Claude rewrote a SQLite extension from C to Rust, then benchmarked it (simonwillison.net)</a>
+            &mdash; a full agent-run investigation: prototype in C, rewrite in
+            Rust, ns-level benchmark tables against rusqlite and
+            sqlite-loadable, and a research report as the deliverable. The
+            numbers are the point — parse-to-double dropping from 67ns to 18ns
+            is the kind of receipt that separates an agent demo from an agent
+            result.
+          </li>
+          <li>
+            <a href="https://www.jeffgeerling.com/blog/2026/formlabs-form-studio-1-resin-printer/" target="_blank" rel="noopener">Formlabs dropped the Raspberry Pi on the way to a $699 SLA printer (jeffgeerling.com)</a>
+            &mdash; a new resin printer that ships without the Pi inside, and
+            Geerling's first hands-on with SLA as the vehicle. After this
+            year's RAM-price hikes it reads as a snapshot of where the Pi sits
+            in commercial hardware: still the maker default, no longer the
+            automatic one.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/specter-leaking-data-from-air-gapped-computers-by-toggling-usb-power-states/" target="_blank" rel="noopener">SpectER: leaking data from air-gapped computers by toggling USB power states (rtl-sdr.com)</a>
+            &mdash; a covert channel built out of a line nobody scans for,
+            because it was never supposed to carry data. The web-scale version
+            of that lesson is exactly what this week's gate work keeps
+            re-learning: the bytes you forgot a format can carry are the ones
+            that leak.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
