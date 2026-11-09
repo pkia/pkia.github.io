@@ -15,8 +15,10 @@ This script runs the gates instead:
   busters     styles.css / script.js carry the same ?v= cache-buster on
               every page that references them (and always a buster)
   addresses   no LAN/tailnet IP literals, no .ts.net hostnames and no
-              known LAN hostnames in any page (AGENTS.md: "Never publish
-              network addresses")
+              known LAN hostnames in any page — or in any other
+              published text file: the feed's item text, sitemap.xml,
+              robots.txt, and the CSS/JS/SVG/JSON assets (AGENTS.md:
+              "Never publish network addresses")
 
 Every fault names its file and line. Exit 0 clean, 1 on any fault.
 Stdlib only; the script is read-only — it never writes or removes
@@ -259,14 +261,26 @@ def find_faults(root):
                           f"v={mode}")
 
     # ---- gate: no network addresses ---------------------------------------
-    for page in html_files:
-        text = page.read_text(encoding="utf-8", errors="replace")
+    # Pages, plus every other published text file: the feed's item text,
+    # the sitemap, robots.txt, and the CSS/JS/SVG/JSON assets. A private
+    # address can ride in a feed description, a robots directive or an
+    # SVG <desc> exactly as it can ride in a page.
+    addr_files = list(html_files)
+    for extra in (feed_path, sm_path, root / "robots.txt"):
+        if extra.is_file() and extra not in addr_files:
+            addr_files.append(extra)
+    for pattern in ("*.css", "*.js", "*.svg", "*.json"):
+        for p in sorted(root.rglob(pattern)):
+            if ".git" not in p.parts and p not in addr_files:
+                addr_files.append(p)
+    for text_file in addr_files:
+        text = text_file.read_text(encoding="utf-8", errors="replace")
         for lineno, text_line in enumerate(text.splitlines(), 1):
-            for label, pattern in ADDR_PATTERNS:
-                m = pattern.search(text_line)
+            for label, addr_pattern in ADDR_PATTERNS:
+                m = addr_pattern.search(text_line)
                 if m:
-                    fault("addresses", rel(root, page), lineno,
-                          f"{label} in page text: {m.group(0)!r}")
+                    fault("addresses", rel(root, text_file), lineno,
+                          f"{label} in published text: {m.group(0)!r}")
 
     return faults, {
         "pages": len(html_files),
@@ -276,6 +290,7 @@ def find_faults(root):
         "cards": len(cards),
         "asset_refs": total_refs,
         "busters": modes,
+        "addr_files": len(addr_files),
     }
 
 
@@ -302,7 +317,8 @@ def main(argv=None):
     print(f"OK — {stats['pages']} pages, {stats['posts']} posts, feed "
           f"{stats['feed_items']} items, sitemap {stats['sitemap_locs']} locs, "
           f"index {stats['cards']} cards, {stats['asset_refs']} asset refs, "
-          f"busters {busters}, no network addresses")
+          f"busters {busters}, no network addresses in "
+          f"{stats['addr_files']} files")
     return 0
 
 

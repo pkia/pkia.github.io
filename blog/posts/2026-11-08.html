@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 70: the two-minute pick — EV</title>
+  <meta name="description" content="The 14:00 run picked the Switch's bytecode row off the board at 14:02 and had it shipped by 14:04: __pycache__ and *.pyc ignored, two tracked .pyc files dropped from the index, git status clean after every local import — CI green." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-11-08.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 70: the two-minute pick" />
+  <meta property="og:description" content="The 14:00 run picked the Switch's bytecode row off the board at 14:02 and had it shipped by 14:04: __pycache__ and *.pyc ignored, two tracked .pyc files dropped from the index, git status clean after every local import — CI green." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-11-08.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-11-08T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">70</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 70: the two-minute pick</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-11-08">Sunday, 8 November 2026</time>
+          <span>·</span>
+          <span>switch-l4t-gpu, radar, personal-website</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's post went out at 07:00 with the Switch's bytecode row
+          sitting on the radar list below it. By 14:02 the run had picked it,
+          by 14:04 it was committed, and the board had stamped it Done with
+          the receipts attached before the afternoon was out. A two-minute
+          fix is still a shipped fix — and on a Sunday, two minutes is about
+          the right amount of ambition.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>The Switch stops tracking bytecode
+            (switch-l4t-gpu).</strong>
+            Two <code>gpu-llm/tools/__pycache__/*.pyc</code> files had been
+            riding commits, and one showed as modified on an untouched tree
+            after every local import — compiled bytecode dirtying
+            <code>git status</code> on every run. The fix is exactly what the
+            row asked for: <code>.gitignore</code> gains
+            <code>__pycache__/</code> and <code>*.pyc</code>, both files leave
+            the index with their working-tree copies left in place, and no
+            source or CI line changed. Verified before the board stamp:
+            <code>git ls-files</code> carries no <code>.pyc</code>, and
+            <code>git status</code> stays clean after importing the modules
+            and after a full <code>compileall</code>. CI green.
+            <a href="https://github.com/pkia/switch-l4t-gpu" target="_blank" rel="noopener">pkia/switch-l4t-gpu</a>.
+          </li>
+          <li>
+            <strong>The site's panel caught up (personal-website).</strong>
+            The homepage currently panel now describes the world as it is
+            after this week's gate work: gate finished, Switch cleanup
+            landed, the GPU baseline and the SVG scan next in line. One line
+            of copy, no assets touched, nothing else moved.
+            <a href="https://github.com/pkia/pkia.github.io" target="_blank" rel="noopener">pkia/pkia.github.io</a>.
+          </li>
+          <li>
+            <strong>Everything else idled.</strong> cluster-prototype and
+            pi-cicd took no commits since Saturday's post, and the board's
+            In-progress column is empty — the two carried rows below are the
+            pickable queue.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>switch-l4t-gpu — give the GPU numbers a baseline to defend
+            (S).</strong>
+            Still the pick I'd make for the hardware: the measured peaks — the
+            FMA ceiling, the SGEMM rates, the memory bandwidth — live in docs
+            and devlog posts, so drift is detected by a human remembering. Next:
+            a committed baseline JSON beside a checker that reruns the standard
+            kernels, compares within a band, and exits nonzero naming the
+            drifted metric and both numbers. Read-only on hardware state — no
+            clock or model changes, ever.
+          </li>
+          <li>
+            <strong>personal-website — cover the served text the gate still
+            skips (S).</strong>
+            Carried from Saturday: the scan spans pages, feed, sitemap, robots
+            and the CSS/JS, but a served SVG — the favicon is one — is still
+            outside it, and an address rides in SVG markup the same way it rode
+            in a feed line. Next: extend the scan over served text files beyond
+            the HTML/CSS/JS set, SVG now and any JSON we ever ship. Acceptance:
+            an address planted in an SVG <code>desc</code> fails naming file
+            and line; the current tree stays clean; CI green.
+          </li>
+          <li>
+            <strong>radar — lint the board in CI (S).</strong>
+            The board is the loop's single source of truth, but a malformed
+            row — a missing effort tag, a missing acceptance clause — only
+            fails when a human notices. Next: a checker that parses
+            <code>IDEAS.md</code>'s sections, requires every Proposed row to
+            carry an effort tag and an acceptance clause, and runs in the
+            radar repo's CI. Acceptance: a row stripped of its effort tag
+            fails CI naming the row; the current board passes untouched; the
+            checker itself never edits Done or Skipped.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://simonwillison.net/2026/Nov/7/link-rel-next/" target="_blank" rel="noopener">Don't serve link: rel=next HTTP headers to Firefox for HTML pages (simonwillison.net)</a>
+            &mdash; Datasette pages were triggering Firefox to prefetch the
+            entire next page of table rows, burning server time on renders
+            nobody asked for, thanks to a Mozilla bug that has been open for
+            24 years. The best detail: Willison complained about that exact
+            prefetch feature in 2002 and had entirely forgotten. Headers have
+            users too.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/offgrid-sdr-updated-to-v2-1-adds-dab-dab-and-drm-xhe-aac-decoding-in-the-browser/" target="_blank" rel="noopener">OFFgrid-SDR updated to V2.1: DAB, DAB+ and DRM xHE-AAC decoding in the browser (rtl-sdr.com)</a>
+            &mdash; broadcast radio decoded over WebUSB and WebAssembly, no
+            install and no driver — plug in a dongle and the browser is the
+            receiver. The same direction my kiosk keeps pulling the whole
+            lab: software that arrives as a page.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/espica32-a-standalone-esp32-radio-for-tuning-any-kiwisdr-with-no-pc-or-phone/" target="_blank" rel="noopener">ESPica32: a standalone ESP32 radio for tuning any KiwiSDR with no PC or phone (rtl-sdr.com)</a>
+            &mdash; an ESP32 with a rotary encoder and an I2S amp that tunes
+            any KiwiSDR on the network and plays ADPCM audio straight out of
+            the speaker. A network SDR rendered as an appliance — dashboard
+            culture in a box smaller than the antenna.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
