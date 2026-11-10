@@ -6,9 +6,13 @@ The real repo tree must pass (that test is also the house-rules gate
 CI runs).
 """
 
+import os
 import re
 import subprocess
 import sys
+import threading
+import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 import pytest
@@ -89,9 +93,11 @@ def make_site(root, posts=("2026-11-02.html", "2026-11-01.html"),
     return root
 
 
-def run(root):
+def run(root, env_extra=None):
+    env = dict(os.environ)
+    env.update({k: str(v) for k, v in (env_extra or {}).items()})
     return subprocess.run([sys.executable, str(CHECKER), "--root", str(root)],
-                          capture_output=True, text=True, timeout=60)
+                          capture_output=True, text=True, timeout=300, env=env)
 
 
 @pytest.fixture
@@ -382,3 +388,178 @@ def test_checker_is_read_only():
     for banned in ("write_text", "unlink", "os.remove", "shutil", "subprocess",
                    "open("):
         assert banned not in src, f"checker source must not {banned!r}"
+
+
+# ---- links gate: every <a href> lands ------------------------------------
+# Internal links resolve the way Pages serves them — including the site's
+# own origin-absolute URLs (https://pkia.github.io/...), which the assets
+# gate always skipped as "external" — and every #fragment an internal link
+# carries names a real anchor in its target file.
+
+def test_dangling_internal_link_names_file_line_target(site):
+    p = site / "blog" / "posts" / "2026-11-01.html"
+    p.write_text(p.read_text() +
+                 '  <a href="/blog/posts/2026-12-31.html">ghost</a>\n')
+    r = run(site)
+    assert r.returncode == 1
+    lineno = len(p.read_text().splitlines())
+    assert f"FAIL blog/posts/2026-11-01.html:{lineno} links" in r.stdout
+    assert "2026-12-31.html" in r.stdout
+    assert "does not resolve" in r.stdout
+
+
+def test_missing_anchor_names_file_line_and_target(site):
+    p = site / "blog" / "posts" / "2026-11-01.html"
+    p.write_text(p.read_text() +
+                 '  <a href="/blog/posts/2026-11-02.html#no-such-anchor">x</a>\n')
+    r = run(site)
+    assert r.returncode == 1
+    lineno = len(p.read_text().splitlines())
+    assert f"FAIL blog/posts/2026-11-01.html:{lineno} links" in r.stdout
+    assert "#no-such-anchor" in r.stdout
+    assert "blog/posts/2026-11-02.html" in r.stdout
+
+
+def test_same_page_missing_anchor_faults(site):
+    p = site / "blog" / "posts" / "2026-11-02.html"
+    p.write_text(p.read_text() + '  <a href="#nope">x</a>\n')
+    r = run(site)
+    assert r.returncode == 1
+    assert "#nope" in r.stdout and "not found on this page" in r.stdout
+
+
+def test_origin_absolute_broken_link_faults(site):
+    # the origin-absolute spelling is internal for this site: it must
+    # resolve like the path spelling and fault the same way
+    p = site / "blog" / "posts" / "2026-11-01.html"
+    p.write_text(p.read_text() +
+                 f'  <a href="{BASE}/blog/posts/2026-12-31.html">x</a>\n')
+    r = run(site)
+    assert r.returncode == 1
+    assert "links" in r.stdout and "2026-12-31.html" in r.stdout
+
+
+def test_valid_anchor_links_pass(site):
+    # the control: same-page fragment, cross-post fragment and an
+    # origin-absolute link with a fragment all land on real anchors
+    p = site / "blog" / "posts" / "2026-11-02.html"
+    p.write_text(p.read_text() + '  <h2 id="summary">s</h2>\n'
+                 '  <a href="#summary">x</a>\n'
+                 f'  <a href="{BASE}/blog/posts/2026-11-01.html#top">y</a>\n')
+    q = site / "blog" / "posts" / "2026-11-01.html"
+    q.write_text(q.read_text() + '  <h2 id="top">t</h2>\n')
+    r = run(site)
+    assert r.returncode == 0, r.stdout
+
+
+def test_ok_line_carries_link_counts(site):
+    # index.html's one /blog/ link + the two index cards = 3 internal;
+    # no external links -> no probe, no network, no skip note
+    r = run(site)
+    assert r.returncode == 0, r.stdout
+    assert "links 3 internal / 0 external" in r.stdout
+    assert "SKIPPED" not in r.stdout
+
+
+# ---- external pass: timed, report-only, loud when skipped -----------------
+# The pass is exercised against a loopback HTTP server (localhost, random
+# port) so the real fetch path runs with zero external network. Planted
+# links use the localhost hostname — an IP literal would trip the
+# addresses gate on the fixture itself.
+
+class _Routes(BaseHTTPRequestHandler):
+    routes = {}
+    hits = {}
+
+    def do_GET(self):
+        type(self).hits[self.path] = type(self).hits.get(self.path, 0) + 1
+        route = type(self).routes.get(self.path)
+        if route and route[0] == "sleep":
+            time.sleep(route[1])
+            self.send_response(200)
+            self.send_header("Content-Length", "1")
+            self.end_headers()
+            self.wfile.write(b"x")
+        elif route:
+            self.send_response(route[0])
+            self.send_header("Content-Length", str(len(route[1])))
+            self.end_headers()
+            self.wfile.write(route[1].encode())
+        else:
+            self.send_response(404)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+
+    def log_message(self, *args, **kwargs):
+        pass
+
+
+def make_server(routes):
+    handler = type("_Routes", (_Routes,), {"routes": routes, "hits": {}})
+    srv = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    return srv, handler.hits
+
+
+@pytest.fixture
+def ext_site(site):
+    """A fixture site plus a loopback server; yields (site, base, srv, hits)."""
+    srv, hits = make_server({"/probe": (200, "ok"),
+                             "/live": (200, "yes"),
+                             "/gone": (404, "no")})
+    yield site, f"http://localhost:{srv.server_port}", srv, hits
+    srv.shutdown()
+
+
+def test_external_broken_link_reported_run_stays_green(ext_site):
+    site, base, srv, hits = ext_site
+    p = site / "blog" / "posts" / "2026-11-01.html"
+    p.write_text(p.read_text() + f'  <a href="{base}/gone">dead</a>\n'
+                 f'  <a href="{base}/live">alive</a>\n')
+    r = run(site, {"CHECK_SITE_PROBE_URL": f"{base}/probe"})
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert f"external: {base}/gone -> 404" in r.stdout
+    assert "2 unique link(s), 1 flagged" in r.stdout
+    assert hits["/gone"] == 1 and hits["/live"] == 1
+
+
+def test_external_timeout_does_not_fail_run(site):
+    srv, hits = make_server({"/probe": (200, "ok"), "/slow": ("sleep", 3)})
+    base = f"http://localhost:{srv.server_port}"
+    try:
+        p = site / "blog" / "posts" / "2026-11-01.html"
+        p.write_text(p.read_text() + f'  <a href="{base}/slow">slow</a>\n')
+        r = run(site, {"CHECK_SITE_PROBE_URL": f"{base}/probe",
+                       "CHECK_SITE_TIMEOUT": "1"})
+    finally:
+        srv.shutdown()
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert f"{base}/slow" in r.stdout and "unreachable" in r.stdout
+    # the retry happened: one flaky timeout is a report, not a verdict
+    assert hits["/slow"] == 2
+
+
+def test_networkless_run_skips_external_loudly(ext_site):
+    site, _base, srv, hits = ext_site
+    p = site / "blog" / "posts" / "2026-11-01.html"
+    p.write_text(p.read_text() +
+                 f'  <a href="{_base}/live">alive</a>\n')
+    # nothing listens on port 1: the probe fails, the pass must skip
+    r = run(site, {"CHECK_SITE_PROBE_URL": "http://localhost:1/probe"})
+    srv.shutdown()
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "SKIPPED" in r.stdout and "no network" in r.stdout
+    assert "SKIPPED" in r.stderr, "the skip must be loud on stderr too"
+    assert hits.get("/live", 0) == 0, "skipped pass must not fetch links"
+
+
+def test_external_urls_fetched_once(ext_site):
+    site, base, srv, hits = ext_site
+    for name in ("2026-11-01.html", "2026-11-02.html"):
+        p = site / "blog" / "posts" / name
+        p.write_text(p.read_text() + f'  <a href="{base}/live">alive</a>\n')
+    r = run(site, {"CHECK_SITE_PROBE_URL": f"{base}/probe"})
+    srv.shutdown()
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert hits["/live"] == 1, "the same external URL must fetch once"
+    assert "1 unique link(s)" in r.stdout

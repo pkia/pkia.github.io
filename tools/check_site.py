@@ -4,8 +4,24 @@
 The repo's conventions (AGENTS.md) were enforced by remembering them.
 This script runs the gates instead:
 
-  assets      every local src=/href= reference in an HTML page resolves
-              to a file in the repo (query strings and fragments stripped)
+  assets      every local src=/href= reference in an HTML page (except
+              <a href> — that is the links gate) resolves to a file in
+              the repo (query strings and fragments stripped)
+  links       every <a href> lands: internal links resolve the way
+              Pages serves them (directory URLs and the site's own
+              origin-absolute URLs map to index.html), and every
+              in-page anchor an internal link carries — including
+              same-page #fragment links — exists in its target file
+  external    http(s) links outside the site's origin get one timed
+              status check each (redirects followed, one retry on a
+              network error). REPORT-ONLY by design: URL and status
+              are named, but no third-party answer can fail the run —
+              one flaky timeout must not turn red. A run with no
+              network skips the pass loudly: the probe fetch fails and
+              a named SKIPPED line goes to stdout and stderr, never a
+              silent pass-over. Knobs (all optional env):
+              CHECK_SITE_PROBE_URL (default the site's own origin),
+              CHECK_SITE_TIMEOUT (default 10 s per attempt)
   feed        feed.xml and blog/posts/ are 1:1 — every post appears in
               exactly one <item> (link or guid), every item maps to a post
   sitemap     sitemap.xml carries every post exactly once and only lists
@@ -20,18 +36,22 @@ This script runs the gates instead:
               robots.txt, and the CSS/JS/SVG/JSON assets (AGENTS.md:
               "Never publish network addresses")
 
-Every fault names its file and line. Exit 0 clean, 1 on any fault.
+Every fault names its file and line. Exit 0 clean, 1 on any internal
+fault; external link results are reports and never affect the exit code.
 Stdlib only; the script is read-only — it never writes or removes
 anything. --root DIR checks another tree (the tests build fixture sites
 and drive this CLI against them).
 """
 
 import argparse
+import http.client
 import os
 import re
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urljoin, urlsplit
 
 BASE = "https://pkia.github.io"
 POSTS_DIR = "blog/posts"
@@ -41,6 +61,8 @@ SITEMAP_FILE = "sitemap.xml"
 ASSET_ATTRS = ("src", "href", "poster", "srcset")
 POST_NAME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}.*\.html$")
 LOCAL_SKIP_PREFIXES = ("http://", "https://", "//", "mailto:", "data:", "#")
+OUR_NETLOC = urlsplit(BASE).netloc
+REDIRECTS = (301, 302, 303, 307, 308)
 
 # Private / link-local / CGNAT IPv4, local IPv6, tailnet hostnames, and
 # the hostnames of this deployment's own machines. None may ship in a page.
@@ -64,7 +86,7 @@ BARE_ASSET_RE = re.compile(r"[\"']/(?:styles\.css|script\.js)(?![?.\w])")
 
 
 class RefCollector(HTMLParser):
-    """Collects local asset references as (line, attr, url)."""
+    """Collects asset references as (line, tag, attr, url)."""
 
     def __init__(self):
         super().__init__(convert_charrefs=True)
@@ -76,7 +98,23 @@ class RefCollector(HTMLParser):
             if attr in ASSET_ATTRS and value:
                 for candidate in value.split(","):
                     url = candidate.strip().split()[0] if candidate.strip() else ""
-                    self.refs.append((line, attr, url))
+                    self.refs.append((line, tag, attr, url))
+
+
+class AnchorCollector(HTMLParser):
+    """The in-page anchor names a #fragment can target: every element's
+    id=, plus <a name=> for the pre-HTML5 spelling."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.names = set()
+
+    def handle_starttag(self, tag, attrs):
+        for attr, value in attrs:
+            if value and attr == "id":
+                self.names.add(value)
+            elif value and tag == "a" and attr == "name":
+                self.names.add(value)
 
 
 def line_of(text, pos):
@@ -114,6 +152,110 @@ def resolve(root, page, url):
     return root / path
 
 
+def classify_href(url):
+    """Sort one <a href> into what the links gate can prove.
+
+    -> ("frag", anchor)          same-page #fragment
+    -> ("internal", "path#frag") a link the site itself serves (relative,
+                                 /absolute, or origin-absolute)
+    -> ("external", url)         http(s) outside the site's origin
+    -> (None, None)              uncheckable: mailto:, tel:, javascript:,
+                                 data:, ftp:, empty
+    """
+    if url.startswith("#"):
+        return "frag", url[1:]
+    u = urlsplit(url)
+    if u.scheme and u.scheme not in ("http", "https"):
+        return None, None
+    if u.netloc and u.netloc.lower() != OUR_NETLOC:
+        if url.startswith("//"):
+            return "external", "https:" + url
+        return "external", url
+    path = u.path
+    if not path and u.netloc:
+        path = "/"          # origin-absolute link to the site root
+    if not path:
+        return ("frag", u.fragment) if u.fragment else (None, None)
+    full = path + ("#" + u.fragment if u.fragment else "")
+    return "internal", full
+
+
+def fetch_status(url, timeout, hops=0):
+    """GET a URL's status line without reading the body (http.client, so
+    the read-only source scan never sees an open-like token). Returns
+    (status, "") on any HTTP answer — a 404 is an answer — and
+    (None, reason) when the network itself refused."""
+    if hops > 5:
+        return None, "too many redirects"
+    u = urlsplit(url)
+    if u.scheme == "https":
+        conn = http.client.HTTPSConnection(u.netloc, timeout=timeout)
+    elif u.scheme == "http":
+        conn = http.client.HTTPConnection(u.netloc, timeout=timeout)
+    else:
+        return None, f"unsupported scheme {u.scheme!r}"
+    try:
+        path = u.path or "/"
+        if u.query:
+            path += "?" + u.query
+        conn.request("GET", path, headers={"User-Agent": "pkia.github.io site-check"})
+        resp = conn.getresponse()
+        status = resp.status
+        loc = resp.getheader("Location") if status in REDIRECTS else None
+        resp.close()
+    except Exception as err:
+        return None, f"{type(err).__name__}: {err}"
+    finally:
+        conn.close()
+    if status in REDIRECTS and loc:
+        return fetch_status(urljoin(url, loc), timeout, hops + 1)
+    return status, ""
+
+
+def fetch_with_retry(url, timeout, attempts=2):
+    """One flaky timeout is not a verdict: a network-level failure gets a
+    second attempt; an HTTP status is an answer and is final."""
+    detail = ""
+    for _ in range(attempts):
+        status, detail = fetch_status(url, timeout)
+        if status is not None:
+            return status, ""
+    return None, f"unreachable after {attempts} attempts ({detail})"
+
+
+def check_external(refs):
+    """The external pass: report-only, never exit-code-bearing.
+
+    refs is [(file, line, url)] as found by the links gate. One timed
+    check per unique URL, in parallel; every non-answer or 4xx/5xx gets
+    a line naming URL and status. Returns (unique, flagged, skipped).
+    """
+    unique = sorted({u for _, _, u in refs})
+    if not unique:
+        return 0, 0, False
+    probe_url = os.environ.get("CHECK_SITE_PROBE_URL", BASE)
+    timeout = float(os.environ.get("CHECK_SITE_TIMEOUT", "10"))
+    status, detail = fetch_status(probe_url, timeout)
+    if status is None:
+        line = f"external: SKIPPED — no network (probe {probe_url}: {detail})"
+        print(line)
+        print(line, file=sys.stderr)
+        return len(unique), 0, True
+    results = {}
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = {u: pool.submit(fetch_with_retry, u, timeout) for u in unique}
+        for u, fut in futures.items():
+            results[u] = fut.result()
+    flagged = 0
+    for u in unique:
+        status, detail = results[u]
+        if status is None or status >= 400:
+            flagged += 1
+            print(f"external: {u} -> {detail or status}")
+    print(f"external: {len(unique)} unique link(s), {flagged} flagged")
+    return len(unique), flagged, False
+
+
 def find_faults(root):
     faults = []
 
@@ -136,14 +278,58 @@ def find_faults(root):
     for page in html_files:
         parser = RefCollector()
         parser.feed(page.read_text(encoding="utf-8", errors="replace"))
-        for line, attr, url in parser.refs:
-            if not is_local(url):
-                continue
+        for line, tag, attr, url in parser.refs:
+            if tag == "a" or not is_local(url):
+                continue        # <a href> belongs to the links gate
             total_refs += 1
             target = resolve(root, page, url)
             if target is None or not target.is_file():
                 fault("assets", rel(root, page), line,
                       f"{attr}={url!r} does not resolve to a file")
+
+    # ---- gate: every <a href> lands (internal links + anchors) -----------
+    anchors_cache = {}
+
+    def anchors_of(path):
+        key = str(path)
+        if key not in anchors_cache:
+            p = AnchorCollector()
+            p.feed(path.read_text(encoding="utf-8", errors="replace"))
+            anchors_cache[key] = p.names
+        return anchors_cache[key]
+
+    total_links = 0
+    external_refs = []
+    for page in html_files:
+        parser = RefCollector()
+        parser.feed(page.read_text(encoding="utf-8", errors="replace"))
+        page_anchors = None
+        for line, tag, attr, url in parser.refs:
+            if tag != "a" or attr != "href":
+                continue
+            kind, detail = classify_href(url)
+            if kind is None or detail is None:
+                continue
+            if kind == "external":
+                external_refs.append((page, line, url))
+                continue
+            total_links += 1
+            if kind == "frag":
+                if page_anchors is None:
+                    page_anchors = anchors_of(page)
+                if detail and detail not in page_anchors:
+                    fault("links", rel(root, page), line,
+                          f"anchor '#{detail}' not found on this page")
+                continue
+            target = resolve(root, page, detail)
+            frag = detail.split("#", 1)[1] if "#" in detail else ""
+            if not target.is_file():
+                fault("links", rel(root, page), line,
+                      f"href {url!r} does not resolve to a file")
+            elif frag and frag not in anchors_of(target):
+                fault("links", rel(root, page), line,
+                      f"anchor '#{frag}' not found in "
+                      f"{target.relative_to(root).as_posix()}")
 
     # ---- gate: feed.xml is 1:1 with posts --------------------------------
     feed_path = root / FEED_FILE
@@ -289,9 +475,11 @@ def find_faults(root):
         "sitemap_locs": len(re.findall(r"<loc>", sm)),
         "cards": len(cards),
         "asset_refs": total_refs,
+        "internal_links": total_links,
+        "external_refs": len(external_refs),
         "busters": modes,
         "addr_files": len(addr_files),
-    }
+    }, external_refs
 
 
 def rel(root, path):
@@ -307,18 +495,23 @@ def main(argv=None):
     if not root.is_dir():
         print(f"FAIL {root}: not a directory")
         return 1
-    faults, stats = find_faults(root)
+    faults, stats, external_refs = find_faults(root)
     for line in faults:
         print(line)
     if faults:
         print(f"site-check: {len(faults)} fault(s) in {stats['pages']} pages")
         return 1
+    ext_checked, _ext_flagged, ext_skipped = check_external(external_refs)
     busters = ", ".join(f"{a} v={v}" for a, v in stats["busters"].items()) or "none"
+    links_note = (f"links {stats['internal_links']} internal / "
+                  f"{ext_checked} external")
+    if ext_skipped:
+        links_note += " (external skipped: no network)"
     print(f"OK — {stats['pages']} pages, {stats['posts']} posts, feed "
           f"{stats['feed_items']} items, sitemap {stats['sitemap_locs']} locs, "
           f"index {stats['cards']} cards, {stats['asset_refs']} asset refs, "
           f"busters {busters}, no network addresses in "
-          f"{stats['addr_files']} files")
+          f"{stats['addr_files']} files, {links_note}")
     return 0
 
 
