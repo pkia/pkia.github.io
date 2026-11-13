@@ -231,21 +231,21 @@
                 <ul class="term-out">
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">cluster-coordinator.service</span>
+                    <span class="term-unit">fingerprint-demo.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Dispatch API on port 8800 — units digest-checked on return, /health paging worker silence, /metrics feeding the box's Prometheus</span>
+                    <span class="term-desc">Look-alike login page on a throwaway domain — logs what the browser leaks on load, and the trail it mails is the point</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">qwen-llm.service</span>
+                    <span class="term-unit">cluster-coordinator.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">OpenAI-compatible Qwen2.5-0.5B endpoint served from hand-written PTX on the Switch — the cluster's third fallback brain</span>
+                    <span class="term-desc">Dispatch API on port 8800 — digest-checked results, /health paging worker silence, /metrics into Prometheus</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one board idea per 14:00 run and ships it — bytecode purged from the ledger repo, GPU baseline and link-report rows next</span>
+                    <span class="term-desc">Picks one board idea per 14:00 run — pointer lint landed, the pi-cicd feed tripwire is next in the queue</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -390,27 +390,6 @@ to work: the last gate is a human in the seat.
               <span class="project-badge subtle">Ops</span>
               <span class="project-year">2026</span>
             </div>
-            <h3>Project Hub</h3>
-            <p>
-              Single-page operations portal for my Raspberry Pi home server: live
-              port and systemd health for every project on the box, an uptime
-              scoreboard fed by five-minute probes, host vitals, pull-based CD
-              with auto-rollback. Offline during the October 2026 rebuild —
-              first in line to come back.
-            </p>
-            <ul class="chips chips-sm">
-              <li>Flask</li><li>systemd</li><li>Self-hosted</li><li>CI/CD</li>
-            </ul>
-            <a class="project-link" href="https://github.com/pkia/project-hub" target="_blank" rel="noopener">View on GitHub
-              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-          </article>
-
-          <article class="project-card reveal">
-            <div class="project-top">
-              <span class="project-badge subtle">Ops</span>
-              <span class="project-year">2026</span>
-            </div>
             <h3>pi-cicd</h3>
             <p>
               The CI/CD machinery that runs the Pi itself: pull-based deploys with
@@ -425,6 +404,28 @@ the commit it is running.
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
             </ul>
             <a class="project-link" href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">View on GitHub
+              <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </article>
+
+          <article class="project-card reveal">
+            <div class="project-top">
+              <span class="project-badge">In progress</span>
+              <span class="project-year">2026</span>
+            </div>
+            <h3>Fingerprint Lab</h3>
+            <p>
+              A look-alike login page built to measure what a browser gives away
+              before anyone types: screen, language, timezone, plugins, memory and
+              the WebGL renderer, plus a GPS fix and device identifiers on load.
+              The server resolves the real client IP behind the tunnel and mails
+              the trail. Runs as a systemd unit; CI green on every push. The
+              honest gap is no README and no tests yet.
+            </p>
+            <ul class="chips chips-sm">
+              <li>Node.js</li><li>Cloudflared</li><li>systemd</li><li>Browser&nbsp;APIs</li>
+            </ul>
+            <a class="project-link" href="/blog/posts/2026-11-13.html">Read the devlog
               <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
           </article>
@@ -452,7 +453,7 @@ the commit it is running.
         </div>
 
         <p class="more-link reveal">
-          Also: <a href="https://github.com/pkia/shelfmate" target="_blank" rel="noopener">ShelfMate</a>, the Goodreads-powered book recommender,
+          Also: the <a href="https://github.com/pkia/project-hub" target="_blank" rel="noopener">Project Hub ops portal</a> (offline since the October rebuild, first in line to come back), <a href="https://github.com/pkia/shelfmate" target="_blank" rel="noopener">ShelfMate</a>, the Goodreads-powered book recommender,
           the 🏆 <a href="https://github.com/pkia/Covid-Pool-Testing" target="_blank" rel="noopener">Covid Pool Testing optimiser</a> that won the 2021 university hackathon,
           <a href="https://github.com/pkia/Twitter_Threat_Scanner" target="_blank" rel="noopener">Tweet Guard</a> (NLP timeline scanning from a team-of-five hack build),
           the <a href="https://github.com/pkia/kiosk-home" target="_blank" rel="noopener">kiosk chooser</a> that flips the touchscreen between dashboards,
