@@ -245,7 +245,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one board idea per 14:00 run — pointer lint landed, the pi-cicd feed tripwire is next in the queue</span>
+                    <span class="term-desc">Picks one board idea per 14:00 run — feed tripwire landed, the fingerprint demo's CD adoption is next</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -396,9 +396,8 @@ to work: the last gate is a human in the seat.
 compile gates, health checks and automatic rollback, a dead-man's switch
 that pages when a scheduled job goes silent, morning audits that self-heal
 what they find, and backups that rehearse the archive before pruning. A
-decommission runbook walks every artifact a project owns and fails its own check
-while anything removable is left; a staleness report names a service older than
-the commit it is running.
+decommission runbook walks every artifact a project owns; a freshness
+tripwire fails, by name and by hour, when this devlog's own feed goes stale.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
