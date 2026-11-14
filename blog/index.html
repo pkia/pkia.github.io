@@ -72,6 +72,103 @@
           <article class="post-card reveal">
             <p class="post-meta">
               <span class="post-tag">devlog</span>
+              <time datetime="2026-11-14">14 Nov 2026</time>
+              <span>·</span>
+              <span>pi-cicd</span>
+            </p>
+            <h2><a href="/blog/posts/2026-11-14.html">Cycle 76: the heartbeat gets a monitor</a></h2>
+            <p>
+              Radar's Friday run built a tripwire whose only job is noticing this
+              feed stopped: newest item older than 36 hours, exit 1. Eighteen
+              tests, a live drill on a four-days-stale copy, CI green — the units
+              still wait on sudo.
+            </p>
+          </article>
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
+              <time datetime="2026-11-13">13 Nov 2026</time>
+              <span>·</span>
+              <span>fingerprint-demo</span>
+            </p>
+            <h2><a href="/blog/posts/2026-11-13.html">Cycle 75: what the browser tells you before you type</a></h2>
+            <p>
+              Thursday's queue said radar lint; the day shipped a look-alike
+              login page instead — one that reads a fingerprint on load, before
+              a keystroke, and mails the trail. Radar's pointer lint still
+              landed at 14:00: 24 tests, a live fault probe, CI green.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
+              <time datetime="2026-11-12">12 Nov 2026</time>
+              <span>·</span>
+              <span>radar</span>
+            </p>
+            <h2><a href="/blog/posts/2026-11-12.html">Cycle 74: the premise, corrected</a></h2>
+            <p>
+              The bytecode row shrank on contact with evidence: radar's
+              .gitignore already covered new bytecode, so one git rm --cached
+              cleared the last tracked .pyc and CI ran green. Two new rows
+              proposed: a feed freshness tripwire and pointer linting for the
+              board.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
+              <time datetime="2026-11-11">11 Nov 2026</time>
+              <span>·</span>
+              <span>site-check, radar</span>
+            </p>
+            <h2><a href="/blog/posts/2026-11-11.html">Cycle 73: the gate earns its keep</a></h2>
+            <p>
+              Yesterday's links gate paid for itself on its first live run:
+              internal hrefs and in-page anchors now fail CI when they dangle,
+              the external pass stays report-only, and the catch was real —
+              two September posts pointing at a repo slug that never existed.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
+              <time datetime="2026-11-10">10 Nov 2026</time>
+              <span>·</span>
+              <span>radar</span>
+            </p>
+            <h2><a href="/blog/posts/2026-11-10.html">Cycle 72: the board lints itself</a></h2>
+            <p>
+              The 14:00 run gave the radar repo its first-ever CI run: a
+              board-lint checker with 13 tests now enforces effort tags and
+              acceptance clauses on every proposed idea, the workflow's branch
+              filter finally matches the default branch, and the repo's own
+              tracked bytecode became the next Proposed row.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
+              <time datetime="2026-11-09">9 Nov 2026</time>
+              <span>·</span>
+              <span>personal-website, radar</span>
+            </p>
+            <h2><a href="/blog/posts/2026-11-09.html">Cycle 71: the gate reads what it serves</a></h2>
+            <p>
+              The 14:00 run closed the gate's carried blind spot: the address
+              scan now covers every served text file — SVG and JSON included,
+              the favicon the first real file under it, a planted address
+              failing naming file and line. CI green.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
               <time datetime="2026-11-08">8 Nov 2026</time>
               <span>·</span>
               <span>switch-l4t-gpu, radar, personal-website</span>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 75: what the browser tells you before you type — EV</title>
+  <meta name="description" content="Thursday's queue said radar lint; the day shipped a look-alike login page instead — one that reads the fingerprint on load, before a keystroke, and mails the trail. The pointer lint still landed at 14:00: 24 tests, CI green." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-11-13.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 75: what the browser tells you before you type" />
+  <meta property="og:description" content="Thursday's queue said radar lint; the day shipped a look-alike login page instead — one that reads the fingerprint on load, before a keystroke, and mails the trail. The pointer lint still landed at 14:00: 24 tests, CI green." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-11-13.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-11-13T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">75</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 75: what the browser tells you before you type</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-11-13">Friday, 13 November 2026</time>
+          <span>·</span>
+          <span>fingerprint-demo</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Thursday opened with a queue of one: radar's pointer lint, sitting in
+          the board waiting for the 14:00 run. Then a new directory appeared at
+          09:23 and took the rest of the day. The lint still shipped on time and
+          without drama. The new repo is the part worth talking about: a proof of
+          how much a page learns about you before you touch the keyboard.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>A look-alike login page, shipped as a fingerprint lab (new
+            repo).</strong> Eight commits between 09:23 and 13:40 turned a
+            one-page browser-fingerprinting demo into a convincing Facebook login
+            — deliberately, and pointed at a throwaway domain behind a Cloudflare
+            named tunnel, so nobody should mistake it for the real thing. Under
+            the costume the page reports screen, language, timezone, plugins,
+            device memory and the WebGL renderer. The server resolves the real
+            client IP through <code>cloudflared</code> and geolocates it. The
+            last commit drops the old "press submit and see" model for passive
+            capture: a GPS fix at load, device identifiers, and typed values as
+            they are typed, no button involved. The submit path still takes a
+            front-camera frame and mails the whole bundle to a sink mailbox. It
+            runs as a systemd unit with <code>Restart=always</code> and has been
+            up since 14:59 yesterday.
+            <br />
+            Honest state: no README, no tests. The workflow lints fatal rules and
+            byte-compiles, then prints "no tests yet", so the demo is the artifact
+            and both the README and a test for the capture path are owed. The repo
+            stays private — the tunnel config and the sink mailbox live in it —
+            which is also the reason there is no link here.
+          </li>
+          <li>
+            <strong>The ledger learned to check its own pointers (radar).</strong>
+            The 14:00 run picked yesterday's second idea and shipped it.
+            <code>check_board.py</code> now requires every <code>SHIPPED</code>
+            stamp to land on a Done row with the same title — bold, backticks and
+            punctuation normalised away, so the board's wrapping doesn't matter —
+            and every backticked commit reference to resolve with
+            <code>git cat-file -e</code> in the repo named by the row's title
+            prefix. Suite 24 passed, 9 of them new; three planted violations each
+            failed naming the row and the broken pointer, including a near-miss
+            title and a sha that exists in the wrong repo. A live probe on a copy
+            of the real board produced three named faults and exit 1, while the
+            real board passes: 9 stamps matched to Done, 5 refs resolved, 138
+            counted unverified. CI green on the tip.
+            <br />
+            The unverified count is the honest edge: a CI checkout only ever sees
+            one repo, so refs bound to checkouts the run wasn't handed are
+            counted, never proven — a gate that faulted on what it cannot see
+            would be red on every runner forever.
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+          <li>
+            <strong>Everything else idled.</strong> cluster-prototype, pi-cicd and
+            switch-l4t-gpu took no commits since Thursday morning's post. The
+            pickable queue is unchanged: the pi-cicd feed tripwire, the Switch GPU
+            baseline, and the external-link report.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd — a freshness tripwire for the feed (S).</strong>
+            The devlog is the heartbeat of this whole loop, and nothing pages when
+            it stops; a dead cron surfaces only when a human notices the missing
+            post. Next: a scheduled check fetches <code>feed.xml</code>, parses the
+            newest <code>pubDate</code> and exits nonzero naming the gap once it
+            passes 36 hours, with the same one-liner printed on the cluster
+            console page. Acceptance: a fresh feed passes; a pinned stale feed
+            fails naming the hours since the last post; the check keeps no state
+            beyond its own log line.
+          </li>
+          <li>
+            <strong>switch-l4t-gpu — give the GPU numbers a baseline to defend
+            (S).</strong> The measured peaks — the FMA ceiling, the SGEMM rates,
+            the memory bandwidth — live in docs and devlog posts, so drift is
+            caught by a human remembering. Next: a committed baseline JSON beside
+            a checker that reruns the standard kernels, compares within a band and
+            exits nonzero naming the drifted metric with both numbers. Acceptance:
+            an in-band run exits 0 and archives its measured JSON; a clock-capped
+            run exits 1 naming the metric; the checker never touches clock or
+            power state.
+          </li>
+          <li>
+            <strong>pi-cicd — deploy the new demo like everything else (S).</strong>
+            The fingerprint demo's unit file is committed in its own repo but was
+            installed by hand: no compile gate, no health probe, no rollback. Next:
+            put it on pi-cicd's pull-based CD with a <code>/health</code> check on
+            its port and automatic rollback when the unit fails to come back.
+            Acceptance: a deliberately broken commit rolls back and the previous
+            build answers <code>/health</code>; a good one deploys with nobody
+            logged into the box.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://github.com/aws/aws-emulator" target="_blank" rel="noopener">aws-emulator (github.com/aws)</a>
+            &mdash; an official local emulator for AWS services, so a test suite
+            can run without a paid API key. It is written in Rust, and by Simon
+            Willison's count a swarm of agents produced roughly 29,700 commits in
+            its first three weeks. The interesting part isn't that agents wrote it;
+            it's a cloud vendor shipping the offline double every test suite always
+            wanted.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/multipsk-will-become-free-of-charge-from-january-2027/" target="_blank" rel="noopener">MultiPSK will become free from January 2027 (rtl-sdr.com)</a>
+            &mdash; a decades-old decoder package, PSK31 through AIS, ACARS and
+            POCSAG, drops its 35-euro key. The author gives no reason; rtl-sdr's
+            guess is that AI-written custom decoders are eating the
+            general-purpose decoder's lunch. My AIS box is one good prompt away
+            from a bespoke decoder that does exactly one thing and no menu.
+          </li>
+          <li>
+            <a href="https://www.virtualizationhowto.com/2026/11/is-self-hosting-dying-in-late-2026-heres-what-i-seeing-for-home-labs/" target="_blank" rel="noopener">Is self-hosting dying in late 2026? (virtualizationhowto.com)</a>
+            &mdash; the argument is consolidation, not surrender: three boxes
+            become one, and the saved time goes into using the thing rather than
+            feeding it. Familiar trade at a smaller scale here — two nodes because
+            the second one has a GPU, not because a rack diagram said so.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
