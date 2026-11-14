@@ -19,7 +19,11 @@ This script runs the gates instead:
               one flaky timeout must not turn red. A run with no
               network skips the pass loudly: the probe fetch fails and
               a named SKIPPED line goes to stdout and stderr, never a
-              silent pass-over. Knobs (all optional env):
+              silent pass-over. The findings are also written to the
+              run summary — $GITHUB_STEP_SUMMARY, or --summary PATH —
+              so a dead link shows on the job's page without anyone
+              opening the log; the summary is appended, and writing it
+              never changes the exit code. Knobs (all optional env):
               CHECK_SITE_PROBE_URL (default the site's own origin),
               CHECK_SITE_TIMEOUT (default 10 s per attempt)
   feed        feed.xml and blog/posts/ are 1:1 — every post appears in
@@ -38,9 +42,11 @@ This script runs the gates instead:
 
 Every fault names its file and line. Exit 0 clean, 1 on any internal
 fault; external link results are reports and never affect the exit code.
-Stdlib only; the script is read-only — it never writes or removes
-anything. --root DIR checks another tree (the tests build fixture sites
-and drive this CLI against them).
+Stdlib only. The only file this script ever writes is the run summary,
+and only when one is named ($GITHUB_STEP_SUMMARY / --summary); it never
+writes inside the checked tree, never removes anything. --root DIR checks
+another tree (the tests build fixture sites and drive this CLI against
+them).
 """
 
 import argparse
@@ -228,11 +234,14 @@ def check_external(refs):
 
     refs is [(file, line, url)] as found by the links gate. One timed
     check per unique URL, in parallel; every non-answer or 4xx/5xx gets
-    a line naming URL and status. Returns (unique, flagged, skipped).
+    a line naming URL and status. Returns (unique, flagged, skipped,
+    findings) where findings is [(url, detail-or-status)] — the same
+    facts the run summary is built from, so the log and the summary can
+    never disagree.
     """
     unique = sorted({u for _, _, u in refs})
     if not unique:
-        return 0, 0, False
+        return 0, 0, False, []
     probe_url = os.environ.get("CHECK_SITE_PROBE_URL", BASE)
     timeout = float(os.environ.get("CHECK_SITE_TIMEOUT", "10"))
     status, detail = fetch_status(probe_url, timeout)
@@ -240,20 +249,86 @@ def check_external(refs):
         line = f"external: SKIPPED — no network (probe {probe_url}: {detail})"
         print(line)
         print(line, file=sys.stderr)
-        return len(unique), 0, True
+        return len(unique), 0, True, [(probe_url, detail)]
     results = {}
     with ThreadPoolExecutor(max_workers=8) as pool:
         futures = {u: pool.submit(fetch_with_retry, u, timeout) for u in unique}
         for u, fut in futures.items():
             results[u] = fut.result()
     flagged = 0
+    findings = []
     for u in unique:
         status, detail = results[u]
         if status is None or status >= 400:
             flagged += 1
-            print(f"external: {u} -> {detail or status}")
+            shown = detail or status
+            findings.append((u, shown))
+            print(f"external: {u} -> {shown}")
     print(f"external: {len(unique)} unique link(s), {flagged} flagged")
-    return len(unique), flagged, False
+    return len(unique), flagged, False, findings
+
+
+def summary_target(cli_value):
+    """Where the run summary goes: --summary PATH wins, else the CI
+    mechanism ($GITHUB_STEP_SUMMARY). Empty/absent means write nothing."""
+    raw = cli_value or os.environ.get("GITHUB_STEP_SUMMARY", "")
+    if not raw.strip():
+        return None
+    return Path(raw.strip()).expanduser()
+
+
+def render_summary(unique, findings, skipped, probe_detail=""):
+    """The summary block: markdown, one row per flagged link.
+
+    skipped means the pass could not measure anything — that is stated
+    as such, never rendered as a clean result.
+    """
+    lines = ["## External link check", ""]
+    if skipped:
+        lines += [f"**SKIPPED — no network** (probe unreachable: "
+                  f"{probe_detail}). This says nothing about the links.", ""]
+        return "\n".join(lines)
+    if not unique:
+        lines += ["**0 external links** — nothing to check.", ""]
+        return "\n".join(lines)
+    if findings:
+        lines += [f"**{unique} unique link(s), {len(findings)} flagged** — "
+                  "report-only; this does not affect the run's verdict.", "",
+                  "| URL | Status |", "| --- | --- |"]
+        for url, shown in findings:
+            lines.append(f"| {url} | {shown} |")
+        lines.append("")
+    else:
+        lines += [f"**{unique} unique link(s), 0 flagged** — no findings: "
+                  "every external link answered.", ""]
+    return "\n".join(lines)
+
+
+def write_summary(path, block, root):
+    """Append the block to the summary file. Never writes inside the
+    checked tree; a failure is reported and swallowed so the summary can
+    never change the run's verdict or its exit code."""
+    try:
+        target = path.resolve()
+    except OSError as err:
+        print(f"external: summary not written — {err}")
+        return False
+    if target == root or root in target.parents:
+        print(f"external: summary not written — {target} is inside the "
+              "checked tree")
+        return False
+    try:
+        existing = target.read_bytes()
+    except OSError:
+        existing = b""
+    sep = b"" if not existing or existing.endswith(b"\n") else b"\n"
+    try:
+        target.write_bytes(existing + sep + block.encode("utf-8"))
+    except OSError as err:
+        print(f"external: summary not written — {err}")
+        return False
+    print(f"external: findings written to the run summary ({target})")
+    return True
 
 
 def find_faults(root):
@@ -490,6 +565,9 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--root", type=Path, default=Path(__file__).resolve().parent.parent,
                     help="site tree to check (default: this repo)")
+    ap.add_argument("--summary", default=None,
+                    help="append the external-link findings to this file "
+                         "(default: $GITHUB_STEP_SUMMARY when set, else none)")
     args = ap.parse_args(argv)
     root = args.root.resolve()
     if not root.is_dir():
@@ -501,7 +579,13 @@ def main(argv=None):
     if faults:
         print(f"site-check: {len(faults)} fault(s) in {stats['pages']} pages")
         return 1
-    ext_checked, _ext_flagged, ext_skipped = check_external(external_refs)
+    ext_checked, _ext_flagged, ext_skipped, findings = check_external(external_refs)
+    summary = summary_target(args.summary)
+    if summary is not None:
+        probe_detail = findings[0][1] if (ext_skipped and findings) else ""
+        write_summary(summary,
+                      render_summary(ext_checked, findings, ext_skipped,
+                                     probe_detail), root)
     busters = ", ".join(f"{a} v={v}" for a, v in stats["busters"].items()) or "none"
     links_note = (f"links {stats['internal_links']} internal / "
                   f"{ext_checked} external")

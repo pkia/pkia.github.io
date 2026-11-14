@@ -93,11 +93,19 @@ def make_site(root, posts=("2026-11-02.html", "2026-11-01.html"),
     return root
 
 
-def run(root, env_extra=None):
+def run(root, env_extra=None, argv=()):
     env = dict(os.environ)
+    env.pop("GITHUB_STEP_SUMMARY", None)   # hermetic: this box's cron has none
     env.update({k: str(v) for k, v in (env_extra or {}).items()})
-    return subprocess.run([sys.executable, str(CHECKER), "--root", str(root)],
+    return subprocess.run([sys.executable, str(CHECKER), "--root", str(root),
+                           *argv],
                           capture_output=True, text=True, timeout=300, env=env)
+
+
+def tree_state(root):
+    """Every file's path, size and bytes — the read-only assertion's ruler."""
+    return {p.relative_to(root).as_posix(): p.read_bytes()
+            for p in sorted(Path(root).rglob("*")) if p.is_file()}
 
 
 @pytest.fixture
@@ -384,10 +392,24 @@ def test_directory_urls_resolve_to_index(site):
 
 
 def test_checker_is_read_only():
+    # The checker's one write is the run summary, and only when one is
+    # named. The scan below stays a proof of scope rather than a token
+    # ban that has to be deleted: no write/remove/exec verb anywhere,
+    # exactly ONE write call site, and its target is the summary path —
+    # never the checked tree (write_summary refuses a path inside it,
+    # proven behaviourally by test_summary_never_written_inside_tree).
     src = CHECKER.read_text()
     for banned in ("write_text", "unlink", "os.remove", "shutil", "subprocess",
-                   "open("):
+                   "open(", "mkdir", "rename", "rmtree", "copyfile"):
         assert banned not in src, f"checker source must not {banned!r}"
+    assert src.count("write_bytes(") == 1, "exactly one write call site"
+    assert "target.write_bytes(existing + sep + block.encode" in src, \
+        "the only write goes to the summary target"
+    # the summary target comes from --summary / $GITHUB_STEP_SUMMARY,
+    # never from the checked root
+    target_fn = src.split("def write_summary(")[1].split("def ")[0]
+    assert "root" in target_fn, "write_summary must know the tree it guards"
+    assert "target.read_bytes()" in target_fn
 
 
 # ---- links gate: every <a href> lands ------------------------------------
@@ -563,3 +585,141 @@ def test_external_urls_fetched_once(ext_site):
     assert r.returncode == 0, r.stdout + r.stderr
     assert hits["/live"] == 1, "the same external URL must fetch once"
     assert "1 unique link(s)" in r.stdout
+
+
+# ---- external pass → run summary (report-only, at a glance) ---------------
+# The 11-10 ship made the external pass report-only by design, so its
+# findings lived in CI logs nobody opens. These tests pin the fix: the
+# same facts the log carries land in the run summary (a markdown block
+# GitHub renders on the job page), and the gate's exit code is untouched
+# by the summary's presence, its absence, or its failure.
+
+def test_summary_names_planted_dead_url_and_status(ext_site, tmp_path):
+    site, base, srv, hits = ext_site
+    p = site / "blog" / "posts" / "2026-11-01.html"
+    p.write_text(p.read_text() + f'  <a href="{base}/gone">dead</a>\n'
+                 f'  <a href="{base}/live">alive</a>\n')
+    summary = tmp_path / "summary.md"
+    r = run(site, {"CHECK_SITE_PROBE_URL": f"{base}/probe"},
+            ["--summary", str(summary)])
+    srv.shutdown()
+    assert r.returncode == 0, r.stdout + r.stderr
+    text = summary.read_text()
+    assert "## External link check" in text
+    assert f"| {base}/gone | 404 |" in text
+    assert "2 unique link(s), 1 flagged" in text
+    assert f"{base}/live" not in text, "a live link is not a finding"
+    assert "does not affect the run's verdict" in text
+
+
+def test_summary_lists_every_flagged_link(ext_site, tmp_path):
+    site, base, srv, hits = ext_site
+    p = site / "blog" / "posts" / "2026-11-01.html"
+    p.write_text(p.read_text() + f'  <a href="{base}/gone">a</a>\n'
+                 f'  <a href="{base}/missing">b</a>\n'
+                 f'  <a href="{base}/live">c</a>\n')
+    summary = tmp_path / "summary.md"
+    r = run(site, {"CHECK_SITE_PROBE_URL": f"{base}/probe"},
+            ["--summary", str(summary)])
+    srv.shutdown()
+    assert r.returncode == 0
+    text = summary.read_text()
+    assert text.count("| http") == 2, text        # one row per finding, no more
+    assert f"| {base}/gone | 404 |" in text
+    assert f"| {base}/missing | 404 |" in text
+    assert "3 unique link(s), 2 flagged" in text
+
+
+def test_summary_clean_run_reports_zero_findings(ext_site, tmp_path):
+    site, base, srv, hits = ext_site
+    p = site / "blog" / "posts" / "2026-11-01.html"
+    p.write_text(p.read_text() + f'  <a href="{base}/live">alive</a>\n')
+    summary = tmp_path / "summary.md"
+    r = run(site, {"CHECK_SITE_PROBE_URL": f"{base}/probe"},
+            ["--summary", str(summary)])
+    srv.shutdown()
+    assert r.returncode == 0, r.stdout + r.stderr
+    text = summary.read_text()
+    assert "1 unique link(s), 0 flagged" in text
+    assert "no findings" in text
+    assert "| URL |" not in text, "a clean run has no findings table"
+    assert "404" not in text
+
+
+def test_summary_does_not_change_exit_code(ext_site, tmp_path):
+    site, base, srv, hits = ext_site
+    p = site / "blog" / "posts" / "2026-11-01.html"
+    p.write_text(p.read_text() + f'  <a href="{base}/gone">dead</a>\n')
+    env = {"CHECK_SITE_PROBE_URL": f"{base}/probe"}
+    without = run(site, env)
+    with_summary = run(site, env, ["--summary", str(tmp_path / "s.md")])
+    srv.shutdown()
+    assert without.returncode == 0 and with_summary.returncode == 0
+    # and the internal-fault path keeps its 1, summary or not
+    q = site / "index.html"
+    q.write_text(q.read_text() + '  <img src="/nope.png" />\n')
+    faulty = run(site, env, ["--summary", str(tmp_path / "s2.md")])
+    assert faulty.returncode == 1, faulty.stdout
+    assert not (tmp_path / "s2.md").exists(), \
+        "a faulting run never reached the external pass, so it writes no summary"
+
+
+def test_summary_honours_github_step_summary_env(ext_site, tmp_path):
+    site, base, srv, hits = ext_site
+    p = site / "blog" / "posts" / "2026-11-01.html"
+    p.write_text(p.read_text() + f'  <a href="{base}/gone">dead</a>\n')
+    summary = tmp_path / "step_summary.md"
+    summary.write_text("### Previous step\n\nalready here\n")   # CI appends
+    r = run(site, {"CHECK_SITE_PROBE_URL": f"{base}/probe",
+                   "GITHUB_STEP_SUMMARY": str(summary)})
+    srv.shutdown()
+    assert r.returncode == 0, r.stdout + r.stderr
+    text = summary.read_text()
+    assert text.startswith("### Previous step"), "the summary must be appended"
+    assert "already here" in text
+    assert f"| {base}/gone | 404 |" in text
+
+
+def test_summary_networkless_run_says_skipped(ext_site, tmp_path):
+    site, base, srv, hits = ext_site
+    p = site / "blog" / "posts" / "2026-11-01.html"
+    p.write_text(p.read_text() + f'  <a href="{base}/live">alive</a>\n')
+    summary = tmp_path / "summary.md"
+    r = run(site, {"CHECK_SITE_PROBE_URL": "http://localhost:1/probe"},
+            ["--summary", str(summary)])
+    srv.shutdown()
+    assert r.returncode == 0
+    text = summary.read_text()
+    assert "SKIPPED" in text and "no network" in text
+    assert "says nothing about the links" in text
+    assert "0 flagged" not in text, "a skipped pass is never a clean result"
+
+
+def test_summary_never_written_inside_tree(site):
+    before = tree_state(site)
+    inside = site / "summary.md"
+    r = run(site, argv=["--summary", str(inside)])
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert not inside.exists()
+    assert "inside the checked tree" in r.stdout
+    assert tree_state(site) == before
+
+
+def test_summary_absent_writes_nothing(site):
+    before = tree_state(site)
+    r = run(site)      # no --summary, no GITHUB_STEP_SUMMARY
+    assert r.returncode == 0
+    assert "run summary" not in r.stdout
+    assert tree_state(site) == before
+
+
+def test_summary_write_failure_never_fails_the_run(ext_site, tmp_path):
+    site, base, srv, hits = ext_site
+    p = site / "blog" / "posts" / "2026-11-01.html"
+    p.write_text(p.read_text() + f'  <a href="{base}/gone">dead</a>\n')
+    blocked = tmp_path / "no-such-dir" / "summary.md"
+    r = run(site, {"CHECK_SITE_PROBE_URL": f"{base}/probe"},
+            ["--summary", str(blocked)])
+    srv.shutdown()
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "summary not written" in r.stdout
