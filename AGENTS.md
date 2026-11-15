@@ -8,8 +8,8 @@ HTML/CSS/JS, no build step. The deploy branch is `master` — pushing to
 ## Devlog job (runs daily at 07:00 via hermes cron)
 
 Write today's devlog post and publish it, then refresh the homepage content to
-match the current state of things (see "Portfolio refresh" below), then refresh
-my GitHub profile README (see "Profile README refresh" below). The blog is
+match the current state of things (see "Portfolio refresh" below). The GitHub
+profile README is frozen — leave `pkia/pkia` alone. The blog is
 at `blog/`; each post is a standalone HTML page styled by the site's existing
 `styles.css`.
 
@@ -129,51 +129,17 @@ is current. Rules:
   page fast (no frameworks, no build step), and only ship changes that make
   the site better — never churn for the sake of change.
 
-### Profile README refresh (also part of the daily job)
+### Profile README — frozen (owner directive 2026-11-15)
 
-Keep my GitHub profile README (repo `pkia/pkia`, file `README.md`, default
-branch `master`) in sync with the projects I'm actually working on. It is
-**not** part of this repo — do not clone it into `/home/ev` (that would
-pollute the devlog repo discovery); edit it through the GitHub contents API
-with the authenticated `gh` CLI:
+The profile README (`pkia/pkia`, `README.md`) is **not** updated by this job any
+more. The owner called the daily "Right now" changelog paragraph cringe and
+asked for it to be left alone and kept professional.
 
-```bash
-gh api repos/pkia/pkia/readme --jq '.sha'                  # sha needed for the update
-gh api repos/pkia/pkia/readme --jq '.content' | base64 -d  # current README.md
-# write the new README to a temp file, then commit it in one API call:
-gh api -X PUT repos/pkia/pkia/contents/README.md \
-    -f message='readme: <what changed>' -f sha=<sha> \
-    -f content="$(base64 -w0 /tmp/readme-new.md)"
-```
-
-Rules:
-
-- **Featured work**: same bar as the homepage projects grid — owned repos
-  that shipped real substance (README, tests, working code). Add newly
-  shipped repos (including ones created by the radar implementer), keep the
-  list at four to five bullets, retire or fold the least significant older
-  ones into a short "More on GitHub" line. Never invent or oversell work.
-- **Length discipline (owner directive 2026-09-12 — the README had become
-  a wall of text): the "Right now" paragraph is max ~90 words; each repo
-  bullet is ONE line, max ~30 words. No semicolon chains, no dates, commit
-  shas, CI-run ids or test-count deltas. The profile is a shop window, not
-  a changelog — detail lives in the repo READMEs and the devlog.**
-- **"Right now" interest line**: refresh from the same sources as the
-  homepage "Currently" panel (recent commits + the radar board at
-  https://github.com/pkia/radar/IDEAS.md).
-- **Toolbox**: update only when genuinely stale.
-- Keep the intro bio and contact links untouched unless genuinely outdated;
-  keep the markdown valid and the concise engineer voice; no emoji spam.
-- **Employer privacy on GitHub**: the site (pkia.github.io) may name
-  Cohesity (owner-approved 2026-09-12); this GitHub README does NOT name
-  an employer — keep it that way unless the owner says otherwise.
-- **No profile-views counter**: deliberately removed in Aug 2026 — the hosted
-  counter services are either dead (komarev.com) or unprofessionally styled
-  (getloli anime characters), and a vanity view count adds nothing to the
-  profile. Do not re-add any visitor counter badge.
-- Only push a commit when something actually changed — never churn for the
-  sake of change. If the API update fails, report the failure and continue
-  with the rest of the job.
+- Do not read, rewrite, or commit to `pkia/pkia` from any scheduled job.
+- It stays a short, static profile: name, one-line bio, five selected repos,
+  a stack line, and a link to the site. No daily/seasonal churn, no "Right now"
+  paragraph, no view counters, no emoji.
+- Only touch it if the owner explicitly asks for a change in a live session.
 
 ### Publish flow
 
