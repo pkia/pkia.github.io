@@ -129,17 +129,16 @@ is current. Rules:
   page fast (no frameworks, no build step), and only ship changes that make
   the site better — never churn for the sake of change.
 
-### Profile README — frozen (owner directive 2026-11-15)
+### Profile README — deleted (owner directive 2026-11-15)
 
-The profile README (`pkia/pkia`, `README.md`) is **not** updated by this job any
-more. The owner called the daily "Right now" changelog paragraph cringe and
-asked for it to be left alone and kept professional.
+The profile README (`pkia/pkia`, `README.md`) no longer exists. The owner
+called the daily "Right now" changelog paragraph cringe, then had the file
+deleted outright. The repository `pkia/pkia` is intentionally empty.
 
-- Do not read, rewrite, or commit to `pkia/pkia` from any scheduled job.
-- It stays a short, static profile: name, one-line bio, five selected repos,
-  a stack line, and a link to the site. No daily/seasonal churn, no "Right now"
-  paragraph, no view counters, no emoji.
-- Only touch it if the owner explicitly asks for a change in a live session.
+- Do not read, rewrite, recreate, or commit to `pkia/pkia` from any job.
+- Do not add a replacement README, badge set, view counter, or "profile
+  summary" anywhere. An empty profile repo is the desired end state.
+- Only recreate it if the owner explicitly asks in a live session.
 
 ### Publish flow
 
