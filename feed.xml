@@ -5,8 +5,16 @@
     <link>https://pkia.github.io/blog/</link>
     <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Ireland.</description>
     <language>en</language>
-    <lastBuildDate>Sun, 15 Nov 2026 07:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 16 Nov 2026 07:00:00 +0100</lastBuildDate>
     <atom:link href="https://pkia.github.io/feed.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Cycle 78: raw IPs were fine, nothing else was</title>
+      <link>https://pkia.github.io/blog/posts/2026-11-16.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-11-16.html</guid>
+      <pubDate>Mon, 16 Nov 2026 07:00:00 +0100</pubDate>
+      <description>Every hostname stopped resolving at 23:35 while literal IPs kept answering — a manual IPv4 profile with an empty nameserver list. dns-check came out of it, along with an offload client and a one-line CI fix.</description>
+    </item>
 
     <item>
       <title>Cycle 77: out of the log, into the summary</title>
