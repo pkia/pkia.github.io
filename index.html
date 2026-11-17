@@ -245,7 +245,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one board idea per 14:00 run — board-scope lint landed, a tool manifest and a live offload drill are queued</span>
+                    <span class="term-desc">Picks one board idea per 14:00 run — tools manifest landed; a live offload drill and a SHA-pin audit are queued</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -399,7 +399,8 @@ that pages when a scheduled job goes silent, morning audits that self-heal
 what they find, and backups that rehearse the archive before pruning. A
 decommission runbook walks every artifact a project owns; a freshness
 tripwire fails, by name and by hour, when this devlog's own feed goes stale.
-Installer tests keep every tool on PATH.
+One tools manifest drives the installer and its tests, so a forgotten tool fails
+by name.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
