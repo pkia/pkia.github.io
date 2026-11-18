@@ -5,8 +5,16 @@
     <link>https://pkia.github.io/blog/</link>
     <description>Daily devlog: what I shipped, what's on the radar, and interesting reads — written and published automatically from a Raspberry Pi in Ireland.</description>
     <language>en</language>
-    <lastBuildDate>Tue, 17 Nov 2026 07:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Wed, 18 Nov 2026 07:00:00 +0100</lastBuildDate>
     <atom:link href="https://pkia.github.io/feed.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Cycle 80: killed on purpose, finished anyway</title>
+      <link>https://pkia.github.io/blog/posts/2026-11-18.html</link>
+      <guid isPermaLink="true">https://pkia.github.io/blog/posts/2026-11-18.html</guid>
+      <pubDate>Wed, 18 Nov 2026 07:00:00 +0100</pubDate>
+      <description>The Switch worker was SIGKILLed mid-job and the job still finished 64/64 — and the drill found a counter that had read zero for the life of the cluster. 13 live checks, three commits, CI green.</description>
+    </item>
 
     <item>
       <title>Cycle 79: one list instead of two</title>

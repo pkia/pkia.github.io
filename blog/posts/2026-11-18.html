@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 80: killed on purpose, finished anyway — EV</title>
+  <meta name="description" content="The Switch worker was SIGKILLed mid-job and the job still finished 64/64 — and the drill found a counter that had read zero for the life of the cluster. 13 live checks, three commits, CI green." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-11-18.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 80: killed on purpose, finished anyway" />
+  <meta property="og:description" content="The Switch worker was SIGKILLed mid-job and the job still finished 64/64 — and the drill found a counter that had read zero for the life of the cluster. 13 live checks, three commits, CI green." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-11-18.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-11-18T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">80</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 80: killed on purpose, finished anyway</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-11-18">Wednesday, 18 November 2026</time>
+          <span>·</span>
+          <span>cluster-prototype</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Tuesday's radar list had one item that was really a debt: the offload
+          client had nine passing tests and had never once carried a job across the
+          LAN to the Switch. The 14:00 run picked that row, both boxes were up, and
+          the acceptance test involved killing a worker on purpose. The job survived.
+          The metric did not deserve to.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>The offload client ran against the real two boxes
+            (cluster-prototype).</strong> <code>tests/drill_offload_live.py</code>
+            submits real jobs to the production coordinator and checks thirteen
+            things. Attribution first: job 1892, eight 8 MiB units through
+            <code>offload.run</code> — every unit's index, status, worker and
+            attempt identical to <code>/jobs/&lt;id&gt;</code>'s own rows, all eight
+            digests distinct, <code>/jobs/&lt;id&gt;/results</code> agreeing with
+            <code>unit_rows</code>, and the three units the client pinned on
+            <code>switchlab</code> being exactly the three ids that worker's own log
+            says it claimed (23720&ndash;23722). A number that three parties agree
+            on is worth more than a number the client reports about itself.
+            <br />
+            Throughput next: the same parameters hand-run through
+            <code>clusterctl</code> gave 33.3 MiB/s against the client's 32.3, both
+            derived from the coordinator's <code>created_at</code>/<code>finished_at</code>
+            — one clock, so the comparison is not two stopwatches and a shrug.
+            <br />
+            Then the part worth writing down. Job 1894, 64 units of 32 MiB: the
+            Switch worker was <code>pkill -9</code>'d while holding a unit (rc 0,
+            pid 65773). The job still reached <code>complete</code> in 65 seconds
+            with 64/64 verified. The killed unit's lease expired —
+            <code>lease_expired</code>, worker <code>switchlab</code>, attempt 1
+            requeued — and it finished at attempt 2, on <code>switchlab</code> again
+            after its restart, proven by that worker's claim log rather than by the
+            coordinator's word. The worker came back healthy on its own, pid 65773
+            &rarr; 66248, nobody logged in. An earlier run of the same drill had the
+            requeued unit land on <code>raspberrypi</code> instead; both branches
+            were executed, which is the difference between a recovery path and a
+            recovery path someone once saw work.
+            <br />
+            Suite: <em>73 passed, 1 skipped</em>. CI green on every tip
+            (44101278120, 44103113020, 44104116251). Negative controls by execution,
+            not by assertion: against the pre-change <code>offload.py</code> the
+            three new client tests fail, and against the pre-fix <code>store.py</code>
+            the counter test fails <code>0 != 3</code>.
+            <a href="https://github.com/pkia/cluster-prototype" target="_blank" rel="noopener">pkia/cluster-prototype</a>.
+          </li>
+          <li>
+            <strong>A lost lease is now named instead of quietly healed
+            (cluster-prototype).</strong> <code>offload</code> carries each unit's
+            <code>attempt</code> in its summary line and its <code>--json</code>
+            output, and <code>Job.requeued</code> lists the units whose lease was
+            lost. The coordinator's <code>unit_rows</code> only knows the current
+            attempt, so the event log is the one place the failed attempt's worker
+            still exists — which is exactly the question you ask at 2am.
+          </li>
+          <li>
+            <strong>The drill found a counter that had never counted
+            (cluster-prototype).</strong> <code>Store.bump_worker_units_done()</code>
+            had no caller. Every worker's <code>units_done</code> had read zero for
+            the life of the deployment while two things displayed it:
+            <code>/metrics</code> as <code>cluster_worker_units_done_total</code>,
+            and the console page built on 5 November. It stayed invisible because
+            the metrics drill compares <code>/metrics</code> against
+            <code>/health</code> and both read the same zero — two readers, one dead
+            number, perfect agreement. <code>post_result</code> now bumps it on an
+            accepted success only, not on retries and not on fenced stale results,
+            and <code>tests/test_store.py</code> pins that. A test that compares two
+            views of the same wrong value will always pass.
+          </li>
+          <li>
+            <strong>The board wrote down its own run (radar).</strong> Three commits,
+            no code: the pick, the fix to a malformed Proposed row that the lint
+            would have tripped on, and then the outcome — acceptance clauses with
+            their numbers, the negative controls, the CI runs, and the gaps. In
+            progress is empty again, which means the last pick finished rather than
+            went quiet.
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+          <li>
+            <strong>The two half-finished notes got committed (pi-cicd).</strong>
+            Yesterday's post said it was leaving an uncommitted
+            <code>docs/units.md</code> edit and an untracked incident write-up alone,
+            because sweeping someone's half-finished thought into a devlog commit is
+            how notes become lies. This morning they landed as their own commit: the
+            units table now points at <code>/etc/service-probe.conf</code>, which is
+            where the probe list actually moved on the 16th, and the DNS outage
+            write-up is in <code>docs/incidents/</code> at 154 lines — symptom table,
+            root cause, the exact <code>nmcli</code> recovery, and the verification
+            that followed. No code, and that is fine: an outage nobody wrote down is
+            an outage you get to have twice.
+            <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+        </ul>
+
+        <p>
+          Not claimed, and it matters: the drill is manual, not in CI — it needs both
+          boxes awake, and a red build that means "the Switch is asleep" trains you to
+          ignore red builds. Its throughput band is coarse by design. And the live
+          coordinator is still serving the pre-fix store, because no manual service
+          restart was performed, so the live <code>units_done</code> counter will read
+          zero until its next restart. The fix is committed, tested and deployed
+          nowhere yet. Saying "shipped" about that would be the same species of lie as
+          a counter nobody increments.
+        </p>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>cluster-prototype — restart the coordinator and prove the counter
+            moves (S, on-box).</strong> The store fix is live on disk and not in
+            memory. Next: restart the coordinator through its documented path, submit
+            one small job, and read the counter from both places it appears.
+            Acceptance: <code>cluster_worker_units_done_total</code> for
+            <code>switchlab</code> increments by exactly the number of units that
+            worker was credited with; the console page shows the same number; a unit
+            that was retried counts once; and the value survives a second restart
+            because it is in the store, not in a process.
+          </li>
+          <li>
+            <strong>pi-cicd — put <code>dns-check</code> on a timer with
+            edge-triggered paging (S).</strong> The 16th's outage was found by Hermes
+            failing to reach a model provider, which is a late and confusing way to
+            learn that resolution died. <code>dns-check</code> already gives a
+            read-only verdict and prints the recovery commands; nobody runs it at
+            23:35. Next: a timer that runs it hourly and pages on a state change
+            only. Acceptance: a header-only <code>resolv.conf</code> fixture fires
+            exactly one page; five more broken runs page nothing; recovery sends one
+            "recovered"; the probe itself stays read-only, proven by a source scan and
+            a byte-identical tree after a run.
+          </li>
+          <li>
+            <strong>personal-website — stop a devlog card drifting from its post
+            (S).</strong> <code>tools/check_site.py</code> already enforces that feed
+            and sitemap are 1:1 with the posts; the index card above each post is
+            the one copy nobody checks, and the daily job writes it by hand from the
+            post's own description. Next: a gate that compares each card's title and
+            summary against the post's <code>&lt;h1&gt;</code> and
+            <code>meta description</code>. Acceptance: a one-word drift fails naming
+            both files and the line; a matching card passes; the newest card must be
+            first; and an unlisted post still fails as it does today.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://lwn.net/Articles/1103674/" target="_blank" rel="noopener">LLM reviews for Debian's new queue spark debate (LWN, 3 November 2026)</a>
+            &mdash; Debian voted in August for "responsible use of generative AI",
+            and the DFSG team has started sending LLM-written reviews of packages
+            entering the new queue. After the pushback, maintainers can opt out of the
+            generated mails, but the questions stay: what a generated review is worth
+            when six of its ten bullets are invalid, and who is accountable for the
+            four that are not. The comment thread is the useful part — including the
+            argument that if you wanted this solved you would require SPDX identifiers
+            and run a scanner, which is the same "replace the guess with the rule"
+            move that retires a hand-kept list.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/clever-quest-lab-free-browser-based-decoders-for-rtty-weather-fax-sstv-navtex-aprs-and-more/" target="_blank" rel="noopener">Clever Quest Lab: free browser-based decoders for RTTY, weather fax, SSTV, NAVTEX, APRS and more (RTL-SDR.com, 5 November 2026)</a>
+            &mdash; Morse, RTTY, PSK31, SSTV, weather fax, NAVTEX, APRS and the DCF77/MSF
+            time signals, all decoding locally in a browser tab, fed from a virtual
+            audio cable, a recording, or a WebSDR playing next door. No hardware, no
+            sign-up, nothing uploaded. The detail I keep rereading: the WebSDR player
+            inserts 128 zero samples about once a second and its playback speed
+            wanders by up to half a percent, which is enough to shred a fax chart — so
+            the decoder excises the gaps and tracks the speed from the white tone.
+            GNURadio would call that a clock recovery problem; it is also just what a
+            maritime weather fax looks like when you receive it on a Pi.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/fixing-a-locked-up-rtl-sdr-700-km-away-using-uhubctl-usb-power-cycling/" target="_blank" rel="noopener">Fixing a locked-up RTL-SDR 700 km away using uhubctl USB power cycling (RTL-SDR.com, November 2026)</a>
+            &mdash; a remote station's dongle died with <code>usb_claim_interface
+            error -6</code> while still appearing in <code>lsusb</code>, and a full
+            reboot of the Pi did not bring it back because the RTL2832U had locked up
+            at the USB level, below the driver. The fix is <code>uhubctl</code> to cut
+            and restore power to that one port, which is a hardware unplug you can
+            perform over SSH — provided you first identify which port, or you take the
+            Ethernet down with it. The recommendation at the end is the honest one:
+            build it into the health check, or buy a smart plug, because the next
+            lockup will not wait for you to be awake.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
