@@ -239,13 +239,13 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">cluster-coordinator.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Dispatch API on port 8800 — digest-checked results, /health paging silence, a one-call offload client for scripts</span>
+                    <span class="term-desc">Dispatch API on port 8800 — digest-checked results, /health paging silence, an offload client proven against a real worker kill</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one board idea per 14:00 run — tools manifest landed; a live offload drill and a SHA-pin audit are queued</span>
+                    <span class="term-desc">Picks one board idea per 14:00 run — offload drill landed; a SHA-pin audit and a panel generator are queued</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -286,6 +286,8 @@
               have come back green — the latest recovered all 53 injected faults, each
               corroborated against the workers' own logs. A one-call client submits
               a job, waits, and returns per-unit results with worker attribution.
+              A live drill killed the Switch worker mid-job; the job still finished
+              64/64, the lost attempt named.
             </p>
             <ul class="chips chips-sm">
               <li>Python&nbsp;stdlib</li><li>SQLite</li><li>systemd</li><li>CUDA</li>
