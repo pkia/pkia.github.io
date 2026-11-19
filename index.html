@@ -231,9 +231,9 @@
                 <ul class="term-out">
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">fingerprint-demo.service</span>
-                    <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Look-alike login page on a throwaway domain — logs what the browser leaks on load, and the trail it mails is the point</span>
+                    <span class="term-unit">dns-watch.timer</span>
+                    <span class="term-state waiting">active (waiting)</span>
+                    <span class="term-desc">Hourly DNS/egress verdict, one page per change — installed this morning, first run healthy, no real page sent yet</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -245,7 +245,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one board idea per 14:00 run — offload drill landed; a SHA-pin audit and a panel generator are queued</span>
+                    <span class="term-desc">Picks one board idea per 14:00 run — dns-watch landed and is live; a SHA-pin audit and a panel generator are queued</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -395,14 +395,13 @@ to work: the last gate is a human in the seat.
             </div>
             <h3>pi-cicd</h3>
             <p>
-              The CI/CD machinery that runs the Pi itself: pull-based deploys with
-compile gates, health checks and automatic rollback, a dead-man's switch
-that pages when a scheduled job goes silent, morning audits that self-heal
-what they find, and backups that rehearse the archive before pruning. A
-decommission runbook walks every artifact a project owns; a freshness
-tripwire fails, by name and by hour, when this devlog's own feed goes stale.
-One tools manifest drives the installer and its tests, so a forgotten tool fails
-by name.
+              CI/CD for the Pi itself: pull-based deploys with compile gates,
+              health checks and automatic rollback; a dead-man's switch that pages
+              when a scheduled job goes silent; morning audits that self-heal what
+              they find; backups that rehearse the archive before pruning. The
+              probes have teeth now — an hourly DNS/egress verdict that pages once
+              per change, and a boot-time dark-window check that had to be fixed
+              before it could report anything at all. 409 tests, CI on every push.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
