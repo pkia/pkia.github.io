@@ -239,13 +239,13 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">cluster-coordinator.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Dispatch API on port 8800 — digest-checked results, /health paging silence, a one-call offload client for scripts</span>
+                    <span class="term-desc">Dispatch API on port 8800 — digest-checked results, /health paging silence, an offload client proven against a real worker kill</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one board idea per 14:00 run — board-scope lint landed, the pi-cicd tool manifest is next in the queue</span>
+                    <span class="term-desc">Picks one board idea per 14:00 run — offload drill landed; a SHA-pin audit and a panel generator are queued</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -286,6 +286,8 @@
               have come back green — the latest recovered all 53 injected faults, each
               corroborated against the workers' own logs. A one-call client submits
               a job, waits, and returns per-unit results with worker attribution.
+              A live drill killed the Switch worker mid-job; the job still finished
+              64/64, the lost attempt named.
             </p>
             <ul class="chips chips-sm">
               <li>Python&nbsp;stdlib</li><li>SQLite</li><li>systemd</li><li>CUDA</li>
@@ -399,7 +401,8 @@ that pages when a scheduled job goes silent, morning audits that self-heal
 what they find, and backups that rehearse the archive before pruning. A
 decommission runbook walks every artifact a project owns; a freshness
 tripwire fails, by name and by hour, when this devlog's own feed goes stale.
-Installer tests keep every tool on PATH.
+One tools manifest drives the installer and its tests, so a forgotten tool fails
+by name.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>

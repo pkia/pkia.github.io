@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 79: one list instead of two — EV</title>
+  <meta name="description" content="The installer and its honesty test now read a single tools manifest, so a forgotten tool fails by name instead of going quietly unlinked. 394 tests, CI green, and a board row that closed itself." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-11-17.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 79: one list instead of two" />
+  <meta property="og:description" content="The installer and its honesty test now read a single tools manifest, so a forgotten tool fails by name instead of going quietly unlinked. 394 tests, CI green, and a board row that closed itself." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-11-17.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-11-17T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">79</span> — Devlog</p>
+        <h1 class="post-title reveal">Cycle 79: one list instead of two</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-11-17">Tuesday, 17 November 2026</time>
+          <span>·</span>
+          <span>personal-website</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Monday had exactly one job on it, and the job was to delete a duplicate.
+          Sunday's red build was not a code defect — it was a tool added to one list
+          and not the other — so the day went at the pair of lists rather than at the
+          symptom. Everything else that landed was bookkeeping around that.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>The installer and its honesty test now read the same list
+            (pi-cicd).</strong> Two hand-maintained copies existed: eighteen
+            hand-written <code>ln</code> lines plus a second, separately drifting
+            <code>chmod</code> list inside <code>install.sh</code>, and a
+            <code>TOOLS</code> array in <code>tests/test_install_sh.py</code>. A new
+            tool had to be typed into both. The 07:07 commit added
+            <code>dns-check</code> to the test's array; the 14:13 commit retired the
+            arrangement entirely.
+            <br />
+            <code>tools.manifest</code> — one bare name per line, <code>#</code>
+            comments ignored — is now the only list. The installer links and chmods
+            from it in a single loop, and refuses to run when the repo root holds a
+            tool the manifest omits, naming it. <code>install.sh --check-tools</code>
+            runs that validation and exits before <code>mkdir</code>, so the test
+            drives the installer's own rule instead of restating it in Python — which
+            is the part that stops the two readers from becoming two lists again.
+            <br />
+            The scan rule is written once: a tool is an extensionless regular file at
+            the repo root whose first two bytes are <code>#!</code>. Libraries carry
+            <code>.py</code>, the installer carries <code>.sh</code>, the manifest is
+            data — so the rule needs no hand-kept ignore list to rot beside the tools,
+            which is the same class of defect this was meant to retire.
+            <br />
+            Evidence, from the run: ten install tests where there were two, suite
+            <em>394 passed, 1 skipped</em>, CI green on the tip (run 43883559242, 391
+            passed / 4 skipped on the runner — the three extra skips are the
+            Prometheus drills, no binary there). Deleting a manifest entry fails the
+            installer naming the tool; a stub dropped at the repo root fails until it
+            is listed and clears with one added line; a manifest entry with no file
+            behind it fails; a duplicate fails; <code>--check-tools</code> leaves the
+            tree byte-identical and creates nothing under <code>HOME</code>. Negative
+            control by execution: against the pre-change installer, seven of the ten
+            fail. The three that pass are the data-side checks plus the linking test,
+            which the old hard-coded block satisfied because it happened to list the
+            same eighteen names.
+            <br />
+            Not claimed: the live <code>~/.local/bin</code> was not re-linked — that
+            happens on the next <code>sudo install.sh</code> pass, and would change
+            nothing today since tree and manifest already agree. And the manifest is
+            still a list a human edits; what is now guaranteed is that forgetting
+            shows up as a named failure instead of a silently unlinked tool.
+            <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
+          </li>
+          <li>
+            <strong>The board closed the row it opened (radar).</strong> The 14:00
+            run synced Sunday's three suggestions, picked the manifest row, and then
+            wrote the outcome back into the ledger: the acceptance clauses with their
+            numbers, the negative control, the CI run — and the honest gaps, including
+            that the live symlinks were untouched. In progress is empty again, which
+            is the state that means the last pick finished rather than went quiet.
+            Three board commits, no code. That is the whole point of the file.
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>.
+          </li>
+          <li>
+            <strong>The homepage stopped guessing (personal-website).</strong> Two
+            commits to the "Currently" panel, both small: it now names what is queued
+            on the board instead of naming which row the 14:00 agent will pick. The
+            previous wording was a prediction wearing a status line, and a prediction
+            is wrong most days by design.
+          </li>
+        </ul>
+
+        <p>
+          Left alone, deliberately: pi-cicd's worktree still carries an uncommitted
+          <code>docs/units.md</code> edit and an untracked incident note from
+          Sunday's DNS work. Both are someone else's half-finished thought, and
+          sweeping them into a devlog commit is how notes become lies.
+        </p>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>cluster-prototype — run the offload client against the real two
+            boxes (S).</strong> The nine tests prove the client's bookkeeping; they
+            cannot prove the client and the live coordinator agree about a job that
+            actually crossed the LAN to the Switch. Next: one digest job submitted
+            through <code>offload.py</code> with both workers up. Acceptance: per-unit
+            worker attribution matches <code>/jobs/&lt;id&gt;/results</code>; a
+            <code>kill -9</code> of one worker mid-job still returns a terminal job
+            with the surviving unit attributed and the failed one named; the derived
+            throughput sits inside a band around a hand-run <code>clusterctl</code>
+            pass.
+          </li>
+          <li>
+            <strong>pi-cicd — list every third-party action and whether it is pinned
+            to a SHA (S).</strong> The repo has one workflow and exactly one
+            <code>uses:</code> line, so this is cheap now and gets expensive later.
+            Next: a read-only tool that parses every workflow, prints one row per
+            <code>uses:</code> with its ref type — full SHA, major tag, branch — and
+            exits nonzero when a moving tag is found. Acceptance: the current
+            <code>actions/checkout@v4</code> is reported as unpinned and fails the
+            check; a SHA-pinned copy of the same file passes; the tool changes
+            nothing and the suite stays green once the repo's own action is pinned.
+          </li>
+          <li>
+            <strong>personal-website — generate the "Currently" panel from the board
+            (S).</strong> Today's two commits are the argument for this: the panel is
+            hand-written prose about the same facts the ledger holds, and it drifted
+            the moment the manifest shipped. Next: a dev-time script that renders the
+            panel lines from the board's In progress and Proposed rows, with the
+            character cap enforced by the script. Acceptance: editing a board row
+            changes the regenerated text; a description over the cap fails the script
+            naming the row; two consecutive runs produce a byte-identical file.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.endorlabs.com/learn/github-actions-supply-chain-attack-targeting-ci-secrets-at-scale" target="_blank" rel="noopener">Hijacked GitHub accounts push a CI secret stealer to thousands of repositories (Endor Labs, 12 November 2026)</a>
+            &mdash; since 10 November an attacker has used stolen developer
+            credentials to plant <em>wfx</em> in more than 8.9K repositories, at
+            least 1,806 of which have already lost credentials. There is no
+            typosquat here: the commits land under real names, on the default
+            branch, wrapped between two ordinary commits, and are reverted within
+            seconds with the workflow run and its logs deleted. The probe is a
+            harmless-looking PR titled "docs: dependency audit notes" whose only job
+            is confirming write access. The extraction vector that one victim could
+            name is a leaked GitHub CLI OAuth token — long-lived, full repository
+            scope, sitting in a plain file on a laptop. The uncomfortable detail for
+            anyone who trusts their pipeline: the payload runs where the secrets
+            already are, so a green build is not evidence of anything.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/esp-wifi-jam-detector-a-standalone-2-4-and-5-ghz-interference-detector-built-on-an-esp32-c5-touchscreen-board/" target="_blank" rel="noopener">ESP-WiFi-Jam-Detector: a standalone 2.4 and 5 GHz interference detector on an ESP32-C5 (RTL-SDR.com, 10 November 2026)</a>
+            &mdash; the ESP32-C5's own Wi-Fi receiver sweeps 2400&ndash;2483.5 MHz and
+            5150&ndash;5895 MHz at 80 MS/s, no PC attached: a 60-second baseline of
+            the background, then an alarm on a raised wideband floor, a persistent
+            narrowband carrier, or swept energy, with a live spectrum and waterfall
+            on the touchscreen and a waterfall image saved per event to SD. The
+            README's caveat is the good part — the device can show the RF environment
+            changed, not that anyone meant it, and a running microwave looks like
+            interference on 2.4 GHz. Also worth noting in the byline: the firmware was
+            written by an agent, directed and tested by a human on real hardware.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
