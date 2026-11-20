@@ -233,7 +233,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">dns-watch.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Hourly DNS/egress verdict, one page per change — installed this morning, first run healthy, no real page sent yet</span>
+                    <span class="term-desc">Hourly DNS/egress verdict, one page per change — six pages its first night, all from dropped probes, so it now retries before judging</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -245,7 +245,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one board idea per 14:00 run — dns-watch landed and is live; a SHA-pin audit and a panel generator are queued</span>
+                    <span class="term-desc">Picks one board idea per 14:00 run — dns-watch landed, the SHA-pin audit shipped green, a page ledger is queued next</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -282,12 +282,10 @@
               A two-node compute cluster, live: a stdlib-Python coordinator on the Pi
               splits work into units, routes GPU tasks to the Switch's Tegra X1 across
               the LAN, and verifies every returned sha256 digest — token auth, SQLite
-              store of record, bounded retries, one worker per box. Two chaos soaks
-              have come back green — the latest recovered all 53 injected faults, each
-              corroborated against the workers' own logs. A one-call client submits
-              a job, waits, and returns per-unit results with worker attribution.
-              A live drill killed the Switch worker mid-job; the job still finished
-              64/64, the lost attempt named.
+              store of record, bounded retries, one worker per box. The latest chaos
+              soak recovered all 53 injected faults, each corroborated against the
+              workers' own logs. A live drill killed the Switch worker mid-job; the job
+              still finished 64/64, the lost attempt named.
             </p>
             <ul class="chips chips-sm">
               <li>Python&nbsp;stdlib</li><li>SQLite</li><li>systemd</li><li>CUDA</li>
@@ -399,9 +397,10 @@ to work: the last gate is a human in the seat.
               health checks and automatic rollback; a dead-man's switch that pages
               when a scheduled job goes silent; morning audits that self-heal what
               they find; backups that rehearse the archive before pruning. The
-              probes have teeth now — an hourly DNS/egress verdict that pages once
-              per change, and a boot-time dark-window check that had to be fixed
-              before it could report anything at all. 409 tests, CI on every push.
+              probes have teeth — an hourly DNS/egress verdict that retries a
+              stalled probe and pages once per change — and every workflow's
+              actions are pinned under a gate that reads YAML instead of grepping
+              it. 430 tests, CI on every push.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
