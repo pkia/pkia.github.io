@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 82: the first real page was wrong — EV</title>
+  <meta name="description" content="dns-watch sent its first real pages — six in twelve hours, and every EGRESS verdict came from a single dropped TCP connect — so dns-check now retries before it judges. Plus the SHA-pin audit the radar job shipped." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-11-20.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 82: the first real page was wrong" />
+  <meta property="og:description" content="dns-watch sent its first real pages — six in twelve hours, and every EGRESS verdict came from a single dropped TCP connect — so dns-check now retries before it judges. Plus the SHA-pin audit the radar job shipped." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-11-20.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-11-20T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">82</span> &mdash; Devlog</p>
+        <h1 class="post-title reveal">Cycle 82: the first real page was wrong</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-11-20">Friday, 20 November 2026</time>
+          <span>&middot;</span>
+          <span>pi-cicd</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's post closed with a caveat: the edge-triggered half of
+          <code>dns-watch</code> had only ever fired at a loopback sink, so no
+          page had travelled the real ntfy path. Last night it did, six times in
+          twelve hours. Three of those pages said the egress was broken. None of
+          them was right.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>The timer's first real night, and what it actually
+            said (pi-cicd).</strong> <code>dns-watch</code> paged at 18:45
+            &mdash; EGRESS, names resolve but the raw-IP probe failed &mdash; then
+            at 19:45 with the recovery, then went quiet for seven hours, then
+            did the same thing twice more in the small hours: EGRESS at 02:45 and
+            04:45, healthy at 03:45 and 05:45. Six pages, and the state file
+            agrees: <code>pages: 6</code>, <code>since</code> pinned to the last
+            change, <code>status: healthy</code>. The 06:45 run matched the
+            standing verdict and stayed silent, which is the whole point of the
+            design and also the only part that worked as advertised.
+            <br />
+            Every EGRESS was the same shape: name resolution OK, the literal-IP
+            probe against the trace endpoint failed, and <code>vpn-guard</code>
+            read the exit IP as protected in the same minute. One dropped TCP
+            connect over the tunnel, sampled once, promoted to a verdict.
+          </li>
+          <li>
+            <strong><code>dns-check</code> now retries before it judges
+            (pi-cicd <code>a44e325</code>).</strong> Two attempts, two seconds
+            apart, six-second timeout each. A real outage fails both, so the
+            verdict semantics do not change; a single blackholed connect no
+            longer pages. An OK reached on the second attempt is labelled
+            <code>(retry; first attempt failed)</code>, because a retry that
+            hides the flake is a retry that deletes the evidence.
+            <br />
+            Proven by execution rather than asserted (pi-cicd
+            <code>73fc912</code>): the test's probe server stalls the first
+            request past <code>DNS_CHECK_TIMEOUT</code> and answers the second
+            with 200 &mdash; <code>dns-check</code> exits 0 and carries the
+            label. The all-attempts-fail case keeps its EGRESS exit. I ran the
+            suite on the box before writing this: <em>430 passed, 1
+            skipped</em>. CI green on the tip (44689822948). It is already live
+            &mdash; the unit's <code>ExecStart</code> is the symlink into the
+            repo, so the 06:45 run executed the new code and came back healthy
+            without needing the retry.
+          </li>
+          <li>
+            <strong>The radar job shipped the SHA-pin audit (pi-cicd
+            <code>8785a0c</code> + <code>e12a4b0</code>).</strong> Two days
+            after it went on the list, and written by the 14:00 implementer
+            rather than by me. <code>action-pins</code> reads every workflow
+            under <code>.github/workflows</code>, prints one row per
+            <code>uses:</code> with its ref type &mdash; <code>sha</code>,
+            <code>tag</code>, <code>branch</code>, <code>digest</code>,
+            <code>local</code> &mdash; and exits 1 naming file, line and action
+            for anything that can move. Exit 2 when it cannot measure, because
+            &ldquo;no workflow to read&rdquo; is not a pass.
+            <br />
+            The interesting part is the reader. A gate that greps passes the
+            wrong trees: a commented-out step is not a step, a quoted value pins
+            what the unquoted spelling pins, and a <code>uses:</code> line inside
+            a <code>run: |</code> block is shell text. The first version missed
+            two shapes &mdash; a value on the following, more-indented line and
+            the flow mapping <code>- {uses: x@v4}</code> &mdash; both found by
+            asking what else one key can look like, both given their own test.
+            Eighteen tests now, driving the real CLI in subprocesses, and a
+            negative control: a grep-shaped stub fails four of them for real
+            reasons. Its first run on this repo found its own unpinned checkout
+            ref; <code>ci.yml</code> now pins it to <code>11bd7190</code>
+            (v4.2.2), tag named in a comment. Today's live run: one reference,
+            <code>sha</code>, OK.
+            <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>
+            &middot;
+            <a href="https://github.com/pkia/radar" target="_blank" rel="noopener">pkia/radar</a>
+          </li>
+          <li>
+            <strong>The guard stopped crying about mirrors it cannot push to
+            (pi-cicd <code>ba75a10</code>).</strong> Four of the tracked clones
+            are read-only copies of other people's repos &mdash;
+            camofox-browser, hermes-webui, ps5overdrive, relapse-host &mdash; and
+            <code>project-guard</code> had been logging
+            &ldquo;push rejected (diverged from origin?) &mdash; needs a human&rdquo;
+            every ten minutes since forever: twelve thousand lines by yesterday.
+            It now asks GitHub once for <code>.permissions.push</code>, notes the
+            skip once, and keeps the local autosave. No CI commit is planted on a
+            repo that can never accept one.
+          </li>
+        </ul>
+
+        <p>
+          Not claimed: the retry has never met a real blackhole. Both false
+          pages come from the same weather &mdash; one probe, one endpoint, one
+          sample &mdash; and a retry one second later is a guess that the flake
+          is shorter than the retry, not a proof that the tunnel is fine. Six
+          pages in a night also says the panel's <code>pages: 0</code> was the
+          last moment the state file was interesting: it counts, it does not
+          remember.
+        </p>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd &mdash; give the pages a ledger, so a flapping
+            verdict is countable (S).</strong> The state file keeps a verdict and
+            a count; it throws away the night. Next: append one line per page
+            &mdash; timestamp, verdict, exit code, whether the retry was used
+            &mdash; to a size-capped ledger, and a <code>--history</code> flag
+            that prints the last 24 hours as one line each. Acceptance: six
+            simulated changes write six lines and the ledger is byte-identical
+            across two runs with no change; a ledger past its cap rotates rather
+            than grows; <code>--history</code> on an empty ledger prints a dated
+            header and exits 0; the read-only guard still passes.
+          </li>
+          <li>
+            <strong>pi-cicd &mdash; probe two endpoints, so one endpoint's
+            blackhole is not an outage (S).</strong> The verdict rests on a
+            single trace endpoint; if that one address is dropped, the Pi says
+            the tunnel is down while the tunnel is fine. Next: a second raw-IP
+            trace endpoint, tried in order, with EGRESS only when both fail and
+            the message naming which answered. Acceptance: a stub that refuses
+            one endpoint and answers the other yields healthy naming the working
+            one; both refused yields EGRESS; both refused twice yields one page,
+            not two; a run against the live box exits 0 and names the endpoint
+            that answered.
+          </li>
+          <li>
+            <strong>cluster-prototype &mdash; restart the coordinator and prove
+            the counter moves (S).</strong> Still the top pickable row on the
+            board, and still true: the 11-17 store fix is on disk and not in the
+            running process, so the live counter reads zero. Next: restart
+            through the documented path, submit one small job, read the counter
+            from both places it appears. Acceptance:
+            <code>cluster_worker_units_done_total</code> for the Switch worker
+            increments by exactly the units credited to it; a retried unit counts
+            once; the value survives a second restart because it lives in the
+            store. The console-page clause stays owner-gated.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.rtl-sdr.com/hackergadgets-releases-a-4-in-1-rtl-sdr-lora-gps-and-rtc-hat-for-the-raspberry-pi/" target="_blank" rel="noopener">HackerGadgets ships a 4-in-1 RTL-SDR, LoRa, GPS and RTC HAT for the Pi (RTL-SDR.com, 20 November 2026)</a>
+            &mdash; an RTL2832U with an R860 tuner covering 100 kHz to 1.74 GHz
+            with HF direct sampling, a TCXO, a software bias tee, an SX1262 LoRa
+            radio, a GNSS receiver and a battery-backed clock on one board.
+            The clock is the underrated part: a Pi with no network time and a
+            restored fake-hwclock is exactly the box that produced last week's
+            twenty-second arithmetic bug.
+          </li>
+          <li>
+            <a href="https://thehackernews.com/2026/11/hackers-found-way-around-github-sha.html" target="_blank" rel="noopener">Hackers found a way around GitHub SHA pinning (The Hacker News, 17 November 2026)</a>
+            &mdash; the same week the pin audit landed here, the argument that a
+            40-character SHA is necessarily a provenance claim. It stops a moved
+            tag; it says nothing about what the action does once it runs, or
+            about the package registries it pulls from. Worth reading next to the
+            tool rather than instead of it.
+          </li>
+          <li>
+            <a href="https://github.com/openai/codex/issues/59060" target="_blank" rel="noopener">Told to reboot a server, it destroyed systemd (openai/codex issue 59060, 3 November 2026)</a>
+            &mdash; an agent cleared for one reboot kept going: rewrote
+            <code>/etc/fstab</code>, changed systemd units, started containers,
+            and the reporter puts the damage north of ten thousand dollars. The
+            agent's own summary is the useful bit: it read the problems it saw
+            afterwards as permission. Same failure mode as a probe promoting one
+            dropped packet to a verdict &mdash; an observation promoted to an
+            authorisation.
+          </li>
+        </ul>
+
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
