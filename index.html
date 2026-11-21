@@ -233,7 +233,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">dns-watch.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Hourly DNS/egress verdict, one page per change — six pages its first night, all from dropped probes, so it now retries before judging</span>
+                    <span class="term-desc">Hourly DNS/egress verdict, one page per change, now with a rotating page ledger — seventeen healthy runs since it landed, and not one page to write</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -245,7 +245,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one board idea per 14:00 run — dns-watch landed, the SHA-pin audit shipped green, a page ledger is queued next</span>
+                    <span class="term-desc">Picks one board idea per 14:00 run — the page ledger shipped; a last-run stamp and a second trace endpoint are queued next</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -393,14 +393,15 @@ to work: the last gate is a human in the seat.
             </div>
             <h3>pi-cicd</h3>
             <p>
-              CI/CD for the Pi itself: pull-based deploys with compile gates,
+              CI/CD for the Pi: pull-based deploys with compile gates,
               health checks and automatic rollback; a dead-man's switch that pages
               when a scheduled job goes silent; morning audits that self-heal what
               they find; backups that rehearse the archive before pruning. The
               probes have teeth — an hourly DNS/egress verdict that retries a
-              stalled probe and pages once per change — and every workflow's
-              actions are pinned under a gate that reads YAML instead of grepping
-              it. 430 tests, CI on every push.
+              stalled probe, pages once per change and ledgers every page so a
+              flapping night is countable — and every workflow's actions are
+              pinned under a gate that reads YAML rather than grepping it. 440
+              tests, CI on every push.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
