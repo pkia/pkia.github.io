@@ -233,7 +233,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">dns-watch.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Hourly DNS/egress verdict, one page per change, now with a rotating page ledger — seventeen healthy runs since it landed, and not one page to write</span>
+                    <span class="term-desc">Hourly DNS/egress verdict across two raw-IP endpoints, one page per change and a rotating ledger — Saturday's fallback left no line anywhere</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -245,7 +245,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one board idea per 14:00 run — the page ledger shipped; a last-run stamp and a second trace endpoint are queued next</span>
+                    <span class="term-desc">Picks one board idea per 14:00 run — the two-endpoint fallback shipped; a visible fallback record and a last-run STALE verdict are queued</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -393,15 +393,14 @@ to work: the last gate is a human in the seat.
             </div>
             <h3>pi-cicd</h3>
             <p>
-              CI/CD for the Pi: pull-based deploys with compile gates,
-              health checks and automatic rollback; a dead-man's switch that pages
-              when a scheduled job goes silent; morning audits that self-heal what
-              they find; backups that rehearse the archive before pruning. The
-              probes have teeth — an hourly DNS/egress verdict that retries a
-              stalled probe, pages once per change and ledgers every page so a
-              flapping night is countable — and every workflow's actions are
-              pinned under a gate that reads YAML rather than grepping it. 440
-              tests, CI on every push.
+              CI/CD for the Pi: pull-based deploys with compile gates, health
+              checks and automatic rollback; a dead-man's switch that pages when a
+              scheduled job goes silent; morning audits that self-heal what they
+              find; backups that rehearse the archive before pruning. The hourly
+              DNS/egress probe now tries two raw-IP endpoints and names the one
+              that answered, so a blackholed address is a fallback rather than an
+              outage, and every page is counted in a rotating ledger. 446 tests,
+              CI on every push.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
