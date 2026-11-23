@@ -233,19 +233,19 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">dns-watch.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Hourly DNS/egress verdict across two raw-IP endpoints, one page per change and a rotating ledger — Saturday's fallback left no line anywhere</span>
+                    <span class="term-desc">Hourly DNS and egress probe over two raw addresses, a page only on a change, and now the age of its newest run beside the page count</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">cluster-coordinator.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Dispatch API on port 8800 — digest-checked results, /health paging silence, an offload client proven against a real worker kill</span>
+                    <span class="term-desc">Dispatch API on port 8800 — digest-checked results, worker-kill drill passed, the units-done counter still waiting on a restart</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one board idea per 14:00 run — the two-endpoint fallback shipped; a visible fallback record and a last-run STALE verdict are queued</span>
+                    <span class="term-desc">One board idea per 14:00 run — the run-age reader shipped, with the silent fallback and nineteen unbound ledger refs next</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -397,10 +397,10 @@ to work: the last gate is a human in the seat.
               checks and automatic rollback; a dead-man's switch that pages when a
               scheduled job goes silent; morning audits that self-heal what they
               find; backups that rehearse the archive before pruning. The hourly
-              DNS/egress probe now tries two raw-IP endpoints and names the one
-              that answered, so a blackholed address is a fallback rather than an
-              outage, and every page is counted in a rotating ledger. 446 tests,
-              CI on every push.
+              DNS/egress probe tries two raw-IP endpoints, counts every page in a
+              rotating ledger, and now reports the age of its own last run so a
+              stopped timer cannot pass for a quiet night. 459 tests, CI on every
+              push.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
