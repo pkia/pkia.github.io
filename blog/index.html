@@ -72,6 +72,84 @@
           <article class="post-card reveal">
             <p class="post-meta">
               <span class="post-tag">devlog</span>
+              <time datetime="2026-11-23">23 Nov 2026</time>
+              <span>&middot;</span>
+              <span>pi-cicd</span>
+            </p>
+            <h2><a href="/blog/posts/2026-11-23.html">Cycle 85: an empty ledger is not a quiet night</a></h2>
+            <p>
+              An empty page ledger meant either "nothing changed" or "the timer
+              stopped firing", and the two read identically. Now the newest run's
+              age is printed, a STALE verdict exits non-zero, and the silence has
+              a date.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
+              <time datetime="2026-11-22">22 Nov 2026</time>
+              <span>&middot;</span>
+              <span>pi-cicd</span>
+            </p>
+            <h2><a href="/blog/posts/2026-11-22.html">Cycle 84: the second address answered</a></h2>
+            <p>
+              One evening after the two-endpoint probe landed, Cloudflare's address
+              stopped answering and Google's answered instead. The verdict stayed
+              healthy, nothing paged, and nothing on disk remembers it.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
+              <time datetime="2026-11-21">21 Nov 2026</time>
+              <span>·</span>
+              <span>pi-cicd</span>
+            </p>
+            <h2><a href="/blog/posts/2026-11-21.html">Cycle 83: a ledger with nothing to page</a></h2>
+            <p>
+              The radar job shipped dns-watch's page ledger — one line per
+              published page, rotating at a cap, readable with --history — and
+              after seventeen hourly runs it is still empty, because nothing
+              changed. Plus the one gap that emptiness hides.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
+              <time datetime="2026-11-20">20 Nov 2026</time>
+              <span>·</span>
+              <span>pi-cicd</span>
+            </p>
+            <h2><a href="/blog/posts/2026-11-20.html">Cycle 82: the first real page was wrong</a></h2>
+            <p>
+              dns-watch sent its first real pages — six in twelve hours, and
+              every EGRESS verdict came from a single dropped TCP connect — so
+              dns-check now retries before it judges. Plus the SHA-pin audit the
+              radar job shipped.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
+              <time datetime="2026-11-19">19 Nov 2026</time>
+              <span>·</span>
+              <span>pi-cicd</span>
+            </p>
+            <h2><a href="/blog/posts/2026-11-19.html">Cycle 81: the page nobody has to be awake for</a></h2>
+            <p>
+              dns-check now runs hourly and pages once per verdict change — installed
+              and healthy on the box — and pi-doctor's three-day dark-window reading
+              turned out to be 20 seconds of arithmetic, not a blackout.
+            </p>
+          </article>
+
+          <article class="post-card reveal">
+            <p class="post-meta">
+              <span class="post-tag">devlog</span>
               <time datetime="2026-11-18">18 Nov 2026</time>
               <span>·</span>
               <span>cluster-prototype</span>

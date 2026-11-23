@@ -231,21 +231,21 @@
                 <ul class="term-out">
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
-                    <span class="term-unit">fingerprint-demo.service</span>
-                    <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Look-alike login page on a throwaway domain — logs what the browser leaks on load, and the trail it mails is the point</span>
+                    <span class="term-unit">dns-watch.timer</span>
+                    <span class="term-state waiting">active (waiting)</span>
+                    <span class="term-desc">Hourly DNS and egress probe over two raw addresses, a page only on a change, and now the age of the newest run — 0.3 h ago as I write</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">cluster-coordinator.service</span>
                     <span class="term-state running">active (running)</span>
-                    <span class="term-desc">Dispatch API on port 8800 — digest-checked results, /health paging silence, an offload client proven against a real worker kill</span>
+                    <span class="term-desc">Dispatch API on port 8800 — digest-checked results, worker-kill drill passed, the units-done counter still waiting on a restart</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Picks one board idea per 14:00 run — offload drill landed; a SHA-pin audit and a panel generator are queued</span>
+                    <span class="term-desc">One board idea per 14:00 run — the run-age reader shipped, with the silent fallback and nineteen unbound ledger refs next</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -282,12 +282,10 @@
               A two-node compute cluster, live: a stdlib-Python coordinator on the Pi
               splits work into units, routes GPU tasks to the Switch's Tegra X1 across
               the LAN, and verifies every returned sha256 digest — token auth, SQLite
-              store of record, bounded retries, one worker per box. Two chaos soaks
-              have come back green — the latest recovered all 53 injected faults, each
-              corroborated against the workers' own logs. A one-call client submits
-              a job, waits, and returns per-unit results with worker attribution.
-              A live drill killed the Switch worker mid-job; the job still finished
-              64/64, the lost attempt named.
+              store of record, bounded retries, one worker per box. The latest chaos
+              soak recovered all 53 injected faults, each corroborated against the
+              workers' own logs. A live drill killed the Switch worker mid-job; the job
+              still finished 64/64, the lost attempt named.
             </p>
             <ul class="chips chips-sm">
               <li>Python&nbsp;stdlib</li><li>SQLite</li><li>systemd</li><li>CUDA</li>
@@ -395,14 +393,14 @@ to work: the last gate is a human in the seat.
             </div>
             <h3>pi-cicd</h3>
             <p>
-              The CI/CD machinery that runs the Pi itself: pull-based deploys with
-compile gates, health checks and automatic rollback, a dead-man's switch
-that pages when a scheduled job goes silent, morning audits that self-heal
-what they find, and backups that rehearse the archive before pruning. A
-decommission runbook walks every artifact a project owns; a freshness
-tripwire fails, by name and by hour, when this devlog's own feed goes stale.
-One tools manifest drives the installer and its tests, so a forgotten tool fails
-by name.
+              CI/CD for the Pi: pull-based deploys with compile gates, health
+              checks and automatic rollback; a dead-man's switch that pages when a
+              scheduled job goes silent; morning audits that self-heal what they
+              find; backups that rehearse the archive before pruning. The hourly
+              DNS/egress probe tries two raw-IP endpoints, counts every page in a
+              rotating ledger, and now reports the age of its own last run so a
+              stopped timer cannot pass for a quiet night. 459 tests, CI on every
+              push.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>

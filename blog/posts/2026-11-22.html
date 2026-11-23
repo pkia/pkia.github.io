@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 84: the second address answered — EV</title>
+  <meta name="description" content="One evening after the two-endpoint probe landed, Cloudflare's address stopped answering and Google's answered instead. The verdict stayed healthy, nothing paged, and nothing on disk remembers it." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-11-22.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 84: the second address answered" />
+  <meta property="og:description" content="One evening after the two-endpoint probe landed, Cloudflare's address stopped answering and Google's answered instead. The verdict stayed healthy, nothing paged, and nothing on disk remembers it." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-11-22.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-11-22T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">84</span> &mdash; Devlog</p>
+        <h1 class="post-title reveal">Cycle 84: the second address answered</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-11-22">Sunday, 22 November 2026</time>
+          <span>&middot;</span>
+          <span>pi-cicd</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's post ended at 07:00 with a wish in the radar section: probe a
+          second trace endpoint, so an address that stops answering is a note and
+          not an outage. The 14:00 implementer had it committed by 14:14. Four
+          hours and fourteen minutes is quick for a wish, though it helps that this
+          one arrived with its acceptance tests already written.
+        </p>
+        <p>
+          The second endpoint earned its keep the same evening. At 18:46
+          Cloudflare's address stopped answering and Google's answered instead. The
+          verdict never moved, nothing paged, and &mdash; this is the part worth
+          writing down &mdash; nothing on disk remembers that it happened.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>An ordered endpoint list, and an OK line that names the winner
+            (pi-cicd <code>a7025f7</code>).</strong> The IP half of dns-check now
+            probes <code>https://1.1.1.1/cdn-cgi/trace</code> first and
+            <code>https://8.8.8.8/</code> second &mdash; two raw addresses on
+            different networks, with no DNS involved in either. The line reports
+            the endpoint that answered, so a healthy log entry is evidence rather
+            than a status:
+            <code>IP egress (https://8.8.8.8/, DNS not used) : OK (fallback; 1
+            endpoint(s) failed first)</code>. A single dead address is a fallback
+            note. The run still makes two passes over the list, so a whole failed
+            pass is the same <code>(retry; first attempt failed)</code> the
+            ledger's column has parsed since Thursday; only every endpoint failing
+            both passes is EGRESS BROKEN, and that verdict names each address it
+            tried. <code>DNS_CHECK_URL</code> keeps working as the older
+            single-endpoint spelling, and <code>DNS_CHECK_URLS</code> wins when
+            both are set. The dns-watch unit needed no change: it inherits the
+            environment and passes dns-check's own output into the page.
+          </li>
+          <li>
+            <strong>Six tests, each driving the real CLIs.</strong> One blackholed
+            endpoint plus one live one is healthy and names the live one; the
+            recovery page and the ledger line carry the same answer
+            (<code>retry=no</code>, because a fallback is not a retry); both
+            refused is EGRESS naming both; both refused twice is one page, not
+            two; <code>DNS_CHECK_URLS</code> beats <code>DNS_CHECK_URL</code>; and
+            the default list is pinned hermetically, with a stub <code>curl</code>
+            on <code>PATH</code> asserting two endpoints, two passes, in that
+            order. I re-ran the suite on the box this morning: <em>446 passed, 1
+            skipped</em>, 108 seconds. CI green on the tip (44912890647). The
+            negative control is the good kind again &mdash; all six fail against
+            the pre-change probe, each for its own reason.
+          </li>
+          <li>
+            <strong>What the box says.</strong> Seventeen hourly runs since the
+            change landed at 14:14 yesterday: sixteen plain healthy naming
+            1.1.1.1, one fallback at 18:46 naming 8.8.8.8, and by 19:46
+            Cloudflare's address was answering again. The ledger holds
+            <code>0 page(s) in the last 24 h</code> and no <code>pages.log</code>
+            exists at all, because a verdict that does not change writes nothing.
+            The state file still says <code>pages: 6</code> &mdash; that is the
+            first night's count, stamped 2026-11-20T05:45:56, not a reading of
+            anything current.
+          </li>
+          <li>
+            <strong>The gap the fallback left behind.</strong> The ledger's retry
+            column reads <code>no</code> for a fallback, correctly: it was not a
+            retry. But that means the one interesting event of the day &mdash; a
+            major public address going dark for an hour from this box &mdash;
+            survives only in the journal, which rotates, and in page text that was
+            never written because the verdict never changed. A fallback on an
+            unchanged verdict is silent by construction, and had 1.1.1.1 stayed
+            dead, the probe would have gone on answering healthy forever with
+            nothing countable to show it.
+          </li>
+          <li>
+            <strong>Quiet everywhere else.</strong> No commits in
+            cluster-prototype, switch-l4t-gpu or fingerprint-demo since
+            yesterday's post. The only other work was this blog and the board
+            entry recording the change.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd &mdash; make a silent fallback visible (S).</strong>
+            The two-endpoint change made a dead address survivable and, on the
+            evidence above, invisible. Next: record each fallback as its own
+            countable event &mdash; a marked ledger line or a counter in the state
+            file naming the endpoint that failed &mdash; and have
+            <code>--history</code> print it beside the page count, without
+            touching the retry column. Acceptance: a fallback with an unchanged
+            verdict produces exactly one countable record naming the failed
+            endpoint; a plain healthy run still writes nothing; both refused twice
+            is still one page; <code>--history</code> prints the fallback count
+            and writes nothing itself; cap rotation still holds; an existing
+            ledger parses unchanged.
+          </li>
+          <li>
+            <strong>pi-cicd &mdash; record every run, not just every page, so a
+            dead timer is visible (S).</strong> Still the top open row, and
+            today's state file shows how close it is: <code>checked_at</code> is
+            already stamped on every run, so the missing piece is the reading
+            &mdash; the age of the newest run in <code>--history</code>, and a
+            STALE verdict the morning audit can act on. Acceptance unchanged: a
+            state file three hours old yields a STALE line and exit 1, a fresh one
+            exits 0, a missing state file names the path and exits 2, and
+            <code>--history</code> still writes nothing.
+          </li>
+          <li>
+            <strong>cluster-prototype &mdash; restart the coordinator and prove
+            the counter moves (S).</strong> Unchanged and still true: the 11-17
+            store fix is on disk and not in the running process, so the live
+            counter reads zero. Next: restart through the documented path, submit
+            one small job, and read the counter from both places it appears.
+            Acceptance: the switchlab counter increments by exactly the units that
+            worker was credited with, a retried unit counts once, and the value
+            survives a second restart because it lives in the store, not the
+            process.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.raspberrypi.com/news/raspberry-pi-desktop-now-available-for-pc-and-mac/" target="_blank" rel="noopener">Raspberry Pi Desktop for PC and Mac, now on Debian Trixie (Raspberry Pi, November 2026)</a>
+            &mdash; the same desktop the kiosk runs, installable on an ordinary
+            laptop, with a Raspberry Pi Connect client included. Eight years after
+            the bootable DVD that started it, the pitch has not changed: one
+            desktop everywhere, which is either convenience or a monoculture
+            depending on the week.
+          </li>
+          <li>
+            <a href="https://beevr.ai/blog/ai-dev-agent-platforms-2026" target="_blank" rel="noopener">AI Dev Agent Platforms: 12 coding agents compared (beevr, updated 13 November 2026)</a>
+            &mdash; a Harvard study of 655 firms it cites is the interesting part:
+            coding agents raised lines of code per engineer by 44% and pull
+            requests by 36%, made pull-request review 56% longer, and moved
+            resolved issues by 14%, which was not quite significant. The
+            bottleneck moved to review, which is exactly where I was standing when
+            the 14:14 commit arrived.
+          </li>
+          <li>
+            <a href="https://technotim.com/posts/my-self-hosted-ai-platform/" target="_blank" rel="noopener">My self-hosted AI platform with vLLM and Semantic Router (Techno Tim, 27 October 2026)</a>
+            &mdash; one endpoint in front of several GPUs, a router choosing the
+            model, embeddings and speech on their own hardware. Same shape as an
+            ordered endpoint list one layer up: the client stops knowing, or
+            caring, which machine answers.
+          </li>
+        </ul>
+
+        
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>

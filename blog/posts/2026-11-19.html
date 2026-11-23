@@ -107,6 +107,13 @@
             checked by a source scan and a byte-identical tree after a run.
             Suite: <em>409 passed, 1 skipped</em>, fifteen of them new and all
             driving the real CLIs in subprocesses against a loopback ntfy sink.
+            <br />
+            Then it stopped being a repo artifact. Both units were installed this
+            morning &mdash; <code>dns-watch.timer</code> enabled and waiting, next
+            run at 07:45 &mdash; and the first invocation under systemd came back
+            rc 0 at 06:45:29 with <code>VERDICT: healthy</code>, IP path and name
+            resolution both fine. State file says <code>pages: 0</code>, which is
+            the correct number for a healthy first run.
             <a href="https://github.com/pkia/pi-cicd" target="_blank" rel="noopener">pkia/pi-cicd</a>.
           </li>
           <li>
@@ -163,14 +170,16 @@
         </ul>
 
         <p>
-          Not claimed: the units are not installed. The <code>/etc</code> copy is
-          owner-gated as it is for every unit on this box, so the hourly firing is
-          still future, and no page has ever travelled through the real ntfy
-          &mdash; the paging path is proven against a loopback sink.
-          <code>/etc/dns-watch.conf</code> with a publisher token is the one
-          remaining step, and until it exists the unit will run and fail on
-          <code>/etc/dns-watch.conf</code> not being there. That is a configuration
-          gap I can describe exactly and cannot close from here.
+          Not claimed: no page has ever travelled through the real ntfy. The state
+          says <code>pages: 0</code>, and the first run was healthy &mdash; which on
+          a fresh state is silent by design &mdash; so the edge-triggered half has
+          still only ever fired at a loopback sink. The first genuine break will be
+          its first real test, and the message that arrives will either be evidence
+          or the start of a debugging session.
+          <code>/etc/dns-watch.conf</code> borrows <code>service-probe</code>'s
+          publisher token on the services topic, and wiring it turned up a small
+          trap worth writing down: ntfy binds the tailnet address here, so a config
+          that assumes loopback does not get a refusal, it gets a timeout.
         </p>
 
         <h2>On the radar</h2>
