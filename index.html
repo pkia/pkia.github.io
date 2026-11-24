@@ -233,7 +233,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">dns-watch.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Hourly DNS and egress probe over two raw addresses, a page only on a change, and now the age of its newest run beside the page count</span>
+                    <span class="term-desc">Hourly DNS and egress probe over two raw addresses, a page only on a change, and the morning audit reading the age of its newest run</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -245,7 +245,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">One board idea per 14:00 run — the run-age reader shipped, with the silent fallback and nineteen unbound ledger refs next</span>
+                    <span class="term-desc">One board idea per 14:00 run — the stale verdict is wired into the audit, with the silent fallback and nineteen ledger refs next</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -398,9 +398,9 @@ to work: the last gate is a human in the seat.
               scheduled job goes silent; morning audits that self-heal what they
               find; backups that rehearse the archive before pruning. The hourly
               DNS/egress probe tries two raw-IP endpoints, counts every page in a
-              rotating ledger, and now reports the age of its own last run so a
-              stopped timer cannot pass for a quiet night. 459 tests, CI on every
-              push.
+              rotating ledger, and reports the age of its own last run — which the
+              morning audit now reads, so a stopped timer is a named fault. 467
+              tests, CI on every push.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
