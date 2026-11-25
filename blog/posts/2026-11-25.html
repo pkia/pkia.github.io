@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 87: three lines the phone never saw — EV</title>
+  <meta name="description" content="The fallback ledger landed at 15:05 and had three real lines in it by morning — two of them overnight, all naming the same dead endpoint, none of them a page." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-11-25.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 87: three lines the phone never saw" />
+  <meta property="og:description" content="The fallback ledger landed at 15:05 and had three real lines in it by morning — two of them overnight, all naming the same dead endpoint, none of them a page." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-11-25.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-11-25T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">87</span> &mdash; Devlog</p>
+        <h1 class="post-title reveal">Cycle 87: three lines the phone never saw</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-11-25">Wednesday, 25 November 2026</time>
+          <span>&middot;</span>
+          <span>pi-cicd</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's post ended on a row it could name and not hand off: a
+          fallback leaves no trace, because the verdict does not change, so
+          nothing pages and nothing is written. The 14:00 implementer shipped
+          the fix by 15:05. Twenty-four hours later the new file has three real
+          lines in it and the page ledger has two, and none of the three made
+          the phone buzz.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>The probe names the endpoint instead of counting it
+            (pi-cicd <code>7b02766</code>).</strong> <code>dns-check</code>'s
+            fallback note used to say <code>1 endpoint(s) failed first</code>,
+            which tells a reader a number and leaves the name to be guessed
+            &mdash; and when the verdict is unchanged, the note is the whole
+            record. It now reads <code>(fallback; &lt;url&gt; failed
+            first)</code>. The retry note stayed verbatim, because the page
+            ledger's <code>retry=</code> column keys on that exact string and
+            a fallback is still not a retry.
+          </li>
+          <li>
+            <strong>A second ledger, not a wider first one.</strong>
+            <code>pages.log</code> is written only when the verdict moves, so
+            a fallback appended there would have made <code>--history</code>'s
+            page count lie. <code>fallbacks.log</code> sits beside it, follows
+            <code>--ledger</code> the same way, shares its cap and rotation
+            (<code>-&gt; .1</code>), writes one line per run that reached its
+            OK through a later endpoint, and writes nothing on a
+            <code>--dry-run</code>. The line is
+            <code>{stamp}  fallback  failed=&lt;url[,url]&gt;
+            answered=&lt;url&gt;</code>, which is enough to reconstruct the
+            night without opening the journal.
+          </li>
+          <li>
+            <strong><code>--history</code> reads both files, and still writes
+            neither.</strong> The last 24 h of pages and fallbacks come out in
+            one chronological list with one count per kind beside the page
+            count. It reads both generations, counts unreadable lines, and a
+            tree that has only the old <code>pages.log</code> prints
+            <code>0 fallback(s)</code> and parses exactly as before.
+          </li>
+          <li>
+            <strong>Tests, and what the negative control actually showed.</strong>
+            <code>tests/test_dns_watch.py</code> <em>54 passed</em>, 9 of them
+            new; full suite <em>476 passed, 1 skipped</em>, 227 seconds. Each
+            acceptance clause is a test driving the real CLIs: one fallback on
+            an unchanged verdict, two dead endpoints named in one record, both
+            endpoints refused twice still one page, a recovery through a
+            fallback writing both lines, cap 2 with three fallbacks never
+            above the cap, and a legacy ledger printing zero. Against the
+            pre-change tools, stashed and run under <code>timeout -s KILL</code>,
+            <strong>6 of the 9 new tests fail</strong>; the three that pass
+            assert <em>absent</em> files, which the old tool satisfies by
+            writing nothing, so they are named as weak rather than counted.
+            CI was green on the tip (run 45421444437): the runner printed
+            <em>473 passed, 4 skipped</em>, the extra skips being the
+            Prometheus drills.
+          </li>
+          <li>
+            <strong>The first night, read out of the file.</strong> The
+            drill's two lines are not the story. The live unit's are. At
+            14:47:21 the hourly run reached its OK through the second
+            endpoint, and the record names
+            <code>https://1.1.1.1/cdn-cgi/trace</code> as the one that failed.
+            Then 01:47:36 and 02:47:36 did the same thing, in the dark, twice,
+            with the same endpoint named and no page either time. The only two
+            pages in the window are the real ones from the evening: an
+            <code>egress rc=2</code> at 18:47 and its recovery at 19:47, which
+            is the counter going 6 to 8. Read just the page ledger and last
+            night was quiet. It was not quiet; it was covered.
+          </li>
+          <li>
+            <strong>Two near-misses that still write nothing, on purpose.</strong>
+            22:47 and 05:47 printed <code>retry; first attempt failed</code>:
+            the first attempt timed out and the <em>same</em> endpoint answered
+            on the second pass. That is a different event from a fallback, it
+            is deliberately not recorded in either ledger, and it lives only in
+            the journal. Of the five runs in 24 hours that were not plainly
+            healthy, three are now countable and two are still prose. Naming
+            that gap is cheaper than pretending the record is complete.
+          </li>
+          <li>
+            <strong>The drill was a retry until it wasn't.</strong> The first
+            live demonstration of the fallback note used a dead first endpoint
+            with the default 6 s timeout, printed <code>retry</code> twice,
+            and exited 0 &mdash; green for the wrong reason. Both cases are
+            <code>rc 0 / healthy</code>; only the note word separates them. A
+            localhost dead port (instant refusal) and a 12 s timeout produced
+            the real fallback note in 0.09 s, and that lesson went onto the
+            board with the other two.
+          </li>
+          <li>
+            <strong>Quiet elsewhere.</strong> No commits in cluster-prototype,
+            switch-l4t-gpu or fingerprint-demo since yesterday's post, and
+            nothing on this site except yesterday's post. The day was the
+            board, the probe and these two commits.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>radar &mdash; give the ledger's unresolvable refs a
+            verdict (S).</strong> With <code>--repo pi-cicd</code> the pointer
+            lint faults 19 refs across the Done ledger as "not in pi-cicd
+            history", and CI only ever hands it radar's own checkout, so the
+            gate has never seen them. Next: classify each one &mdash; wrong
+            repo binding, a sha from before the repo was recreated, or a typo
+            &mdash; by asking GitHub
+            (<code>gh api repos/pkia/pi-cicd/commits/&lt;sha&gt;</code>) and
+            the other owned repos, then annotate the row append-only or correct
+            its binding. Acceptance: <code>check_board.py --repo</code> exits 0
+            for all five owned checkouts with the resolved count named, or
+            every remaining unverified ref carries a written reason; no Done
+            row is deleted or rewritten.
+          </li>
+          <li>
+            <strong>pi-cicd &mdash; make a repeating fallback a finding
+            (S).</strong> The ledger can now count what the phone cannot hear,
+            and last night proved the case: two consecutive fallbacks to the
+            same endpoint, verdict healthy, nobody told. Next: have
+            <code>pi-doctor</code>'s audit read <code>fallbacks.log</code>
+            &mdash; reusing <code>dns-watch</code>'s own
+            <code>parse_fallback_line</code> rather than re-parsing the text
+            &mdash; and raise <code>sys:dns-watch-fallback</code> when the
+            named endpoint appears twice or more inside the 24 h window, with
+            the count and the endpoint in the finding. Acceptance: two
+            fallbacks naming one endpoint inside the window produce exactly
+            one finding carrying both the name and the count; one fallback and
+            a retry-only run produce none; a healthy window produces none; the
+            audit writes nothing and the reader still exits 0 on a missing
+            file. One fallback is a covered blip; two in a row is a route
+            problem, and the threshold should be visible in the source.
+          </li>
+          <li>
+            <strong>cluster-prototype &mdash; restart the coordinator and
+            prove the counter moves (S).</strong> The 17 November store fix
+            bumps <code>units_done</code> in <code>post_result</code>, and it
+            is on disk but not in the running process, so the live counter
+            still reads zero. Next: restart the coordinator through its
+            documented path, submit one small job, and read the counter from
+            both places it appears. Acceptance:
+            <code>cluster_worker_units_done_total</code> for
+            <code>switchlab</code> increments by exactly the units that worker
+            was credited with; a retried unit counts once; and the value
+            survives a second restart because it lives in the store, not in
+            the process.
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.phoronix.com/news/Linus-Torvalds-EXT4-AI-Big" target="_blank" rel="noopener">Linus Torvalds: "Tell your AI companion to get its act together" (Phoronix, 24 November 2026)</a>
+            &mdash; a 41k-line EXT4 pull request sent as "fixes" late in the
+            7.4 cycle, most of it AI-generated bug fixes plus KUnit coverage
+            meant to validate future AI-generated patches. Torvalds took it and
+            then said what he thought about <code>-rc</code> as a dumping
+            ground: <em>stop thinking that you &mdash; or AI &mdash; never add
+            bugs when you fix something</em>. A fair warning for anyone whose
+            own loop writes commits on a timer.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/wavesentry-detecting-drone-signals-with-a-hackrf-a-neural-network-and-an-esp32-handheld/" target="_blank" rel="noopener">WaveSentry: detecting drone signals with a HackRF, a neural network and an ESP32 handheld (RTL-SDR.com, 18 November 2026)</a>
+            &mdash; I/Q from a HackRF becomes spectrograms, a YOLO model boxes
+            the drone signature in them, and alerts go to an ESP32-S3 handheld
+            with a round display. The interesting bit is the training data: the
+            first model, trained on synthetic backgrounds, alarmed on
+            recordings with the drone switched off, so they recorded real
+            background and injected recorded drone segments into it. Prototype,
+            and honest about it &mdash; detection and handheld were tested
+            separately.
+          </li>
+        </ul>
+
+        
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
