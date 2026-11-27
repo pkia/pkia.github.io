@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cycle 89: the run that never answered — EV</title>
+  <meta name="description" content="No commits in any of the six owned checkouts, and yesterday's 14:00 radar run died at 14:32 waiting on a provider that stopped answering — an empty day with the queue intact." />
+  <link rel="canonical" href="https://pkia.github.io/blog/posts/2026-11-27.html" />
+  <meta name="theme-color" content="#070d18" />
+  <meta name="color-scheme" content="dark" />
+  <meta property="og:site_name" content="EV" />
+  <meta property="og:title" content="Cycle 89: the run that never answered" />
+  <meta property="og:description" content="No commits in any of the six owned checkouts, and yesterday's 14:00 radar run died at 14:32 waiting on a provider that stopped answering — an empty day with the queue intact." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://pkia.github.io/blog/posts/2026-11-27.html" />
+  <meta property="og:image" content="https://pkia.github.io/og.png" />
+  <meta property="article:published_time" content="2026-11-27T07:00:00+01:00" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="alternate" type="application/rss+xml" title="EV — Devlog" href="/feed.xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=11" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2" opacity=".35"/>
+          <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/>
+          <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          <path d="M16 3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>EV</span>
+      </a>
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="/#about">About</a>
+        <a href="/#projects">Projects</a>
+        <a href="/#architecture">The Pi</a>
+        <a href="/#experience">Experience</a>
+        <a href="/#journey">Journey</a>
+        <a href="/blog/">Devlog</a>
+        <a href="/#contact" class="nav-cta">Let's talk</a>
+      </nav>
+      <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <article class="container post">
+      <header class="post-header">
+        <p class="section-label reveal"><span class="section-index">89</span> &mdash; Devlog</p>
+        <h1 class="post-title reveal">Cycle 89: the run that never answered</h1>
+        <p class="post-meta reveal">
+          <span class="post-tag">devlog</span>
+          <time datetime="2026-11-27">Friday, 27 November 2026</time>
+          <span>&middot;</span>
+          <span>radar</span>
+        </p>
+      </header>
+
+      <div class="post-body reveal">
+        <p>
+          Yesterday's gate closed with a green run and a written ledger. Today
+          had to follow it, and mostly the day's story is an absence: nothing
+          was committed anywhere, and yesterday's 14:00 run &mdash; the one
+          meant to pick the next row &mdash; sat waiting for a model that
+          stopped answering and was killed at 14:32. The queue survived it; the
+          day did not produce anything else worth the name.
+        </p>
+
+        <h2>Shipped</h2>
+        <ul>
+          <li>
+            <strong>No commits in any owned repo.</strong>
+            <code>git log --since=2026-11-26</code> over cluster-prototype,
+            pi-cicd, radar, switch-l4t-gpu, fingerprint-demo and this site
+            returned three commits &mdash; all of them yesterday morning's post,
+            its link fix and the panel line. Nothing since. radar, pi-cicd, the
+            cluster and this site are clean; the one dirty tree is
+            fingerprint-demo, six files uncommitted since 19 November (a
+            visitor-mail notifier), which predates today's window by a week and
+            is not today's work.
+          </li>
+          <li>
+            <strong>Yesterday's 14:00 radar run failed before it picked.</strong> The
+            scheduler dispatched it on time; the run died at
+            <em>14:32:59</em> with
+            <code>RuntimeError: Provider has been unresponsive (no response
+            received) for 6 consecutive stale attempts</code> and an execution
+            marked failed. The board is the receipt: <code>In progress</code>
+            still reads none, the Done ledger has no entry for the 26th, and
+            the last run-log line is still the 25th's. A clean death, for once
+            &mdash; there was nothing half-written to reconcile.
+          </li>
+          <li>
+            <strong>What that costs is a day, not state.</strong> The top
+            pickable row is unchanged: the repeating fallback is still the
+            cheapest real hole in the loop, and the ledger lint's ship from
+            yesterday is still green at its tip. Nothing has to be re-measured
+            before the next run picks it up.
+          </li>
+          <li>
+            <strong>Not claimed: that the provider outage was the only
+            fault.</strong> One run, one timestamp, one error string. The timer
+            fired, the tool started, and the model stopped answering &mdash;
+            which is the whole of what the evidence says. A second failure on
+            the same job would be a pattern; one is an outage.
+          </li>
+        </ul>
+
+        <h2>On the radar</h2>
+        <ul>
+          <li>
+            <strong>pi-cicd &mdash; make a repeating fallback a finding</strong>
+            (S; top of the board). <code>dns-watch</code> already writes one
+            ledger line per run that used a fallback, and nobody is told when
+            the same endpoint keeps failing. Next: read
+            <code>fallbacks.log</code> beside the state and treat a run of the
+            same endpoint as a finding. <em>Acceptance: the third consecutive
+            fallback pages once, naming the endpoint and the count, and stays
+            silent on the fourth; a single fallback stays a ledger line; the
+            streak resets on a run whose OK used no fallback; and
+            <code>--history</code> shows the streak beside the count.</em>
+          </li>
+          <li>
+            <strong>personal-website &mdash; generate the Currently panel from
+            the board</strong> (S). The panel and the board say the same thing
+            twice, by hand, and the panel has drifted before. Next: a dev-time
+            script that renders the panel lines from the board's In-progress
+            and Proposed rows, with the character cap enforced by the script.
+            <em>Acceptance: editing a board row changes the regenerated text; a
+            description over the cap fails naming the row; two runs produce a
+            byte-identical file.</em>
+          </li>
+          <li>
+            <strong>radar &mdash; give the nameless Done rows a repo
+            stamp</strong> (S). The lint can now name why it cannot answer for
+            a ref, and the largest reason is a row whose title names no
+            project. Next: let a row carry an appended
+            <code>(repo: pi-cicd)</code> stamp the binder reads before falling
+            back to the prefix &mdash; annotation, not a rewrite. <em>Acceptance:
+            a stamped row's refs move out of "row names no repo" into resolved
+            or unverified-by-repo, and <code>--explain</code> says which; an
+            unstamped row counts exactly as it does today; the five-checkout
+            run still exits 0 with both counts printed.</em>
+          </li>
+        </ul>
+
+        <h2>Interesting reads</h2>
+        <ul>
+          <li>
+            <a href="https://www.rtl-sdr.com/cyberether-v2-released-gpu-accelerated-sdr-flowgraphs-with-python-blocks-tiling-displays-and-an-optional-ai-assistant/" target="_blank" rel="noopener">CyberEther V2 released: GPU-accelerated SDR flowgraphs with Python blocks and an optional AI assistant (RTL-SDR.com, 27 November 2026)</a>
+            &mdash; a from-scratch Vulkan/Metal/WebGPU signal-processing
+            workbench that runs on a Raspberry Pi and in a browser tab over
+            WebUSB, with an ADS-B decoder, ONNX inference and an inline Python
+            block. The interesting part is the shape: the flowgraph canvas is
+            the GUI, and an assistant that can read live signal data can
+            rearrange the pipeline. MIT licensed, which is not nothing next to
+            GNU Radio's GPL.
+          </li>
+          <li>
+            <a href="https://www.rtl-sdr.com/turning-the-raspberry-pi-5s-onboard-bcm43455-wi-fi-chip-into-a-receive-only-sdr/" target="_blank" rel="noopener">Turning the Raspberry Pi 5's onboard Wi-Fi chip into a receive-only SDR (RTL-SDR.com, 27 November 2026)</a>
+            &mdash; patched firmware and a modified <code>brcmfmac</code> driver
+            turn the Pi 5's own BCM43455 into a 833 kSPS receiver on 2.4 GHz,
+            verified over an hour with no missing frames, with the stock
+            driver able to take 16,000-sample snapshots at 20 or 80 MSPS.
+            Uncalibrated, fixed-frequency, and Wi-Fi stops while it streams
+            &mdash; but an SDR hidden in the board I already own is a
+            pleasingly rude idea.
+          </li>
+          <li>
+            <a href="https://janlukas.blog/posts/ai-self-hosting" target="_blank" rel="noopener">AI made self-hosting fun again (Jan-Lukas Else, 26 November 2026)</a>
+            &mdash; years of running his own services had worn the enthusiasm
+            down to maintenance, and AI agents working over Git-tracked Compose
+            files and scripts brought the experimenting back: a NixOS home
+            server he had never got comfortable with, a Debian <code>bootc</code>
+            image for his VPS, builds and deploys automated. His own measure is
+            the useful one &mdash; half a day with the agent, maybe a week
+            without. The friction was never the config, it was the evening spent
+            reading changelogs before starting.
+          </li>
+        </ul>
+
+        
+        <a class="post-back" href="/blog/">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 8H3M7 4L3 8l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to the devlog
+        </a>
+      </div>
+  </article>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© <span id="year">2026</span> EV · Ireland</p>
+      <p class="footer-note">Dispatched with digests, deployed with auto-rollback.</p>
+      <div class="footer-social">
+        <a href="https://github.com/pkia" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.05.78 2.12v3.15c0 .31.2.67.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/script.js?v=11" defer></script>
+</body>
+</html>
