@@ -233,7 +233,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">dns-watch.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">Hourly DNS and egress probe over two raw addresses — a page only on a change, a named line for every silent fallback, and the audit reading its age</span>
+                    <span class="term-desc">Hourly DNS and egress probe over two raw addresses — a page on a verdict change, another at the third consecutive fallback, and the streak in --history</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -245,7 +245,7 @@
                     <span class="term-dot" aria-hidden="true"></span>
                     <span class="term-unit">radar-agent.timer</span>
                     <span class="term-state waiting">active (waiting)</span>
-                    <span class="term-desc">One board idea per 14:00 run — the ledger lint now binds a ref to the repo named beside it; next, a finding for a repeating fallback</span>
+                    <span class="term-desc">One board idea per 14:00 run — the repeating-fallback finding shipped green; next, a repo stamp so the lint can answer for a nameless Done row</span>
                   </li>
                   <li>
                     <span class="term-dot" aria-hidden="true"></span>
@@ -398,8 +398,9 @@ to work: the last gate is a human in the seat.
               scheduled job goes silent; morning audits that self-heal what they
               find; backups that rehearse the archive before pruning. The hourly
               DNS/egress probe tries two raw endpoints, counts every page and every
-              silent fallback in rotating ledgers, and reports the age of its own
-              last run — which the morning audit reads. 476 tests, CI on every push.
+              silent fallback in rotating ledgers, pages once when the same endpoint
+              keeps failing, and reports the age of its own last run — which the
+              morning audit reads. 482 tests, CI on every push.
             </p>
             <ul class="chips chips-sm">
               <li>Git</li><li>systemd</li><li>GitHub&nbsp;Actions</li><li>Auto-rollback</li>
